@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create Account – MC Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary:    #0a2342;
+    --blue:       #1a56db;
+    --blue-light: #eff6ff;
+    --blue-mid:   #3b82f6;
+    --accent:     #e8461e;
+    --accent2:    #f5a623;
+    --white:      #ffffff;
+    --gray:       #6b7280;
+    --gray-light: #f9fafb;
+    --border:     #e5e7eb;
+    --success:    #16a34a;
+    --error:      #dc2626;
+    --radius:     14px;
+    --transition: 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--gray-light);
+    color: var(--primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  a { text-decoration: none; color: inherit; }
+
+  /* ─── PAGE LAYOUT ─── */
+  .page-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(26,86,219,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(10,35,66,0.06) 0%, transparent 60%),
+      var(--gray-light);
+  }
+
+  /* ─── LOGO BAR ─── */
+  .logo-bar {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent2); }
+
+  .logo-sub {
+    font-size: 0.82rem;
+    color: var(--gray);
+    margin-top: 0.25rem;
+  }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow:
+      0 4px 6px rgba(10,35,66,0.04),
+      0 12px 40px rgba(10,35,66,0.10),
+      0 1px 0px rgba(255,255,255,0.8) inset;
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+  }
+
+  /* ─── PROGRESS BAR ─── */
+  .progress-bar-wrap {
+    padding: 1.5rem 2rem 0;
+  }
+
+  .steps-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .step-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--gray);
+    transition: all var(--transition);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-dot.active {
+    background: var(--blue);
+    border-color: var(--blue);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(26,86,219,0.15);
+  }
+
+  .step-dot.done {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+  }
+
+  .step-dot.done::after {
+    content: '✓';
+    font-size: 0.85rem;
+  }
+
+  .step-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    transition: background var(--transition);
+    margin: 0 -1px;
+  }
+
+  .step-line.done { background: var(--success); }
+
+  .step-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+
+  .step-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--gray);
+    text-align: center;
+    flex: 1;
+    transition: color var(--transition);
+  }
+  .step-label.active { color: var(--blue); }
+  .step-label.done   { color: var(--success); }
+  .step-label:last-child { text-align: right; }
+  .step-label:first-child { text-align: left; }
+
+  /* ─── FORM BODY ─── */
+  .form-body {
+    padding: 0 2rem 2rem;
+  }
+
+  .form-heading {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-heading h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1.2;
+    margin-bottom: 0.3rem;
+  }
+
+  .form-heading p {
+    font-size: 0.875rem;
+    color: var(--gray);
+  }
+
+  /* ─── FIELD ─── */
+  .field {
+    margin-bottom: 1.1rem;
+  }
+
+  .field label {
+    display: block;
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 0.45rem;
+  }
+
+  .field label span {
+    color: var(--accent);
+    margin-left: 2px;
+  }
+
+  .input-wrap {
+    position: relative;
+  }
+
+  .input-wrap svg {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 17px;
+    height: 17px;
+    fill: var(--gray);
+    pointer-events: none;
+    transition: fill var(--transition);
+  }
+
+  .field input,
+  .field textarea {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 0.9rem 0.75rem 2.6rem;
+    font-size: 0.925rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--primary);
+    background: var(--white);
+    outline: none;
+    transition: all var(--transition);
+    min-height: 48px;
+  }
+
+  .field textarea {
+    resize: vertical;
+    min-height: 90px;
+    padding-top: 0.75rem;
+    line-height: 1.55;
+  }
+
+  .field input:focus,
+  .field textarea:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(26,86,219,0.12);
+  }
+
+  .field input.error,
+  .field textarea.error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+  }
+
+  .field input:focus ~ svg,
+  .field textarea:focus ~ svg { fill: var(--blue); }
+
+  /* toggle svg position for textarea */
+  .field textarea ~ svg { top: 1rem; transform: none; }
+
+  .field-error {
+    font-size: 0.78rem;
+    color: var(--error);
+    margin-top: 0.35rem;
+    display: none;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .field-error.show { display: flex; }
+
+  /* ─── PASSWORD STRENGTH ─── */
+  .pw-strength {
+    margin-top: 0.5rem;
+    display: none;
+  }
+  .pw-strength.show { display: block; }
+
+  .pw-bars {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0.3rem;
+  }
+
+  .pw-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--border);
+    transition: background var(--transition);
+  }
+
+  .pw-bar.weak   { background: var(--error); }
+  .pw-bar.fair   { background: var(--accent2); }
+  .pw-bar.strong { background: var(--success); }
+
+  .pw-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--gray);
+  }
+  .pw-label.weak   { color: var(--error); }
+  .pw-label.fair   { color: var(--accent2); }
+  .pw-label.strong { color: var(--success); }
+
+  /* ─── TOGGLE PASSWORD ─── */
+  .pw-toggle {
+    position: absolute;
+    right: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+  .pw-toggle svg { width: 18px; height: 18px; fill: var(--gray); }
+  .pw-toggle:hover svg { fill: var(--blue); }
+
+  /* ─── SUBMIT BUTTON ─── */
+  .btn-submit {
+    width: 100%;
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 11px;
+    padding: 0.95rem;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all var(--transition);
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    box-shadow: 0 4px 18px rgba(26,86,219,0.35);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-submit:hover {
+    background: #1347c8;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(26,86,219,0.45);
+  }
+  .btn-submit:active { transform: translateY(0); }
+  .btn-submit:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-submit .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid rgba(255,255,255,0.35);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .btn-submit.loading .spinner { display: block; }
+  .btn-submit.loading .btn-text { display: none; }
+
+  /* ─── BACK BUTTON ─── */
+  .btn-back {
+    width: 100%;
+    background: transparent;
+    color: var(--gray);
+    border: 1.5px solid var(--border);
+    border-radius: 11px;
+    padding: 0.85rem;
+    font-size: 0.925rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all var(--transition);
+    min-height: 48px;
+    margin-top: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
+  .btn-back:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+
+  /* ─── GLOBAL ERROR BANNER ─── */
+  .error-banner {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    font-size: 0.875rem;
+    color: var(--error);
+    margin-bottom: 1.25rem;
+    display: none;
+    align-items: flex-start;
+    gap: 0.6rem;
+    line-height: 1.5;
+  }
+  .error-banner.show { display: flex; }
+  .error-banner svg { width: 18px; height: 18px; fill: var(--error); flex-shrink: 0; margin-top: 1px; }
+
+  /* ─── SUCCESS BANNER ─── */
+  .success-banner {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    font-size: 0.875rem;
+    color: var(--success);
+    margin-bottom: 1.25rem;
+    display: none;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .success-banner.show { display: flex; }
+  .success-banner svg { width: 18px; height: 18px; fill: var(--success); }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin: 1.25rem 0;
+    position: relative;
+  }
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider span {
+    background: white;
+    padding: 0 0.75rem;
+    position: relative;
+  }
+
+  /* ─── FOOTER NOTE ─── */
+  .form-footer {
+    text-align: center;
+    font-size: 0.825rem;
+    color: var(--gray);
+    padding: 1.25rem 2rem;
+    border-top: 1px solid var(--border);
+    background: var(--gray-light);
+  }
+
+  .form-footer a {
+    color: var(--blue);
+    font-weight: 600;
+  }
+  .form-footer a:hover { text-decoration: underline; }
+
+  /* ─── TERMS NOTE ─── */
+  .terms-note {
+    font-size: 0.75rem;
+    color: var(--gray);
+    text-align: center;
+    margin-top: 1rem;
+    line-height: 1.6;
+  }
+  .terms-note a { color: var(--blue); }
+
+  /* ─── STEP PANELS ─── */
+  .step-panel { display: none; }
+  .step-panel.active { display: block; }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes slideBack {
+    from { opacity: 0; transform: translateX(-20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .step-panel.active { animation: slideIn 0.35s ease both; }
+  .step-panel.slide-back { animation: slideBack 0.35s ease both; }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 520px) {
+    .card { border-radius: 16px; }
+    .form-body { padding: 0 1.25rem 1.5rem; }
+    .progress-bar-wrap { padding: 1.25rem 1.25rem 0; }
+    .form-footer { padding: 1rem 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- LOGO -->
+  <div class="logo-bar">
+    <a href="index.html">
+      <div class="logo">MC<span>Store</span></div>
+    </a>
+    <div class="logo-sub">Create your account — it's free</div>
+  </div>
+
+  <!-- CARD -->
+  <div class="card">
+
+    <!-- PROGRESS INDICATOR -->
+    <div class="progress-bar-wrap">
+      <div class="steps-indicator">
+        <div class="step-dot active" id="dot1">1</div>
+        <div class="step-line" id="line1"></div>
+        <div class="step-dot" id="dot2">2</div>
+      </div>
+      <div class="step-labels">
+        <span class="step-label active" id="label1">Your Details</span>
+        <span class="step-label" id="label2">Delivery Info</span>
+      </div>
+    </div>
+
+    <!-- ═══════════ STEP 1 ═══════════ -->
+    <div class="step-panel active" id="step1">
+      <div class="form-body">
+
+        <div class="form-heading">
+          <h1>Let's get started.</h1>
+          <p>Fill in your basic details to create your MC Store account.</p>
+        </div>
+
+        <!-- Error / Success banners -->
+        <div class="error-banner" id="step1Error">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <span id="step1ErrorMsg"></span>
+        </div>
+
+        <!-- Full Name -->
+        <div class="field">
+          <label for="fullName">Full Name <span>*</span></label>
+          <div class="input-wrap">
+            <input type="text" id="fullName" placeholder="e.g. Adebayo Okonkwo" autocomplete="name">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+          </div>
+          <div class="field-error" id="fullNameError">Please enter your full name.</div>
+        </div>
+
+        <!-- Email -->
+        <div class="field">
+          <label for="email">Email Address <span>*</span></label>
+          <div class="input-wrap">
+            <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </div>
+          <div class="field-error" id="emailError">Please enter a valid email address.</div>
+        </div>
+
+        <!-- Password -->
+        <div class="field">
+          <label for="password">Password <span>*</span></label>
+          <div class="input-wrap">
+            <input type="password" id="password" placeholder="Minimum 6 characters" autocomplete="new-password">
+            <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+            <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">
+              <svg id="eyeIcon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </button>
+          </div>
+          <!-- Password Strength -->
+          <div class="pw-strength" id="pwStrength">
+            <div class="pw-bars">
+              <div class="pw-bar" id="bar1"></div>
+              <div class="pw-bar" id="bar2"></div>
+              <div class="pw-bar" id="bar3"></div>
+            </div>
+            <span class="pw-label" id="pwLabel">Enter a password</span>
+          </div>
+          <div class="field-error" id="passwordError">Password must be at least 6 characters.</div>
+        </div>
+
+        <button type="button" class="btn-submit" id="nextBtn">
+          <span class="btn-text">Continue to Step 2 →</span>
+          <div class="spinner"></div>
+        </button>
+
+        <p class="terms-note">
+          By continuing, you agree to MC Store's
+          <a href="terms.html">Terms of Service</a> and
+          <a href="policy.html">Privacy Policy</a>.
+        </p>
+
+      </div>
+    </div>
+
+    <!-- ═══════════ STEP 2 ═══════════ -->
+    <div class="step-panel" id="step2">
+      <div class="form-body">
+
+        <div class="form-heading">
+          <h1>Almost there!</h1>
+          <p>We need your phone and delivery address to complete your account.</p>
+        </div>
+
+        <!-- Error banner -->
+        <div class="error-banner" id="step2Error">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <span id="step2ErrorMsg"></span>
+        </div>
+
+        <!-- Phone Number -->
+        <div class="field">
+          <label for="phone">Phone Number <span>*</span></label>
+          <div class="input-wrap">
+            <input type="tel" id="phone" placeholder="e.g. 08012345678" autocomplete="tel">
+            <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+          </div>
+          <div class="field-error" id="phoneError">Please enter a valid Nigerian phone number.</div>
+        </div>
+
+        <!-- Delivery Address -->
+        <div class="field">
+          <label for="address">Delivery Address <span>*</span></label>
+          <div class="input-wrap">
+            <textarea id="address" placeholder="Street address, city, state — e.g. 14 Allen Avenue, Ikeja, Lagos"></textarea>
+            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          </div>
+          <div class="field-error" id="addressError">Please enter your delivery address.</div>
+        </div>
+
+        <!-- Create Account Button -->
+        <button type="button" class="btn-submit" id="createBtn">
+          <span class="btn-text">Create My Account</span>
+          <div class="spinner"></div>
+        </button>
+
+        <!-- Back Button -->
+        <button type="button" class="btn-back" id="backBtn">
+          ← Back to Step 1
+        </button>
+
+        <p class="terms-note">
+          Your delivery address is stored securely and only used for order fulfilment.
+        </p>
+
+      </div>
+    </div>
+
+    <!-- FOOTER NOTE -->
+    <div class="form-footer">
+      Already have an account? <a href="login.html">Log in here</a>
+    </div>
+
+  </div>
+  <!-- /card -->
+
+</div>
+<!-- /page-wrap -->
+
+<script type="module">
+  import { mcSignUp } from './auth.js';
+
+  // ── State: store Step 1 data ──
+  const state = {
+    fullName: '',
+    email:    '',
+    password: ''
+  };
+
+  // ── DOM refs ──
+  const step1Panel  = document.getElementById('step1');
+  const step2Panel  = document.getElementById('step2');
+  const dot1        = document.getElementById('dot1');
+  const dot2        = document.getElementById('dot2');
+  const line1       = document.getElementById('line1');
+  const label1      = document.getElementById('label1');
+  const label2      = document.getElementById('label2');
+
+  // Step 1 fields
+  const fullNameInput  = document.getElementById('fullName');
+  const emailInput     = document.getElementById('email');
+  const passwordInput  = document.getElementById('password');
+  const nextBtn        = document.getElementById('nextBtn');
+  const pwToggle       = document.getElementById('pwToggle');
+  const pwStrength     = document.getElementById('pwStrength');
+  const pwLabel        = document.getElementById('pwLabel');
+  const step1Error     = document.getElementById('step1Error');
+  const step1ErrorMsg  = document.getElementById('step1ErrorMsg');
+
+  // Step 2 fields
+  const phoneInput    = document.getElementById('phone');
+  const addressInput  = document.getElementById('address');
+  const createBtn     = document.getElementById('createBtn');
+  const backBtn       = document.getElementById('backBtn');
+  const step2Error    = document.getElementById('step2Error');
+  const step2ErrorMsg = document.getElementById('step2ErrorMsg');
+
+  // ── Helpers ──
+  function showFieldError(inputEl, errorEl, show) {
+    inputEl.classList.toggle('error', show);
+    errorEl.classList.toggle('show', show);
+  }
+
+  function showBanner(bannerEl, msgEl, msg) {
+    msgEl.textContent = msg;
+    bannerEl.classList.add('show');
+  }
+
+  function hideBanner(bannerEl) {
+    bannerEl.classList.remove('show');
+  }
+
+  function setLoading(btn, loading) {
+    btn.disabled = loading;
+    btn.classList.toggle('loading', loading);
+  }
+
+  // ── Password toggle ──
+  pwToggle.addEventListener('click', () => {
+    const isText = passwordInput.type === 'text';
+    passwordInput.type = isText ? 'password' : 'text';
+    document.getElementById('eyeIcon').innerHTML = isText
+      ? '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>'
+      : '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>';
+  });
+
+  // ── Password strength ──
+  passwordInput.addEventListener('input', () => {
+    const val = passwordInput.value;
+    pwStrength.classList.toggle('show', val.length > 0);
+
+    const bars  = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3')];
+    const score = getPasswordScore(val);
+
+    bars.forEach((b, i) => {
+      b.className = 'pw-bar';
+      if (score >= 1 && i === 0) b.classList.add(score === 1 ? 'weak' : score === 2 ? 'fair' : 'strong');
+      if (score >= 2 && i === 1) b.classList.add(score === 2 ? 'fair' : 'strong');
+      if (score >= 3 && i === 2) b.classList.add('strong');
+    });
+
+    pwLabel.className = 'pw-label ' + (score === 1 ? 'weak' : score === 2 ? 'fair' : score === 3 ? 'strong' : '');
+    pwLabel.textContent = score === 0 ? 'Enter a password' : score === 1 ? 'Weak' : score === 2 ? 'Fair' : 'Strong';
+  });
+
+  function getPasswordScore(pw) {
+    if (pw.length < 4) return pw.length > 0 ? 1 : 0;
+    let score = 0;
+    if (pw.length >= 6)  score++;
+    if (pw.length >= 10) score++;
+    if (/[A-Z]/.test(pw) && /[0-9]/.test(pw)) score++;
+    return Math.min(score, 3) || 1;
+  }
+
+  // ── Step 1 Validation & Next ──
+  nextBtn.addEventListener('click', () => {
+    hideBanner(step1Error);
+    let valid = true;
+
+    const name  = fullNameInput.value.trim();
+    const email = emailInput.value.trim();
+    const pw    = passwordInput.value;
+
+    showFieldError(fullNameInput,  document.getElementById('fullNameError'),  !name);
+    showFieldError(emailInput,     document.getElementById('emailError'),      !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+    showFieldError(passwordInput,  document.getElementById('passwordError'),   pw.length < 6);
+
+    if (!name)                                        valid = false;
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) valid = false;
+    if (pw.length < 6)                                valid = false;
+
+    if (!valid) return;
+
+    // Store Step 1 data
+    state.fullName = name;
+    state.email    = email;
+    state.password = pw;
+
+    // Transition to Step 2
+    goToStep2();
+  });
+
+  function goToStep2() {
+    // Update indicators
+    dot1.classList.remove('active');
+    dot1.classList.add('done');
+    dot1.textContent = '';
+    line1.classList.add('done');
+    dot2.classList.add('active');
+    label1.classList.remove('active');
+    label1.classList.add('done');
+    label2.classList.add('active');
+
+    step1Panel.classList.remove('active');
+    step2Panel.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ── Back to Step 1 ──
+  backBtn.addEventListener('click', () => {
+    hideBanner(step2Error);
+
+    dot1.classList.remove('done');
+    dot1.classList.add('active');
+    dot1.textContent = '1';
+    line1.classList.remove('done');
+    dot2.classList.remove('active');
+    label1.classList.remove('done');
+    label1.classList.add('active');
+    label2.classList.remove('active');
+
+    step2Panel.classList.remove('active');
+    step2Panel.classList.add('slide-back');
+    step1Panel.classList.add('active');
+    setTimeout(() => step2Panel.classList.remove('slide-back'), 400);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // ── Step 2: Create Account ──
+  createBtn.addEventListener('click', async () => {
+    hideBanner(step2Error);
+    let valid = true;
+
+    const phone   = phoneInput.value.trim();
+    const address = addressInput.value.trim();
+
+    const phoneValid = /^(\+?234|0)[789][01]\d{8}$/.test(phone.replace(/\s/g, ''));
+
+    showFieldError(phoneInput,   document.getElementById('phoneError'),   !phoneValid);
+    showFieldError(addressInput, document.getElementById('addressError'), !address || address.length < 10);
+
+    if (!phoneValid)              valid = false;
+    if (!address || address.length < 10) valid = false;
+
+    if (!valid) return;
+
+    setLoading(createBtn, true);
+
+    try {
+      await mcSignUp({
+        fullName: state.fullName,
+        email:    state.email,
+        password: state.password,
+        phone,
+        address
+      });
+      // mcSignUp redirects to app-skeleton.html on success
+    } catch (error) {
+      setLoading(createBtn, false);
+      showBanner(step2Error, step2ErrorMsg, error.message);
+
+      // If error is email-related, send back to Step 1
+      if (error.message.includes('email') || error.message.includes('account')) {
+        setTimeout(() => {
+          hideBanner(step2Error);
+          backBtn.click();
+          showBanner(step1Error, step1ErrorMsg, error.message);
+        }, 1800);
+      }
+    }
+  });
+
+  // ── Clear errors on input ──
+  [fullNameInput, emailInput, passwordInput].forEach(el => {
+    el.addEventListener('input', () => el.classList.remove('error'));
+  });
+  [phoneInput, addressInput].forEach(el => {
+    el.addEventListener('input', () => el.classList.remove('error'));
+  });
+
+  // ── Enter key support ──
+  [fullNameInput, emailInput, passwordInput].forEach(el => {
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter') nextBtn.click(); });
+  });
+  [phoneInput, addressInput].forEach(el => {
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter') createBtn.click(); });
+  });
+</script>
+
+</body>
+</html>
