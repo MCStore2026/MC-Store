@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login – MC Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary:    #0a2342;
+    --blue:       #1a56db;
+    --blue-dark:  #1347c8;
+    --blue-light: #eff6ff;
+    --accent:     #e8461e;
+    --accent2:    #f5a623;
+    --white:      #ffffff;
+    --gray:       #6b7280;
+    --gray-light: #f9fafb;
+    --border:     #e5e7eb;
+    --success:    #16a34a;
+    --error:      #dc2626;
+    --radius:     14px;
+    --transition: 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--gray-light);
+    color: var(--primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  a { text-decoration: none; color: inherit; }
+
+  /* ─── PAGE LAYOUT ─── */
+  .page-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 20% 0%,   rgba(26,86,219,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 100%, rgba(10,35,66,0.06)  0%, transparent 60%),
+      var(--gray-light);
+  }
+
+  /* ─── AUTO-LOGIN OVERLAY ─── */
+  .auto-login-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.4s ease;
+  }
+
+  .auto-login-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .auto-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 2rem;
+  }
+  .auto-logo span { color: var(--accent2); }
+
+  .auto-spinner {
+    width: 42px;
+    height: 42px;
+    border: 3.5px solid rgba(255,255,255,0.2);
+    border-top-color: var(--accent2);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  .auto-text {
+    color: rgba(255,255,255,0.65);
+    font-size: 0.875rem;
+    margin-top: 1rem;
+  }
+
+  /* ─── LOGO BAR ─── */
+  .logo-bar {
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent2); }
+
+  .logo-sub {
+    font-size: 0.82rem;
+    color: var(--gray);
+    margin-top: 0.25rem;
+  }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow:
+      0 4px 6px rgba(10,35,66,0.04),
+      0 12px 40px rgba(10,35,66,0.10),
+      0 1px 0px rgba(255,255,255,0.8) inset;
+    width: 100%;
+    max-width: 440px;
+    overflow: hidden;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  /* ─── FORM BODY ─── */
+  .form-body { padding: 2rem 2rem 1.5rem; }
+
+  .form-heading { margin-bottom: 1.75rem; }
+
+  .form-heading h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1.2;
+    margin-bottom: 0.3rem;
+  }
+
+  .form-heading p { font-size: 0.875rem; color: var(--gray); }
+
+  /* ─── ERROR BANNER ─── */
+  .error-banner {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    font-size: 0.875rem;
+    color: var(--error);
+    margin-bottom: 1.25rem;
+    display: none;
+    align-items: flex-start;
+    gap: 0.6rem;
+    line-height: 1.5;
+  }
+  .error-banner.show { display: flex; }
+  .error-banner svg { width: 18px; height: 18px; fill: var(--error); flex-shrink: 0; margin-top: 1px; }
+
+  /* ─── SUCCESS BANNER ─── */
+  .success-banner {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    font-size: 0.875rem;
+    color: var(--success);
+    margin-bottom: 1.25rem;
+    display: none;
+    align-items: flex-start;
+    gap: 0.6rem;
+    line-height: 1.5;
+  }
+  .success-banner.show { display: flex; }
+  .success-banner svg { width: 18px; height: 18px; fill: var(--success); flex-shrink: 0; margin-top: 1px; }
+
+  /* ─── FIELD ─── */
+  .field { margin-bottom: 1.1rem; }
+
+  .field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.45rem;
+  }
+
+  .field label {
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: var(--primary);
+  }
+
+  .field-type-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.55rem;
+    border-radius: 50px;
+    letter-spacing: 0.04em;
+    transition: all var(--transition);
+    opacity: 0;
+  }
+  .field-type-badge.email {
+    background: var(--blue-light);
+    color: var(--blue);
+    opacity: 1;
+  }
+  .field-type-badge.phone {
+    background: rgba(22,163,74,0.1);
+    color: var(--success);
+    opacity: 1;
+  }
+
+  .input-wrap { position: relative; }
+
+  .input-wrap > svg:first-child {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 17px;
+    height: 17px;
+    fill: var(--gray);
+    pointer-events: none;
+    transition: fill var(--transition);
+  }
+
+  .field input {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 0.75rem 0.9rem 0.75rem 2.6rem;
+    font-size: 0.925rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--primary);
+    background: var(--white);
+    outline: none;
+    transition: all var(--transition);
+    min-height: 50px;
+  }
+
+  .field input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(26,86,219,0.12);
+  }
+
+  .field input.error {
+    border-color: var(--error);
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+  }
+
+  .field input:focus + svg { fill: var(--blue); }
+
+  .field-error {
+    font-size: 0.78rem;
+    color: var(--error);
+    margin-top: 0.35rem;
+    display: none;
+    align-items: center;
+    gap: 0.3rem;
+  }
+  .field-error.show { display: flex; }
+
+  /* ─── PASSWORD TOGGLE ─── */
+  .pw-toggle {
+    position: absolute;
+    right: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+  }
+  .pw-toggle svg { width: 18px; height: 18px; fill: var(--gray); transition: fill var(--transition); }
+  .pw-toggle:hover svg { fill: var(--blue); }
+
+  /* ─── REMEMBER ME ─── */
+  .remember-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.25rem;
+    margin-top: -0.25rem;
+  }
+
+  .remember-row input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--blue);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .remember-row label {
+    font-size: 0.85rem;
+    color: var(--gray);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  /* ─── LOGIN BUTTON ─── */
+  .btn-login {
+    width: 100%;
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 11px;
+    padding: 0.95rem;
+    font-size: 1rem;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all var(--transition);
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 18px rgba(26,86,219,0.35);
+  }
+  .btn-login:hover {
+    background: var(--blue-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(26,86,219,0.45);
+  }
+  .btn-login:active { transform: translateY(0); }
+  .btn-login:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+  .btn-login .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid rgba(255,255,255,0.35);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .btn-login.loading .spinner  { display: block; }
+  .btn-login.loading .btn-text { display: none; }
+
+  /* ─── FORGOT PASSWORD TRIGGER ─── */
+  .forgot-trigger {
+    text-align: center;
+    margin-top: 0.9rem;
+  }
+
+  .forgot-trigger button {
+    background: none;
+    border: none;
+    color: var(--blue);
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    padding: 0;
+    transition: color var(--transition);
+  }
+  .forgot-trigger button:hover { color: var(--blue-dark); text-decoration: underline; }
+
+  /* ─── FORGOT PASSWORD PANEL ─── */
+  .forgot-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1),
+                opacity    0.35s ease,
+                margin     0.35s ease;
+    opacity: 0;
+    margin-top: 0;
+  }
+
+  .forgot-panel.open {
+    max-height: 320px;
+    opacity: 1;
+    margin-top: 1.25rem;
+  }
+
+  .forgot-inner {
+    background: var(--blue-light);
+    border: 1.5px solid rgba(26,86,219,0.18);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .forgot-inner h3 {
+    font-size: 0.925rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.4rem;
+  }
+
+  .forgot-inner p {
+    font-size: 0.82rem;
+    color: var(--gray);
+    margin-bottom: 1rem;
+    line-height: 1.6;
+  }
+
+  .forgot-field {
+    display: flex;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+  }
+
+  .forgot-field input {
+    flex: 1;
+    min-width: 160px;
+    border: 1.5px solid var(--border);
+    border-radius: 9px;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--primary);
+    outline: none;
+    transition: border-color var(--transition);
+    min-height: 46px;
+  }
+  .forgot-field input:focus { border-color: var(--blue); }
+
+  .forgot-field button {
+    background: var(--blue);
+    color: white;
+    border: none;
+    border-radius: 9px;
+    padding: 0.7rem 1.1rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all var(--transition);
+    white-space: nowrap;
+    min-height: 46px;
+  }
+  .forgot-field button:hover { background: var(--blue-dark); }
+  .forgot-field button:disabled { opacity: 0.65; cursor: not-allowed; }
+
+  .forgot-msg {
+    font-size: 0.8rem;
+    margin-top: 0.65rem;
+    display: none;
+    align-items: flex-start;
+    gap: 0.4rem;
+    line-height: 1.55;
+  }
+  .forgot-msg.show-success { display: flex; color: var(--success); }
+  .forgot-msg.show-error   { display: flex; color: var(--error);   }
+  .forgot-msg svg { width: 15px; height: 15px; fill: currentColor; flex-shrink: 0; margin-top: 2px; }
+
+  .forgot-close {
+    background: none;
+    border: none;
+    color: var(--gray);
+    font-size: 0.8rem;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 0.75rem;
+    display: block;
+    transition: color var(--transition);
+  }
+  .forgot-close:hover { color: var(--primary); }
+
+  /* ─── DIVIDER ─── */
+  .divider {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin: 1.5rem 0;
+    position: relative;
+  }
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 0; right: 0;
+    height: 1px;
+    background: var(--border);
+  }
+  .divider span {
+    background: white;
+    padding: 0 0.75rem;
+    position: relative;
+  }
+
+  /* ─── GOOGLE BUTTON ─── */
+  .btn-google {
+    width: 100%;
+    background: white;
+    color: var(--primary);
+    border: 1.5px solid var(--border);
+    border-radius: 11px;
+    padding: 0.85rem;
+    font-size: 0.925rem;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all var(--transition);
+    min-height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    box-shadow: 0 1px 4px rgba(10,35,66,0.08);
+  }
+  .btn-google:hover {
+    border-color: #4285f4;
+    box-shadow: 0 4px 16px rgba(66,133,244,0.2);
+    transform: translateY(-1px);
+  }
+  .btn-google:active { transform: translateY(0); }
+  .btn-google:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+
+  .btn-google .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(10,35,66,0.2);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  .btn-google.loading .spinner    { display: block; }
+  .btn-google.loading .google-text { display: none; }
+  .btn-google.loading .google-icon { display: none; }
+
+  /* Google Icon SVG */
+  .google-icon { width: 20px; height: 20px; flex-shrink: 0; }
+
+  /* ─── FORM FOOTER ─── */
+  .form-footer {
+    text-align: center;
+    font-size: 0.825rem;
+    color: var(--gray);
+    padding: 1.25rem 2rem;
+    border-top: 1px solid var(--border);
+    background: var(--gray-light);
+  }
+
+  .form-footer a { color: var(--blue); font-weight: 600; }
+  .form-footer a:hover { text-decoration: underline; }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── MOBILE ─── */
+  @media (max-width: 480px) {
+    .card { border-radius: 16px; }
+    .form-body { padding: 1.5rem 1.25rem 1.25rem; }
+    .form-footer { padding: 1rem 1.25rem; }
+    .forgot-field { flex-direction: column; }
+    .forgot-field button { width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTO-LOGIN OVERLAY (shown while checking session) -->
+<div class="auto-login-overlay" id="autoOverlay">
+  <div class="auto-logo">MC<span>Store</span></div>
+  <div class="auto-spinner"></div>
+  <p class="auto-text">Checking your session…</p>
+</div>
+
+<div class="page-wrap" id="pageWrap" style="display:none;">
+
+  <!-- LOGO -->
+  <div class="logo-bar">
+    <a href="index.html">
+      <div class="logo">MC<span>Store</span></div>
+    </a>
+    <div class="logo-sub">Welcome back — sign in to your account</div>
+  </div>
+
+  <!-- CARD -->
+  <div class="card">
+    <div class="form-body">
+
+      <div class="form-heading">
+        <h1>Sign in.</h1>
+        <p>Enter your email or phone number and password below.</p>
+      </div>
+
+      <!-- Global error banner -->
+      <div class="error-banner" id="loginError">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+        <span id="loginErrorMsg"></span>
+      </div>
+
+      <!-- SMART IDENTIFIER FIELD -->
+      <div class="field">
+        <div class="field-header">
+          <label for="identifier">Email or Phone Number</label>
+          <span class="field-type-badge" id="typeBadge"></span>
+        </div>
+        <div class="input-wrap">
+          <input
+            type="text"
+            id="identifier"
+            placeholder="Email address or phone number"
+            autocomplete="username"
+            inputmode="email"
+          >
+          <!-- Icon changes based on detected type -->
+          <svg id="identifierIcon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </div>
+        <div class="field-error" id="identifierError">Please enter your email or phone number.</div>
+      </div>
+
+      <!-- PASSWORD FIELD -->
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input
+            type="password"
+            id="password"
+            placeholder="Your password"
+            autocomplete="current-password"
+          >
+          <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+          <button type="button" class="pw-toggle" id="pwToggle" aria-label="Toggle password visibility">
+            <svg id="eyeIcon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          </button>
+        </div>
+        <div class="field-error" id="passwordError">Please enter your password.</div>
+      </div>
+
+      <!-- REMEMBER ME -->
+      <div class="remember-row">
+        <input type="checkbox" id="rememberMe">
+        <label for="rememberMe">Keep me logged in on this device</label>
+      </div>
+
+      <!-- LOGIN BUTTON -->
+      <button type="button" class="btn-login" id="loginBtn">
+        <span class="btn-text">Sign In</span>
+        <div class="spinner"></div>
+      </button>
+
+      <!-- FORGOT PASSWORD TRIGGER -->
+      <div class="forgot-trigger">
+        <button type="button" id="forgotTrigger">Forgot your password?</button>
+      </div>
+
+      <!-- FORGOT PASSWORD PANEL (slides open inline) -->
+      <div class="forgot-panel" id="forgotPanel">
+        <div class="forgot-inner">
+          <h3>Reset Your Password</h3>
+          <p id="forgotDesc">Enter the email address linked to your MC Store account and we'll send you a reset link.</p>
+          <div class="forgot-field">
+            <input
+              type="text"
+              id="forgotInput"
+              placeholder="Enter your email address"
+            >
+            <button type="button" id="forgotSendBtn">Send Link</button>
+          </div>
+          <div class="forgot-msg" id="forgotMsg">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+            <span id="forgotMsgText"></span>
+          </div>
+          <button type="button" class="forgot-close" id="forgotClose">← Back to login</button>
+        </div>
+      </div>
+
+      <!-- DIVIDER -->
+      <div class="divider"><span>or continue with</span></div>
+
+      <!-- GOOGLE BUTTON -->
+      <button type="button" class="btn-google" id="googleBtn">
+        <!-- Google Logo SVG -->
+        <svg class="google-icon" viewBox="0 0 24 24">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        <span class="google-text">Continue with Google</span>
+        <div class="spinner"></div>
+      </button>
+
+    </div>
+
+    <!-- FOOTER NOTE -->
+    <div class="form-footer">
+      Don't have an account? <a href="signup.html">Create one free</a>
+    </div>
+
+  </div>
+  <!-- /card -->
+
+</div>
+<!-- /page-wrap -->
+
+<script type="module">
+  import {
+    mcSmartLogin,
+    mcGoogleLogin,
+    mcForgotPassword,
+    mcCheckAutoLogin,
+    detectInputType
+  } from './auth.js';
+
+  // ── DOM refs ──
+  const autoOverlay    = document.getElementById('autoOverlay');
+  const pageWrap       = document.getElementById('pageWrap');
+  const identifierInput= document.getElementById('identifier');
+  const passwordInput  = document.getElementById('password');
+  const rememberMeBox  = document.getElementById('rememberMe');
+  const loginBtn       = document.getElementById('loginBtn');
+  const googleBtn      = document.getElementById('googleBtn');
+  const loginError     = document.getElementById('loginError');
+  const loginErrorMsg  = document.getElementById('loginErrorMsg');
+  const typeBadge      = document.getElementById('typeBadge');
+  const identifierIcon = document.getElementById('identifierIcon');
+  const pwToggle       = document.getElementById('pwToggle');
+  const forgotTrigger  = document.getElementById('forgotTrigger');
+  const forgotPanel    = document.getElementById('forgotPanel');
+  const forgotInput    = document.getElementById('forgotInput');
+  const forgotSendBtn  = document.getElementById('forgotSendBtn');
+  const forgotMsg      = document.getElementById('forgotMsg');
+  const forgotMsgText  = document.getElementById('forgotMsgText');
+  const forgotClose    = document.getElementById('forgotClose');
+
+  // ── Auto-login check on page load ──
+  mcCheckAutoLogin().then((redirecting) => {
+    if (!redirecting) {
+      // No valid session — show the login form
+      autoOverlay.classList.add('hidden');
+      setTimeout(() => {
+        autoOverlay.style.display = 'none';
+        pageWrap.style.display = 'flex';
+      }, 400);
+    }
+    // If redirecting = true, overlay stays while redirect happens
+  });
+
+  // ── Smart field: detect email vs phone ──
+  const emailIconPath = 'M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z';
+  const phoneIconPath = 'M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z';
+
+  identifierInput.addEventListener('input', () => {
+    identifierInput.classList.remove('error');
+    const val = identifierInput.value.trim();
+
+    if (!val) {
+      typeBadge.className = 'field-type-badge';
+      typeBadge.textContent = '';
+      identifierIcon.querySelector('path').setAttribute('d', emailIconPath);
+      identifierInput.inputMode = 'email';
+      return;
+    }
+
+    const type = detectInputType(val);
+
+    if (type === 'phone') {
+      typeBadge.className = 'field-type-badge phone';
+      typeBadge.textContent = 'PHONE';
+      identifierIcon.querySelector('path').setAttribute('d', phoneIconPath);
+      identifierInput.inputMode = 'tel';
+    } else {
+      typeBadge.className = 'field-type-badge email';
+      typeBadge.textContent = 'EMAIL';
+      identifierIcon.querySelector('path').setAttribute('d', emailIconPath);
+      identifierInput.inputMode = 'email';
+    }
+  });
+
+  // ── Password show/hide ──
+  pwToggle.addEventListener('click', () => {
+    const isText = passwordInput.type === 'text';
+    passwordInput.type = isText ? 'password' : 'text';
+    document.getElementById('eyeIcon').innerHTML = isText
+      ? '<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>'
+      : '<path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>';
+  });
+
+  // ── Helpers ──
+  function showError(msg) {
+    loginErrorMsg.textContent = msg;
+    loginError.classList.add('show');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  function hideError() { loginError.classList.remove('show'); }
+
+  function setLoading(btn, on) {
+    btn.disabled = on;
+    btn.classList.toggle('loading', on);
+  }
+
+  // ── Login ──
+  loginBtn.addEventListener('click', async () => {
+    hideError();
+    let valid = true;
+
+    const identifier = identifierInput.value.trim();
+    const password   = passwordInput.value;
+    const rememberMe = rememberMeBox.checked;
+
+    if (!identifier) {
+      identifierInput.classList.add('error');
+      document.getElementById('identifierError').classList.add('show');
+      valid = false;
+    }
+    if (!password) {
+      passwordInput.classList.add('error');
+      document.getElementById('passwordError').classList.add('show');
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    setLoading(loginBtn, true);
+
+    try {
+      await mcSmartLogin({ identifier, password, rememberMe });
+      // mcSmartLogin redirects on success
+    } catch (error) {
+      setLoading(loginBtn, false);
+      showError(error.message);
+    }
+  });
+
+  // ── Google login ──
+  googleBtn.addEventListener('click', async () => {
+    hideError();
+    setLoading(googleBtn, true);
+    try {
+      await mcGoogleLogin({ rememberMe: rememberMeBox.checked });
+    } catch (error) {
+      setLoading(googleBtn, false);
+      showError(error.message);
+    }
+  });
+
+  // ── Forgot password panel toggle ──
+  forgotTrigger.addEventListener('click', () => {
+    forgotPanel.classList.add('open');
+    forgotTrigger.style.display = 'none';
+    // Pre-fill with identifier if it looks like an email
+    const val = identifierInput.value.trim();
+    if (val && detectInputType(val) === 'email') {
+      forgotInput.value = val;
+    }
+    setTimeout(() => forgotInput.focus(), 300);
+  });
+
+  forgotClose.addEventListener('click', () => {
+    forgotPanel.classList.remove('open');
+    forgotTrigger.style.display = '';
+    forgotMsg.className = 'forgot-msg';
+    forgotInput.value = '';
+  });
+
+  // ── Send reset email ──
+  forgotSendBtn.addEventListener('click', async () => {
+    const val = forgotInput.value.trim();
+    forgotMsg.className = 'forgot-msg';
+
+    if (!val) {
+      forgotMsgText.textContent = 'Please enter your email address.';
+      forgotMsg.className = 'forgot-msg show-error';
+      return;
+    }
+
+    forgotSendBtn.disabled = true;
+    forgotSendBtn.textContent = 'Sending…';
+
+    try {
+      await mcForgotPassword(val);
+
+      forgotMsgText.textContent =
+        'Reset link sent! Check your inbox (and spam folder). Click the link to set a new password.';
+      forgotMsg.className = 'forgot-msg show-success';
+
+      // Change button to Resend after success
+      forgotSendBtn.disabled = false;
+      forgotSendBtn.textContent = 'Resend';
+
+    } catch (error) {
+      forgotSendBtn.disabled = false;
+      forgotSendBtn.textContent = 'Send Link';
+      forgotMsgText.textContent = error.message;
+      forgotMsg.className = 'forgot-msg show-error';
+    }
+  });
+
+  // ── Clear errors on input ──
+  identifierInput.addEventListener('input', () => {
+    identifierInput.classList.remove('error');
+    document.getElementById('identifierError').classList.remove('show');
+    hideError();
+  });
+
+  passwordInput.addEventListener('input', () => {
+    passwordInput.classList.remove('error');
+    document.getElementById('passwordError').classList.remove('show');
+    hideError();
+  });
+
+  // ── Enter key support ──
+  [identifierInput, passwordInput].forEach(el => {
+    el.addEventListener('keydown', (e) => { if (e.key === 'Enter') loginBtn.click(); });
+  });
+
+  forgotInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') forgotSendBtn.click();
+  });
+</script>
+
+</body>
+</html>
