@@ -42,12 +42,12 @@ import { saveSession, clearSession, getSession } from "./session.js";
 //  Project Settings → Your Apps → SDK setup
 // ─────────────────────────────────────────
 const firebaseConfig = {
-  apiKey: "AIzaSyC7trJbzcIix4HgPEHCybb6E7Ztkc39kfw",
-  authDomain: "mc-store-b6beb.firebaseapp.com",
-  projectId: "mc-store-b6beb",
-  storageBucket: "mc-store-b6beb.firebasestorage.app",
-  messagingSenderId: "930964754103",
-  appId: "1:930964754103:web:0e79c3dcd6bcc4dafc8732"
+  apiKey:            "YOUR_API_KEY",
+  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId:         "YOUR_PROJECT_ID",
+  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId:             "YOUR_APP_ID"
 };
 
 // ─────────────────────────────────────────
@@ -118,7 +118,7 @@ async function mcSignUp({ fullName, email, password, phone, address }) {
     window.location.href = "app-skeleton.html";
 
   } catch (error) {
-    throw mcAuthError(error.code);
+    throw mcAuthError(error.code, error);
   }
 }
 
@@ -155,7 +155,7 @@ async function mcLogin({ email, password, rememberMe = false }) {
     window.location.href = "app-skeleton.html";
 
   } catch (error) {
-    throw mcAuthError(error.code);
+    throw mcAuthError(error.code, error);
   }
 }
 
@@ -181,7 +181,7 @@ async function mcLoginWithPhone({ phone, password, rememberMe = false }) {
 
   } catch (error) {
     if (error.message) throw error;
-    throw mcAuthError(error.code);
+    throw mcAuthError(error.code, error);
   }
 }
 
@@ -265,7 +265,7 @@ async function mcGoogleLogin({ rememberMe = false } = {}) {
       error.code === "auth/cancelled-popup-request"
     ) return;
 
-    throw mcAuthError(error.code);
+    throw mcAuthError(error.code, error);
   }
 }
 
@@ -289,7 +289,7 @@ async function mcForgotPassword(identifier) {
     await sendPasswordResetEmail(auth, trimmed);
     return { sent: true };
   } catch (error) {
-    throw mcAuthError(error.code);
+    throw mcAuthError(error.code, error);
   }
 }
 
@@ -378,21 +378,63 @@ async function getUserProfile(uid) {
 //  ERROR TRANSLATOR
 //  Friendly Nigerian-context error messages
 // ─────────────────────────────────────────
-function mcAuthError(code) {
+function mcAuthError(code, originalError) {
+  // Log the real error so developer can debug
+  if (originalError) {
+    console.error("MC Store Auth Error:", {
+      code:    originalError.code,
+      message: originalError.message
+    });
+  }
+
   const messages = {
-    "auth/email-already-in-use":                       "An account with this email already exists. Please log in.",
-    "auth/invalid-email":                              "Please enter a valid email address.",
-    "auth/weak-password":                              "Your password must be at least 6 characters.",
-    "auth/user-not-found":                             "No account found. Please check your details or create an account.",
-    "auth/wrong-password":                             "Incorrect password. Please try again.",
-    "auth/invalid-credential":                         "Incorrect email or password. Please check and try again.",
-    "auth/too-many-requests":                          "Too many failed attempts. Please wait a few minutes and try again.",
-    "auth/network-request-failed":                     "Network error. Please check your internet connection.",
-    "auth/user-disabled":                              "This account has been disabled. Please contact MC Store support.",
-    "auth/popup-blocked":                              "Please allow popups in your browser to use Google Sign-In.",
-    "auth/account-exists-with-different-credential":   "An account with this email exists. Please log in with your password.",
+    // Account errors
+    "auth/email-already-in-use":                     "An account with this email already exists. Please log in instead.",
+    "auth/user-not-found":                           "No account found with these details. Please check or create an account.",
+    "auth/user-disabled":                            "This account has been disabled. Please contact MC Store support.",
+
+    // Password / credential errors
+    "auth/wrong-password":                           "Incorrect password. Please try again.",
+    "auth/invalid-password":                         "Incorrect password. Please try again.",
+    "auth/invalid-credential":                       "Incorrect email or password. Please check and try again.",
+    "auth/invalid-login-credentials":                "Incorrect email or password. Please check and try again.",
+    "auth/missing-password":                         "Please enter your password.",
+    "auth/INVALID_LOGIN_CREDENTIALS":                "Incorrect email or password. Please check and try again.",
+
+    // Email errors
+    "auth/invalid-email":                            "Please enter a valid email address.",
+    "auth/missing-email":                            "Please enter your email address.",
+
+    // Rate / network
+    "auth/too-many-requests":                        "Too many failed attempts. Please wait a few minutes and try again.",
+    "auth/network-request-failed":                   "Network error. Please check your internet connection and try again.",
+    "auth/timeout":                                  "Request timed out. Please check your connection.",
+
+    // Password strength
+    "auth/weak-password":                            "Your password must be at least 6 characters long.",
+
+    // Google / popup
+    "auth/popup-blocked":                            "Please allow popups in your browser to use Google Sign-In.",
+    "auth/popup-closed-by-user":                     "Google sign-in was cancelled. Please try again.",
+    "auth/cancelled-popup-request":                  "Google sign-in was cancelled. Please try again.",
+    "auth/account-exists-with-different-credential": "An account with this email already exists. Please log in with your password.",
+
+    // Session
+    "auth/requires-recent-login":                    "Please log in again to continue.",
+    "auth/user-token-expired":                       "Your session has expired. Please log in again.",
   };
-  return new Error(messages[code] || "Something went wrong. Please try again.");
+
+  // Use friendly message if code is known
+  if (code && messages[code]) return new Error(messages[code]);
+
+  // Use original error message if it is not a raw Firebase one
+  if (originalError && originalError.message &&
+      !originalError.message.toLowerCase().includes("firebase") &&
+      !originalError.message.toLowerCase().includes("(auth/")) {
+    return new Error(originalError.message);
+  }
+
+  return new Error("Something went wrong. Please check your details and try again.");
 }
 
 // ─────────────────────────────────────────
