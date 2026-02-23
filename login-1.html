@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MC Store – Sign In</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --blue:       #1a56db;
+      --blue-dark:  #1347c8;
+      --blue-light: #eff6ff;
+      --blue-mid:   #dbeafe;
+      --gold:       #f5a623;
+      --gold-light: #fef3c7;
+      --white:      #ffffff;
+      --gray:       #6b7280;
+      --gray-light: #f8fafc;
+      --border:     #e2e8f0;
+      --success:    #16a34a;
+      --error:      #dc2626;
+      --warning:    #d97706;
+      --text:       #0f172a;
+      --transition: 0.28s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f0f7ff;
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.25rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ══════════════════════════════
+       FLOATING SHAPES BACKGROUND
+    ══════════════════════════════ */
+    .shapes {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .shape {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.12;
+      animation: floatShape linear infinite;
+    }
+
+    .shape-1 {
+      width: 420px; height: 420px;
+      background: var(--blue);
+      top: -120px; left: -100px;
+      animation-duration: 18s;
+      animation-delay: 0s;
+    }
+    .shape-2 {
+      width: 300px; height: 300px;
+      background: var(--gold);
+      top: 60%; right: -80px;
+      animation-duration: 22s;
+      animation-delay: -6s;
+      opacity: 0.1;
+    }
+    .shape-3 {
+      width: 200px; height: 200px;
+      background: var(--blue);
+      bottom: -60px; left: 20%;
+      animation-duration: 16s;
+      animation-delay: -10s;
+      opacity: 0.08;
+    }
+    .shape-4 {
+      width: 140px; height: 140px;
+      background: var(--gold);
+      top: 30%; left: 5%;
+      animation-duration: 20s;
+      animation-delay: -3s;
+      opacity: 0.09;
+      border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    }
+    .shape-5 {
+      width: 90px; height: 90px;
+      background: var(--blue);
+      top: 15%; right: 8%;
+      animation-duration: 14s;
+      animation-delay: -8s;
+      opacity: 0.13;
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    }
+    .shape-6 {
+      width: 60px; height: 60px;
+      background: var(--gold);
+      bottom: 20%; right: 15%;
+      animation-duration: 12s;
+      animation-delay: -4s;
+      opacity: 0.15;
+    }
+
+    @keyframes floatShape {
+      0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+      33%       { transform: translateY(-28px) rotate(6deg) scale(1.04); }
+      66%       { transform: translateY(14px) rotate(-4deg) scale(0.97); }
+    }
+
+    /* ══════════════════════════════
+       TOAST SYSTEM
+    ══════════════════════════════ */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: 14px;
+      font-weight: 600;
+      min-width: 280px;
+      max-width: 380px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+      pointer-events: auto;
+      animation: toastSlideIn 0.45s cubic-bezier(0.34,1.56,0.64,1);
+      border: 1px solid transparent;
+    }
+    .toast.success { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+    .toast.error   { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+    .toast.warning { background: #fffbeb; color: #d97706; border-color: #fde68a; }
+    .toast.removing { animation: toastSlideOut 0.35s ease forwards; }
+
+    .toast-icon {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+      animation: iconPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .toast.success .toast-icon { background: #dcfce7; }
+    .toast.error   .toast-icon { background: #fee2e2; }
+    .toast.warning .toast-icon { background: #fef3c7; }
+
+    .toast-body { flex: 1; }
+    .toast-title { font-weight: 700; font-size: 13px; margin-bottom: 1px; }
+    .toast-msg   { font-size: 12px; opacity: 0.85; font-weight: 500; }
+
+    .toast-x {
+      width: 24px; height: 24px;
+      border-radius: 50%; background: rgba(0,0,0,0.06);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 13px; flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .toast-x:hover { background: rgba(0,0,0,0.12); }
+
+    @keyframes toastSlideIn  { from { opacity:0; transform: translateY(-20px) scale(0.92); } to { opacity:1; transform: translateY(0) scale(1); } }
+    @keyframes toastSlideOut { from { opacity:1; transform: translateY(0) scale(1); } to { opacity:0; transform: translateY(-16px) scale(0.94); } }
+    @keyframes iconPop { 0% { transform: scale(0.3) rotate(-20deg); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+
+    /* ══════════════════════════════
+       PAGE CONTENT
+    ══════════════════════════════ */
+    .page-content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── LOGO ── */
+    .logo-bar {
+      text-align: center;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--gold); }
+
+    .logo-tagline {
+      font-size: 0.85rem;
+      color: var(--gray);
+      margin-top: 0.35rem;
+      font-weight: 500;
+    }
+
+    /* ── TYPING TEXT ── */
+    .typing-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--blue-light);
+      border: 1px solid var(--blue-mid);
+      border-radius: 50px;
+      padding: 0.4rem 1rem;
+      margin-top: 0.6rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--blue);
+      min-height: 32px;
+    }
+    .typing-wrap i { font-size: 0.75rem; }
+    #typingText { min-width: 180px; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--white);
+      border-radius: 24px;
+      box-shadow:
+        0 4px 6px rgba(15,23,42,0.04),
+        0 20px 50px rgba(15,23,42,0.10),
+        0 1px 0 rgba(255,255,255,1) inset;
+      width: 100%;
+      max-width: 450px;
+      overflow: hidden;
+      animation: fadeUp 0.5s ease 0.1s both;
+    }
+
+    .card-body { padding: 2.25rem 2.25rem 1.75rem; }
+
+    .card-heading { margin-bottom: 1.75rem; }
+    .card-heading h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.65rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+      line-height: 1.2;
+    }
+    .card-heading p { font-size: 0.875rem; color: var(--gray); }
+
+    /* ── SECURITY BADGE ── */
+    .security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 50px;
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #15803d;
+      margin-bottom: 1.5rem;
+    }
+    .security-badge svg { width: 12px; height: 12px; fill: #16a34a; }
+
+    /* ── LOCKOUT BANNER ── */
+    .lockout-banner {
+      display: none;
+      background: #fef2f2;
+      border: 1.5px solid #fecaca;
+      border-radius: 14px;
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+    .lockout-banner.show { display: block; }
+    .lockout-banner strong { display: block; font-size: 0.9rem; color: var(--error); margin-bottom: 0.25rem; }
+    .lockout-banner span   { font-size: 0.8rem; color: #991b1b; }
+    .lockout-timer {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem; font-weight: 700;
+      color: var(--error); margin: 0.5rem 0 0.2rem;
+      letter-spacing: 0.07em;
+    }
+
+    /* ── ERROR BANNER ── */
+    .error-banner {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      font-size: 0.855rem;
+      color: var(--error);
+      margin-bottom: 1.25rem;
+      display: none;
+      align-items: flex-start;
+      gap: 0.5rem;
+      line-height: 1.5;
+    }
+    .error-banner.show { display: flex; }
+    .error-banner i { margin-top: 2px; flex-shrink: 0; }
+
+    /* ── ATTEMPTS WARN ── */
+    .attempts-warn {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 10px;
+      padding: 0.65rem 1rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--warning);
+      text-align: center;
+      margin-bottom: 0.85rem;
+      display: none;
+    }
+    .attempts-warn.show { display: block; }
+
+    /* ── FIELD ── */
+    .field { margin-bottom: 1.1rem; }
+
+    .field-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.45rem;
+    }
+    .field label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .field-type-badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 0.15rem 0.5rem;
+      border-radius: 50px;
+      opacity: 0;
+      transition: opacity var(--transition);
+      letter-spacing: 0.04em;
+    }
+    .field-type-badge.email { background: var(--blue-light); color: var(--blue); opacity: 1; }
+    .field-type-badge.phone { background: #f0fdf4; color: #15803d; opacity: 1; }
+
+    .input-wrap { position: relative; }
+
+    .input-wrap .fi {
+      position: absolute;
+      left: 0.9rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 14px;
+      pointer-events: none;
+      transition: color var(--transition);
+      z-index: 1;
+    }
+
+    .field input {
+      width: 100%;
+      border: 1.5px solid var(--border);
+      border-radius: 11px;
+      padding: 0.8rem 2.75rem 0.8rem 2.6rem;
+      font-size: 0.925rem;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      outline: none;
+      transition: all var(--transition);
+      min-height: 50px;
+    }
+    .field input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(26,86,219,0.12);
+    }
+    .field input:focus ~ .fi { color: var(--blue); }
+    .field input.err { border-color: var(--error); box-shadow: 0 0 0 3px rgba(220,38,38,0.1); }
+    .field input:disabled { background: var(--gray-light); cursor: not-allowed; opacity: 0.6; }
+
+    .field-err {
+      font-size: 0.775rem;
+      color: var(--error);
+      margin-top: 0.35rem;
+      display: none;
+    }
+    .field-err.show { display: block; }
+
+    /* ── PW TOGGLE ── */
+    .pw-toggle {
+      position: absolute;
+      right: 0.9rem; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: #94a3b8; font-size: 16px;
+      cursor: pointer; padding: 0;
+      transition: color var(--transition); z-index: 2;
+    }
+    .pw-toggle:hover { color: var(--blue); }
+
+    /* ── LOGIN BUTTON ── */
+    .btn-login {
+      width: 100%;
+      background: linear-gradient(135deg, var(--blue), #2563eb);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 0.95rem;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all var(--transition);
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 20px rgba(26,86,219,0.35);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-login::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: rgba(255,255,255,0.15);
+      transition: left 0.5s ease;
+    }
+    .btn-login:hover::before { left: 100%; }
+    .btn-login:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(26,86,219,0.45);
+    }
+    .btn-login:active { transform: translateY(0); }
+    .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .btn-login .spin {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.35);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    .btn-login.loading .spin    { display: block; }
+    .btn-login.loading .btn-txt { display: none; }
+
+    /* ── FORGOT BUTTON ── */
+    .btn-forgot {
+      width: 100%;
+      background: var(--blue-light);
+      border: 1.5px solid var(--blue-mid);
+      border-radius: 12px;
+      padding: 0.8rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--blue);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all var(--transition);
+      margin-top: 0.6rem;
+    }
+    .btn-forgot:hover {
+      background: var(--blue-mid);
+      border-color: #bfdbfe;
+      transform: translateY(-1px);
+    }
+
+    /* ── FORGOT PANEL ── */
+    .forgot-panel {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.45s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease, margin 0.3s ease;
+      opacity: 0; margin-top: 0;
+    }
+    .forgot-panel.open { max-height: 280px; opacity: 1; margin-top: 0.85rem; }
+
+    .forgot-inner {
+      background: var(--blue-light);
+      border: 1.5px solid var(--blue-mid);
+      border-radius: 14px;
+      padding: 1.25rem;
+    }
+    .forgot-inner h4 {
+      font-size: 0.9rem; font-weight: 700;
+      color: var(--blue); margin-bottom: 0.4rem;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .forgot-inner p {
+      font-size: 0.8rem; color: var(--gray);
+      margin-bottom: 1rem; line-height: 1.6;
+    }
+
+    .forgot-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .forgot-row input {
+      flex: 1; min-width: 140px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 0.7rem 0.9rem; font-size: 0.875rem;
+      font-family: 'DM Sans', sans-serif; color: var(--text);
+      outline: none; background: white; min-height: 44px;
+      transition: border-color var(--transition);
+    }
+    .forgot-row input:focus { border-color: var(--blue); }
+    .forgot-row button {
+      background: var(--blue); color: white; border: none;
+      border-radius: 10px; padding: 0.7rem 1.1rem;
+      font-size: 0.875rem; font-weight: 700;
+      font-family: 'DM Sans', sans-serif; cursor: pointer;
+      white-space: nowrap; min-height: 44px;
+      transition: all var(--transition);
+    }
+    .forgot-row button:hover:not(:disabled) { background: var(--blue-dark); }
+    .forgot-row button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .forgot-result {
+      font-size: 0.8rem; margin-top: 0.65rem;
+      display: none; align-items: center; gap: 5px; line-height: 1.55;
+    }
+    .forgot-result.ok  { display: flex; color: var(--success); }
+    .forgot-result.bad { display: flex; color: var(--error); }
+
+    .forgot-close {
+      background: none; border: none;
+      color: var(--gray); font-size: 0.78rem;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer; padding: 0; margin-top: 0.75rem;
+      display: block; transition: color var(--transition);
+    }
+    .forgot-close:hover { color: var(--blue); }
+
+    /* ── DIVIDER ── */
+    .divider {
+      text-align: center; font-size: 0.78rem;
+      color: #94a3b8; margin: 1.25rem 0; position: relative;
+    }
+    .divider::before {
+      content: ''; position: absolute;
+      top: 50%; left: 0; right: 0; height: 1px; background: var(--border);
+    }
+    .divider span { background: white; padding: 0 0.75rem; position: relative; font-weight: 600; }
+
+    /* ── GOOGLE BUTTON ── */
+    .btn-google {
+      width: 100%;
+      background: white;
+      color: #1a1a2e;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 0.85rem;
+      font-size: 0.925rem;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      transition: all var(--transition);
+      min-height: 52px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      position: relative; overflow: hidden;
+    }
+    .btn-google::before {
+      content: ''; position: absolute;
+      top: 0; left: -100%; width: 100%; height: 100%;
+      background: rgba(26,86,219,0.04); transition: left 0.5s ease;
+    }
+    .btn-google:hover::before { left: 100%; }
+    .btn-google:hover:not(:disabled) {
+      border-color: #4285f4;
+      box-shadow: 0 4px 16px rgba(66,133,244,0.18);
+      transform: translateY(-1px);
+    }
+    .btn-google:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-google .g-spin {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(0,0,0,0.15);
+      border-top-color: var(--blue); border-radius: 50%;
+      animation: spin 0.7s linear infinite; display: none;
+    }
+    .btn-google.loading .g-spin   { display: block; }
+    .btn-google.loading .g-txt    { display: none; }
+    .btn-google.loading .g-logo   { display: none; }
+    .g-logo { width: 20px; height: 20px; flex-shrink: 0; }
+
+    /* ── CARD FOOTER ── */
+    .card-footer {
+      text-align: center;
+      font-size: 0.825rem;
+      color: var(--gray);
+      padding: 1.25rem 2.25rem;
+      border-top: 1px solid var(--border);
+      background: #f8fafc;
+    }
+    .card-footer a { color: var(--blue); font-weight: 700; text-decoration: none; }
+    .card-footer a:hover { text-decoration: underline; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes spin    { to { transform: rotate(360deg); } }
+    @keyframes fadeUp  { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+
+    /* ── MOBILE ── */
+    @media (max-width: 480px) {
+      .card { border-radius: 20px; }
+      .card-body { padding: 1.75rem 1.25rem 1.25rem; }
+      .card-footer { padding: 1rem 1.25rem; }
+      .forgot-row { flex-direction: column; }
+      .forgot-row button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- FLOATING SHAPES -->
+  <div class="shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+    <div class="shape shape-5"></div>
+    <div class="shape shape-6"></div>
+  </div>
+
+  <!-- TOASTS -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="page-content">
+
+    <!-- LOGO -->
+    <div class="logo-bar">
+      <a href="index.html" style="text-decoration:none;">
+        <div class="logo">MC<span>Store</span></div>
+      </a>
+      <div class="logo-tagline">Your favourite shop, always open</div>
+      <div class="typing-wrap">
+        <i class="fas fa-sparkles" style="color:var(--gold);"></i>
+        <span id="typingText"></span>
+      </div>
+    </div>
+
+    <!-- CARD -->
+    <div class="card">
+      <div class="card-body">
+
+        <div class="card-heading">
+          <h1>Sign in. 👋</h1>
+          <p>Log into your account and continue shopping.</p>
+        </div>
+
+        <!-- Security badge -->
+        <div class="security-badge">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+          Your account and orders are protected
+        </div>
+
+        <!-- Lockout -->
+        <div class="lockout-banner" id="lockoutBanner">
+          <strong>🔒 Account Temporarily Locked</strong>
+          <span>Too many failed attempts. Please wait:</span>
+          <div class="lockout-timer" id="lockoutTimer">10:00</div>
+        </div>
+
+        <!-- Error banner -->
+        <div class="error-banner" id="errorBanner">
+          <i class="fas fa-circle-exclamation"></i>
+          <span id="errorMsg"></span>
+        </div>
+
+        <!-- Attempts warning -->
+        <div class="attempts-warn" id="attemptsWarn"></div>
+
+        <!-- SMART FIELD -->
+        <div class="field">
+          <div class="field-header">
+            <label for="identifier"><i class="fas fa-user" style="margin-right:5px;color:var(--blue);"></i>Email or Phone</label>
+            <span class="field-type-badge" id="typeBadge"></span>
+          </div>
+          <div class="input-wrap">
+            <input type="text" id="identifier" placeholder="Email address or phone number" autocomplete="username" inputmode="email"/>
+            <i class="fas fa-envelope fi" id="identIcon"></i>
+          </div>
+          <div class="field-err" id="identErr">Please enter your email or phone number.</div>
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="field">
+          <label for="password"><i class="fas fa-lock" style="margin-right:5px;color:var(--blue);"></i>Password</label>
+          <div class="input-wrap">
+            <input type="password" id="password" placeholder="Your password" autocomplete="current-password"/>
+            <i class="fas fa-lock fi"></i>
+            <button type="button" class="pw-toggle" id="pwToggle" aria-label="Toggle password">
+              <i class="fas fa-eye" id="eyeIcon"></i>
+            </button>
+          </div>
+          <div class="field-err" id="passErr">Please enter your password.</div>
+        </div>
+
+        <!-- SIGN IN BUTTON -->
+        <button class="btn-login" id="loginBtn">
+          <span class="btn-txt"><i class="fas fa-shopping-bag"></i> &nbsp;Sign In to My Account</span>
+          <span class="spin"></span>
+        </button>
+
+        <!-- FORGOT PASSWORD BUTTON -->
+        <button class="btn-forgot" id="forgotTrigger">
+          <i class="fas fa-key"></i> Forgot your password? Reset it here
+        </button>
+
+        <!-- FORGOT PANEL — slides open -->
+        <div class="forgot-panel" id="forgotPanel">
+          <div class="forgot-inner">
+            <h4><i class="fas fa-envelope-open-text"></i> Reset Your Password</h4>
+            <p>Enter the email address linked to your MC Store account and we'll send a reset link straight to your inbox.</p>
+            <div class="forgot-row">
+              <input type="text" id="forgotInput" placeholder="Your email address"/>
+              <button id="forgotSendBtn">Send Link</button>
+            </div>
+            <div class="forgot-result" id="forgotResult">
+              <span id="forgotResultText"></span>
+            </div>
+            <button class="forgot-close" id="forgotClose">← Close reset panel</button>
+          </div>
+        </div>
+
+        <!-- DIVIDER -->
+        <div class="divider"><span>or</span></div>
+
+        <!-- GOOGLE -->
+        <button class="btn-google" id="googleBtn">
+          <svg class="g-logo" viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+          <span class="g-txt">Continue with Google</span>
+          <span class="g-spin"></span>
+        </button>
+
+      </div>
+
+      <div class="card-footer">
+        Don't have an account? <a href="signup.html">Create one free →</a>
+      </div>
+    </div>
+
+  </div><!-- /page-content -->
+
+  <script type="module">
+    import { mcSmartLogin, mcGoogleLogin, mcForgotPassword, detectInputType } from './auth.js';
+
+    // ── CONSTANTS ──
+    const MAX_ATTEMPTS = 5;
+    const LOCKOUT_MS   = 10 * 60 * 1000;
+    const LOCKOUT_KEY  = 'mc_lockout_until';
+    const ATTEMPT_KEY  = 'mc_attempts';
+
+    // ── DOM ──
+    const identifierInput = document.getElementById('identifier');
+    const passwordInput   = document.getElementById('password');
+    const loginBtn        = document.getElementById('loginBtn');
+    const googleBtn       = document.getElementById('googleBtn');
+    const errorBanner     = document.getElementById('errorBanner');
+    const errorMsg        = document.getElementById('errorMsg');
+    const attemptsWarn    = document.getElementById('attemptsWarn');
+    const lockoutBanner   = document.getElementById('lockoutBanner');
+    const lockoutTimer    = document.getElementById('lockoutTimer');
+    const typeBadge       = document.getElementById('typeBadge');
+    const identIcon       = document.getElementById('identIcon');
+    const pwToggle        = document.getElementById('pwToggle');
+    const forgotTrigger   = document.getElementById('forgotTrigger');
+    const forgotPanel     = document.getElementById('forgotPanel');
+    const forgotInput     = document.getElementById('forgotInput');
+    const forgotSendBtn   = document.getElementById('forgotSendBtn');
+    const forgotResult    = document.getElementById('forgotResult');
+    const forgotResultText= document.getElementById('forgotResultText');
+    const forgotClose     = document.getElementById('forgotClose');
+
+    // ── TYPING EFFECT ──
+    const phrases = [
+      'Good to see you again! 👋',
+      'Your cart is waiting 🛍️',
+      'Great deals inside 🔥',
+      'Fast delivery across Nigeria 🚚',
+      'Shop smart, shop MC Store ✨'
+    ];
+    let pIdx=0, cIdx=0, del=false;
+    function type() {
+      const w = phrases[pIdx];
+      document.getElementById('typingText').textContent = w.slice(0, cIdx);
+      if (!del) { cIdx++; if (cIdx > w.length) { del=true; setTimeout(type,1600); return; } }
+      else       { cIdx--; if (cIdx===0) { del=false; pIdx=(pIdx+1)%phrases.length; } }
+      setTimeout(type, del ? 35 : 65);
+    }
+    type();
+
+    // ── TOAST ──
+    const toastContainer = document.getElementById('toastContainer');
+    const TICONS = { success:'✓', error:'✕', warning:'⚠' };
+
+    function showToast(title, message, type='success', duration=5000) {
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.innerHTML = `
+        <div class="toast-icon">${TICONS[type]||'!'}</div>
+        <div class="toast-body">
+          <div class="toast-title">${title}</div>
+          <div class="toast-msg">${message}</div>
+        </div>
+        <div class="toast-x">×</div>
+      `;
+      t.querySelector('.toast-x').onclick = () => {
+        t.classList.add('removing');
+        setTimeout(() => t.remove(), 350);
+      };
+      toastContainer.appendChild(t);
+      if (duration > 0) setTimeout(() => { t.classList.add('removing'); setTimeout(()=>t.remove(),350); }, duration);
+    }
+
+    // ── SMART FIELD ──
+    identifierInput.addEventListener('input', () => {
+      clearErr('ident'); hideError();
+      const val  = identifierInput.value.trim();
+      const type = val ? detectInputType(val) : null;
+      if (type === 'phone') {
+        typeBadge.className='field-type-badge phone'; typeBadge.textContent='PHONE';
+        identIcon.className='fas fa-phone fi'; identifierInput.inputMode='tel';
+      } else if (type === 'email') {
+        typeBadge.className='field-type-badge email'; typeBadge.textContent='EMAIL';
+        identIcon.className='fas fa-envelope fi'; identifierInput.inputMode='email';
+      } else {
+        typeBadge.className='field-type-badge'; typeBadge.textContent='';
+        identIcon.className='fas fa-envelope fi';
+      }
+    });
+
+    // ── PW TOGGLE ──
+    pwToggle.addEventListener('click', () => {
+      const show = passwordInput.type==='password';
+      passwordInput.type = show ? 'text' : 'password';
+      document.getElementById('eyeIcon').className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+    });
+
+    // ── HELPERS ──
+    function showErr(id, msg) { const e=document.getElementById(id+'Err'); if(e){e.textContent=msg;e.classList.add('show');} }
+    function clearErr(id)     { const e=document.getElementById(id+'Err'); if(e) e.classList.remove('show'); document.getElementById(id==='ident'?'identifier':'password')?.classList.remove('err'); }
+    function showError(msg)   { errorMsg.textContent=msg; errorBanner.classList.add('show'); }
+    function hideError()      { errorBanner.classList.remove('show'); }
+    function disableForm(on)  { [identifierInput,passwordInput,loginBtn,googleBtn].forEach(el=>el.disabled=on); }
+
+    function setLoginLoading(on) {
+      loginBtn.disabled = on;
+      loginBtn.classList.toggle('loading', on);
+    }
+    function setGoogleLoading(on) {
+      googleBtn.disabled = on;
+      googleBtn.classList.toggle('loading', on);
+    }
+
+    // ── LOCKOUT ──
+    let lockInterval = null;
+    const getAttempts  = ()    => parseInt(localStorage.getItem(ATTEMPT_KEY)||'0',10);
+    const addAttempt   = ()    => { const n=getAttempts()+1; localStorage.setItem(ATTEMPT_KEY,n); return n; };
+    const clearAttempts= ()    => { localStorage.removeItem(ATTEMPT_KEY); localStorage.removeItem(LOCKOUT_KEY); };
+    const setLockout   = ()    => localStorage.setItem(LOCKOUT_KEY, Date.now()+LOCKOUT_MS);
+    const getRemaining = ()    => Math.max(0, parseInt(localStorage.getItem(LOCKOUT_KEY)||'0',10)-Date.now());
+    const fmtTime      = ms   => { const s=Math.ceil(ms/1000); return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; };
+
+    function startLockout() {
+      disableForm(true);
+      lockoutBanner.classList.add('show');
+      attemptsWarn.classList.remove('show');
+      hideError();
+      const tick = () => {
+        const rem = getRemaining();
+        lockoutTimer.textContent = fmtTime(rem);
+        if (rem <= 0) {
+          clearInterval(lockInterval); lockInterval=null;
+          clearAttempts(); disableForm(false);
+          lockoutBanner.classList.remove('show');
+          showToast('You\'re unlocked!', 'You can sign in again now.', 'success');
+        }
+      };
+      tick();
+      lockInterval = setInterval(tick, 1000);
+    }
+
+    if (getRemaining() > 0) startLockout();
+
+    // ── LOGIN ──
+    loginBtn.addEventListener('click', async () => {
+      if (getRemaining() > 0) return;
+      hideError(); attemptsWarn.classList.remove('show');
+      clearErr('ident'); clearErr('pass');
+
+      const identifier = identifierInput.value.trim();
+      const password   = passwordInput.value;
+      let valid = true;
+
+      if (!identifier) { identifierInput.classList.add('err'); showErr('ident','Please enter your email or phone number.'); valid=false; }
+      if (!password)   { passwordInput.classList.add('err');   showErr('pass','Please enter your password.'); valid=false; }
+      if (!valid) return;
+
+      setLoginLoading(true);
+
+      try {
+        await mcSmartLogin({ identifier, password, rememberMe: false });
+        clearAttempts();
+        showToast('Welcome back!', 'Taking you to your account…', 'success');
+        // auth.js redirects to app-skeleton.html
+
+      } catch (error) {
+        setLoginLoading(false);
+        const attempts  = addAttempt();
+        const remaining = MAX_ATTEMPTS - attempts;
+
+        if (attempts >= MAX_ATTEMPTS) {
+          setLockout(); clearAttempts(); startLockout();
+          showToast('Account Locked', 'Too many failed attempts. Locked for 10 minutes.', 'error');
+        } else {
+          showError(error.message);
+          if (attempts >= 2) {
+            attemptsWarn.textContent = `⚠️ ${remaining} attempt${remaining===1?'':'s'} left before your account is locked for 10 minutes.`;
+            attemptsWarn.classList.add('show');
+          }
+          if (attempts === 4) {
+            showToast('Final Warning', 'One more wrong attempt will lock your account for 10 minutes.', 'warning');
+          }
+        }
+      }
+    });
+
+    // ── GOOGLE ──
+    googleBtn.addEventListener('click', async () => {
+      hideError();
+      setGoogleLoading(true);
+      try {
+        await mcGoogleLogin({ rememberMe: false });
+        clearAttempts();
+        showToast('Welcome!', 'Google sign-in successful. Taking you to your account…', 'success');
+      } catch (error) {
+        setGoogleLoading(false);
+        showToast('Google Sign-In Failed', error.message, 'error');
+      }
+    });
+
+    // ── FORGOT PASSWORD ──
+    forgotTrigger.addEventListener('click', () => {
+      const open = forgotPanel.classList.contains('open');
+      forgotPanel.classList.toggle('open', !open);
+      forgotTrigger.innerHTML = open
+        ? '<i class="fas fa-key"></i> Forgot your password? Reset it here'
+        : '<i class="fas fa-chevron-up"></i> Close reset panel';
+      if (!open) {
+        const val = identifierInput.value.trim();
+        if (val && detectInputType(val)==='email') forgotInput.value=val;
+        setTimeout(()=>forgotInput.focus(), 320);
+      }
+    });
+
+    forgotClose.addEventListener('click', () => {
+      forgotPanel.classList.remove('open');
+      forgotTrigger.innerHTML = '<i class="fas fa-key"></i> Forgot your password? Reset it here';
+      forgotResult.className  = 'forgot-result';
+      forgotInput.value = '';
+      forgotSendBtn.textContent='Send Link'; forgotSendBtn.disabled=false;
+    });
+
+    forgotSendBtn.addEventListener('click', async () => {
+      const val = forgotInput.value.trim();
+      forgotResult.className = 'forgot-result';
+      if (!val) { forgotResultText.textContent='Please enter your email address.'; forgotResult.className='forgot-result bad'; return; }
+
+      forgotSendBtn.disabled=true; forgotSendBtn.textContent='Sending…';
+      try {
+        await mcForgotPassword(val);
+        forgotResultText.textContent='✓ Reset link sent! Check your inbox and spam folder.';
+        forgotResult.className='forgot-result ok';
+        forgotSendBtn.textContent='Resend'; forgotSendBtn.disabled=false;
+        showToast('Email Sent!', 'Check your inbox for the password reset link.', 'success');
+      } catch(error) {
+        forgotSendBtn.disabled=false; forgotSendBtn.textContent='Send Link';
+        forgotResultText.textContent=error.message; forgotResult.className='forgot-result bad';
+        showToast('Could Not Send', error.message, 'error');
+      }
+    });
+
+    // ── CLEAR ERRORS ──
+    passwordInput.addEventListener('input', () => { clearErr('pass'); hideError(); });
+
+    // ── ENTER KEY ──
+    [identifierInput, passwordInput].forEach(el => el.addEventListener('keydown', e => { if(e.key==='Enter') loginBtn.click(); }));
+    forgotInput.addEventListener('keydown', e => { if(e.key==='Enter') forgotSendBtn.click(); });
+  </script>
+</body>
+</html>
