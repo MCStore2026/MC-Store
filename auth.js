@@ -94,7 +94,7 @@ async function mcSignUp({ fullName, email, password, phone, address }) {
 
     await updateProfile(user, { displayName: fullName });
 
-    await setDoc(doc(db, "users", user.uid), {
+    await setDoc(doc(db, "customers", user.uid), {
       uid:       user.uid,
       fullName,
       email,
@@ -133,11 +133,11 @@ async function mcLogin({ email, password, rememberMe = false }) {
     const credential = await signInWithEmailAndPassword(auth, email, password);
     const user       = credential.user;
 
-    const snap    = await getDoc(doc(db, "users", user.uid));
+    const snap    = await getDoc(doc(db, "customers", user.uid));
     const profile = snap.exists() ? snap.data() : {};
 
     if (snap.exists()) {
-      await updateDoc(doc(db, "users", user.uid), {
+      await updateDoc(doc(db, "customers", user.uid), {
         lastLogin: serverTimestamp()
       });
     }
@@ -167,7 +167,7 @@ async function mcLogin({ email, password, rememberMe = false }) {
 async function mcLoginWithPhone({ phone, password, rememberMe = false }) {
   try {
     const cleaned  = phone.replace(/\s/g, "");
-    const q        = query(collection(db, "users"), where("phone", "==", cleaned));
+    const q        = query(collection(db, "customers"), where("phone", "==", cleaned));
     const snapshot = await getDocs(q);
 
     if (snapshot.empty) {
@@ -222,11 +222,11 @@ async function mcGoogleLogin({ rememberMe = false } = {}) {
     const result = await signInWithPopup(auth, provider);
     const user   = result.user;
 
-    const snap = await getDoc(doc(db, "users", user.uid));
+    const snap = await getDoc(doc(db, "customers", user.uid));
 
     if (!snap.exists()) {
       // New Google user — create full profile
-      await setDoc(doc(db, "users", user.uid), {
+      await setDoc(doc(db, "customers", user.uid), {
         uid:       user.uid,
         fullName:  user.displayName || "",
         email:     user.email       || "",
@@ -238,7 +238,7 @@ async function mcGoogleLogin({ rememberMe = false } = {}) {
         provider:  "google"
       });
     } else {
-      await updateDoc(doc(db, "users", user.uid), {
+      await updateDoc(doc(db, "customers", user.uid), {
         lastLogin: serverTimestamp()
       });
     }
@@ -366,7 +366,7 @@ function getCurrentUser() {
 
 async function getUserProfile(uid) {
   try {
-    const snap = await getDoc(doc(db, "users", uid));
+    const snap = await getDoc(doc(db, "customers", uid));
     return snap.exists() ? snap.data() : null;
   } catch (error) {
     console.error("getUserProfile error:", error);
