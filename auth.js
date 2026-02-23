@@ -42,12 +42,12 @@ import { saveSession, clearSession, getSession } from "./session.js";
 //  Project Settings → Your Apps → SDK setup
 // ─────────────────────────────────────────
 const firebaseConfig = {
-  apiKey:            "YOUR_API_KEY",
-  authDomain:        "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId:         "YOUR_PROJECT_ID",
-  storageBucket:     "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId:             "YOUR_APP_ID"
+  apiKey:            "AIzaSyC7trJbzcIix4HgPEHCybb6E7Ztkc39kfw",
+  authDomain:        "mc-store-b6beb.firebaseapp.com",
+  projectId:         "mc-store-b6beb",
+  storageBucket:     "mc-store-b6beb.firebasestorage.app",
+  messagingSenderId: "930964754103",
+  appId:             "1:930964754103:web:0e79c3dcd6bcc4dafc8732"
 };
 
 // ─────────────────────────────────────────
