@@ -1,0 +1,4 @@
+{
+  "buildCommand": "sed -i 's|SUPABASE_URL_PLACEHOLDER|'\"$SUPABASE_URL\"'|g' product.js && sed -i 's|SUPABASE_ANON_PLACEHOLDER|'\"$SUPABASE_ANON_KEY\"'|g' product.js",
+  "outputDirectory": "."
+}
