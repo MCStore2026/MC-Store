@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Store — FAQs</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#1a56db;--blue-lt:#eff6ff;--blue-md:#dbeafe;--gold:#f5a623;--text:#0f172a;--gray:#6b7280;--border:#e5e7eb;--white:#ffffff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f8fafc;color:var(--text)}
+.top-header{position:sticky;top:0;z-index:100;background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(26,86,219,0.06);padding:0 1rem}
+.header-inner{max-width:800px;margin:0 auto;height:56px;display:flex;align-items:center;gap:.75rem}
+.back-btn{width:36px;height:36px;border-radius:10px;border:none;background:var(--blue-lt);color:var(--blue);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.back-btn:hover{background:var(--blue-md)}
+.header-logo{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900}
+.header-logo span{color:var(--gold)}
+.hero{background:linear-gradient(135deg,#7c3aed 0%,#6d28d9 100%);padding:2.5rem 1rem 2rem}
+.hero-inner{max-width:800px;margin:0 auto}
+.hero-icon{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:24px;color:white;margin-bottom:1rem}
+.hero h1{font-family:'Playfair Display',serif;font-size:1.75rem;font-weight:900;color:white;margin-bottom:.4rem}
+.hero p{font-size:.85rem;color:rgba(255,255,255,.78)}
+
+/* Search bar */
+.search-wrap{max-width:800px;margin:0 auto;padding:1.25rem 1rem 0}
+.search-bar{display:flex;align-items:center;gap:.6rem;background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:.7rem 1rem;transition:all .2s}
+.search-bar:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,219,.08)}
+.search-bar i{color:var(--gray);font-size:14px}
+.search-bar input{border:none;background:none;outline:none;font-family:'DM Sans',sans-serif;font-size:.875rem;color:var(--text);width:100%}
+.search-bar input::placeholder{color:#9ca3af}
+
+/* category tabs */
+.cat-tabs{display:flex;gap:.4rem;overflow-x:auto;padding:1rem 1rem .25rem;max-width:800px;margin:0 auto;scrollbar-width:none}
+.cat-tabs::-webkit-scrollbar{display:none}
+.cat-tab{display:flex;align-items:center;gap:.35rem;padding:.38rem .75rem;border-radius:50px;border:1.5px solid var(--border);background:var(--white);color:var(--gray);font-size:.75rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.cat-tab:hover{border-color:var(--blue-md);color:var(--blue);background:var(--blue-lt)}
+.cat-tab.active{background:var(--blue);color:white;border-color:var(--blue)}
+
+.content{max-width:800px;margin:0 auto;padding:1rem 1rem 3rem}
+
+/* faq group */
+.faq-group{margin-bottom:1.5rem}
+.faq-group-title{font-family:'Playfair Display',serif;font-size:1rem;font-weight:800;color:var(--text);margin-bottom:.65rem;display:flex;align-items:center;gap:.45rem}
+.faq-group-title i{color:var(--blue);font-size:15px}
+
+.faq-card{background:var(--white);border:1.5px solid var(--border);border-radius:14px;margin-bottom:.5rem;overflow:hidden;transition:all .25s}
+.faq-card:hover{border-color:var(--blue-md)}
+.faq-card.open{border-color:var(--blue);box-shadow:0 4px 16px rgba(26,86,219,.08)}
+
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;cursor:pointer;gap:.75rem}
+.faq-q-text{font-size:.875rem;font-weight:600;color:var(--text);line-height:1.4}
+.faq-card.open .faq-q-text{color:var(--blue)}
+.faq-toggle{width:28px;height:28px;border-radius:8px;background:var(--blue-lt);color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:all .3s}
+.faq-card.open .faq-toggle{background:var(--blue);color:white;transform:rotate(180deg)}
+
+.faq-a{display:none;padding:.25rem 1rem 1rem;font-size:.855rem;color:var(--gray);line-height:1.8;border-top:1px solid var(--border)}
+.faq-card.open .faq-a{display:block}
+.faq-a ul{padding-left:1.25rem;margin:.5rem 0}
+.faq-a ul li{margin-bottom:.4rem}
+.faq-a strong{color:var(--text);font-weight:700}
+.faq-a a{color:var(--blue);text-decoration:none;font-weight:600}
+
+/* no results */
+.no-results{text-align:center;padding:3rem 1rem;color:var(--gray);display:none}
+.no-results i{font-size:2.5rem;color:var(--blue-md);display:block;margin-bottom:.75rem}
+.no-results h3{font-size:1rem;font-weight:700;color:var(--text);margin-bottom:.3rem}
+
+.contact-box{background:var(--blue-lt);border:1.5px solid var(--blue-md);border-radius:16px;padding:1.25rem;display:flex;align-items:flex-start;gap:.85rem;margin-top:1.5rem}
+.contact-icon{width:42px;height:42px;background:var(--blue);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-size:17px;flex-shrink:0}
+.contact-text h4{font-size:.875rem;font-weight:700;color:var(--text);margin-bottom:.25rem}
+.contact-text p{font-size:.8rem;color:var(--gray);line-height:1.55;margin:0}
+.contact-btn{margin-top:.65rem;display:inline-flex;align-items:center;gap:.4rem;background:var(--blue);color:white;border:none;border-radius:10px;padding:.5rem 1rem;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s}
+.contact-btn:hover{background:#1347c8}
+</style>
+</head>
+<body>
+
+<header class="top-header">
+  <div class="header-inner">
+    <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+    <div class="header-logo">MC<span>Store</span></div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-icon"><i class="fas fa-circle-question"></i></div>
+    <h1>Help & FAQs</h1>
+    <p>Find quick answers to common questions about MC Store.</p>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <div class="search-bar">
+    <i class="fas fa-search"></i>
+    <input type="text" id="faqSearch" placeholder="Search questions..." oninput="searchFAQ()">
+  </div>
+</div>
+
+<!-- CATEGORY TABS -->
+<div class="cat-tabs">
+  <div class="cat-tab active" data-cat="all" onclick="filterCat('all')"><i class="fas fa-list"></i> All</div>
+  <div class="cat-tab" data-cat="orders" onclick="filterCat('orders')"><i class="fas fa-box"></i> Orders</div>
+  <div class="cat-tab" data-cat="delivery" onclick="filterCat('delivery')"><i class="fas fa-truck"></i> Delivery</div>
+  <div class="cat-tab" data-cat="payment" onclick="filterCat('payment')"><i class="fas fa-credit-card"></i> Payment</div>
+  <div class="cat-tab" data-cat="returns" onclick="filterCat('returns')"><i class="fas fa-rotate-left"></i> Returns</div>
+  <div class="cat-tab" data-cat="account" onclick="filterCat('account')"><i class="fas fa-user"></i> Account</div>
+</div>
+
+<div class="content">
+
+  <!-- ORDERS -->
+  <div class="faq-group" data-group="orders">
+    <div class="faq-group-title"><i class="fas fa-box"></i> Orders</div>
+
+    <div class="faq-card" data-cat="orders" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">How do I track my order?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        Go to the <strong>Orders</strong> tab at the bottom of the app and tap on any order to see its live status. Your order goes through the following stages:
+        <ul>
+          <li><strong>Pending</strong> — Order received, awaiting confirmation</li>
+          <li><strong>Processing</strong> — We are preparing your items</li>
+          <li><strong>Shipped</strong> — Order is on the way</li>
+          <li><strong>Delivered</strong> — Order successfully delivered</li>
+        </ul>
+        Once shipped, a <strong>Track Order</strong> button will appear with real-time courier tracking.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="orders" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">How do I cancel an order?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        Orders can only be cancelled <strong>before they are shipped</strong>. To cancel:
+        <ul>
+          <li>Contact us immediately on WhatsApp with your order number</li>
+          <li>Our team will confirm whether the order can still be cancelled</li>
+          <li>If payment was made online, a full refund will be processed within 3–5 business days</li>
+        </ul>
+        Once an order has been shipped, it can no longer be cancelled but may be returned after delivery.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="orders" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">Can I change my order after placing it?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        Order modifications are only possible if the order has not yet been processed. Contact our support team immediately via WhatsApp. Once processing begins, changes cannot be made. You may cancel and place a new order if needed.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="orders" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">Why was my order cancelled?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        Orders may be cancelled due to:
+        <ul>
+          <li>Item out of stock after purchase</li>
+          <li>Payment verification failure</li>
+          <li>Undeliverable address</li>
+          <li>Suspected fraudulent activity</li>
+        </ul>
+        You will be notified via the app and email. A full refund will be issued automatically if payment was made.
+      </div>
+    </div>
+  </div>
+
+  <!-- DELIVERY -->
+  <div class="faq-group" data-group="delivery">
+    <div class="faq-group-title"><i class="fas fa-truck"></i> Delivery</div>
+
+    <div class="faq-card" data-cat="delivery" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">How long does delivery take?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        Delivery typically takes <strong>1–3 business days</strong> depending on your location:
+        <ul>
+          <li><strong>Ibadan</strong> — Same day or next day delivery</li>
+          <li><strong>Lagos, Abuja</strong> — 1–2 business days</li>
+          <li><strong>Other states</strong> — 2–3 business days</li>
+        </ul>
+        You'll receive tracking updates once your order ships. Delays may occur during public holidays.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="delivery" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">How is the delivery fee calculated?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        Delivery fees are calculated automatically based on your delivery address and package weight using <strong>Shipbubble</strong>, our courier partner. You'll see the exact fee at checkout before confirming your order. Store pickup is always free.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="delivery" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">Where is the store pickup location?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        Our store is located at: <strong>Opposite Bovas Filling Station, Bodija, Ibadan, Oyo State, Nigeria.</strong> Pickup orders are usually ready within 1–2 hours of order confirmation. You'll receive a notification when your order is ready.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="delivery" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">Do you deliver outside Nigeria?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        Currently, MC Store only delivers within Nigeria. We cover all 36 states and the FCT. International shipping is not available at this time but may be introduced in the future.
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENT -->
+  <div class="faq-group" data-group="payment">
+    <div class="faq-group-title"><i class="fas fa-credit-card"></i> Payment</div>
+
+    <div class="faq-card" data-cat="payment" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">What payment methods do you accept?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        We accept:
+        <ul>
+          <li><strong>Pay Online</strong> — Debit/credit cards, bank transfer, and USSD via Paystack</li>
+          <li><strong>Cash on Delivery</strong> — Pay when your order arrives (available for orders between ₦7,000 and ₦50,000)</li>
+        </ul>
+        All online payments are secured by Paystack and your card details are never stored on our servers.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="payment" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">Why is Cash on Delivery not available for my order?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        Cash on Delivery is only available for orders <strong>between ₦7,000 and ₦50,000</strong>. If your order total is below ₦7,000 or above ₦50,000, you'll need to pay online via Paystack. This policy helps us ensure safe and efficient order management.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="payment" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">Is it safe to pay on MC Store?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        Yes, absolutely. All online payments on MC Store are processed by <strong>Paystack</strong>, which is PCI-DSS compliant and trusted by thousands of businesses across Africa. We never see or store your card details. Your payment information is fully encrypted and secure.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="payment" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">My payment failed. What should I do?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        If your payment fails, please:
+        <ul>
+          <li>Check that your card has sufficient funds</li>
+          <li>Ensure your internet connection is stable</li>
+          <li>Try a different payment method (e.g. bank transfer instead of card)</li>
+          <li>Contact your bank if the issue persists</li>
+          <li>Reach us on WhatsApp if you need further assistance</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- RETURNS -->
+  <div class="faq-group" data-group="returns">
+    <div class="faq-group-title"><i class="fas fa-rotate-left"></i> Returns & Refunds</div>
+
+    <div class="faq-card" data-cat="returns" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">How do I return an item?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        To return an item:
+        <ul>
+          <li>Contact us within <strong>7 days</strong> of receiving your order</li>
+          <li>Send your order number and photos of the item via WhatsApp</li>
+          <li>Our team will review and approve eligible returns within 24–48 hours</li>
+          <li>We'll arrange a pickup or guide you to drop off at our store</li>
+          <li>Refunds are processed within 3–5 business days after we receive the item</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="returns" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">How long does a refund take?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        Once your return is received and approved, refunds are processed within <strong>3–5 business days</strong>. Online payments are refunded to your original payment method. Cash on Delivery orders are refunded via bank transfer.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="returns" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">I received a wrong or damaged item. What do I do?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        We sincerely apologise! Please:
+        <ul>
+          <li>Take clear photos or a short video of the item immediately</li>
+          <li>Contact us on WhatsApp within <strong>48 hours</strong> of delivery</li>
+          <li>Share your order number and the evidence</li>
+        </ul>
+        We will arrange a free return pickup and either send the correct item or issue a full refund at no extra cost to you.
+      </div>
+    </div>
+  </div>
+
+  <!-- ACCOUNT -->
+  <div class="faq-group" data-group="account">
+    <div class="faq-group-title"><i class="fas fa-user"></i> Account</div>
+
+    <div class="faq-card" data-cat="account" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">How do I create an account?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        Creating an account is quick and easy. On the MC Store homepage, tap <strong>Sign Up</strong>, enter your name, email, phone number, and password. You can also sign up instantly using your <strong>Google account</strong>.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="account" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">I forgot my password. How do I reset it?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        On the login page, tap <strong>Forgot Password</strong> and enter your email address. A password reset link will be sent to your email. Click the link and follow the steps to create a new password. If you don't see the email, check your spam/junk folder.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="account" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">Can I use MC Store without creating an account?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        You can browse products without an account, but you'll need to <strong>create an account</strong> to place orders, save items to your wishlist, and track your deliveries. Signing up is free and takes less than a minute.
+      </div>
+    </div>
+
+    <div class="faq-card" data-cat="account" onclick="toggleFAQ(this)">
+      <div class="faq-q">
+        <div class="faq-q-text">How do I delete my account?</div>
+        <div class="faq-toggle"><i class="fas fa-chevron-down"></i></div>
+      </div>
+      <div class="faq-a">
+        To delete your account, go to <strong>Account → Delete Account</strong> in the app, or contact our support team via WhatsApp. Please note that deleting your account is permanent and cannot be undone. All your order history and saved data will be removed.
+      </div>
+    </div>
+  </div>
+
+  <!-- No results -->
+  <div class="no-results" id="noResults">
+    <i class="fas fa-magnifying-glass"></i>
+    <h3>No results found</h3>
+    <p>Try different keywords or browse by category above.</p>
+  </div>
+
+  <!-- Contact -->
+  <div class="contact-box">
+    <div class="contact-icon"><i class="fas fa-headset"></i></div>
+    <div class="contact-text">
+      <h4>Still need help?</h4>
+      <p>Our support team is available on WhatsApp. We typically respond within a few minutes during business hours.</p>
+      <button class="contact-btn" onclick="openWhatsApp()">
+        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleFAQ(card) {
+  const isOpen = card.classList.contains('open');
+  document.querySelectorAll('.faq-card.open').forEach(c => c.classList.remove('open'));
+  if (!isOpen) card.classList.add('open');
+}
+
+function filterCat(cat) {
+  document.querySelectorAll('.cat-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.cat === cat)
+  );
+  document.querySelectorAll('.faq-group').forEach(g => {
+    g.style.display = (cat === 'all' || g.dataset.group === cat) ? 'block' : 'none';
+  });
+  document.getElementById('noResults').style.display = 'none';
+}
+
+function searchFAQ() {
+  const q = document.getElementById('faqSearch').value.toLowerCase().trim();
+
+  // Reset category filter
+  document.querySelectorAll('.cat-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.cat === 'all')
+  );
+
+  let visibleCount = 0;
+  document.querySelectorAll('.faq-card').forEach(card => {
+    const text = card.textContent.toLowerCase();
+    const show = !q || text.includes(q);
+    card.style.display = show ? 'block' : 'none';
+    if (show) visibleCount++;
+  });
+
+  // Show/hide groups based on visible cards
+  document.querySelectorAll('.faq-group').forEach(g => {
+    const visible = [...g.querySelectorAll('.faq-card')]
+      .some(c => c.style.display !== 'none');
+    g.style.display = visible ? 'block' : 'none';
+  });
+
+  document.getElementById('noResults').style.display = visibleCount === 0 ? 'block' : 'none';
+}
+
+function openWhatsApp() {
+  const msg = encodeURIComponent('Hello MC Store! I need some help.');
+  window.open(`https://wa.me/2348056230366?text=${msg}`, '_blank');
+}
+</script>
+</body>
+</html>

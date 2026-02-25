@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Store — Refund & Returns Policy</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#1a56db;--blue-lt:#eff6ff;--blue-md:#dbeafe;--gold:#f5a623;--green:#16a34a;--green-lt:#f0fdf4;--red:#ef4444;--red-lt:#fef2f2;--text:#0f172a;--gray:#6b7280;--border:#e5e7eb;--white:#ffffff}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f8fafc;color:var(--text)}
+.top-header{position:sticky;top:0;z-index:100;background:var(--white);border-bottom:1px solid var(--border);box-shadow:0 2px 12px rgba(26,86,219,0.06);padding:0 1rem}
+.header-inner{max-width:800px;margin:0 auto;height:56px;display:flex;align-items:center;gap:.75rem}
+.back-btn{width:36px;height:36px;border-radius:10px;border:none;background:var(--blue-lt);color:var(--blue);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.back-btn:hover{background:var(--blue-md)}
+.header-logo{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:900}
+.header-logo span{color:var(--gold)}
+.hero{background:linear-gradient(135deg,#065f46 0%,#059669 100%);padding:2.5rem 1rem 2rem}
+.hero-inner{max-width:800px;margin:0 auto}
+.hero-icon{width:56px;height:56px;border-radius:16px;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:24px;color:white;margin-bottom:1rem}
+.hero h1{font-family:'Playfair Display',serif;font-size:1.75rem;font-weight:900;color:white;margin-bottom:.4rem}
+.hero p{font-size:.85rem;color:rgba(255,255,255,.78)}
+.hero-date{display:inline-flex;align-items:center;gap:.35rem;background:rgba(255,255,255,.15);color:white;font-size:.72rem;font-weight:600;padding:.25rem .65rem;border-radius:50px;margin-top:.75rem}
+.content{max-width:800px;margin:0 auto;padding:2rem 1rem 3rem}
+.section{margin-bottom:2rem}
+.section-title{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:800;color:var(--text);margin-bottom:.75rem;display:flex;align-items:center;gap:.5rem}
+.section-title i{color:var(--blue);font-size:15px}
+.section-body{font-size:.875rem;color:#374151;line-height:1.85}
+.section-body p{margin-bottom:.75rem}
+.section-body p:last-child{margin-bottom:0}
+.section-body ul{padding-left:1.25rem;margin-bottom:.75rem}
+.section-body ul li{margin-bottom:.45rem}
+.section-body strong{color:var(--text);font-weight:700}
+.divider{height:1px;background:var(--border);margin:1.5rem 0}
+.highlight-box{border-radius:14px;padding:1rem 1.1rem;margin-bottom:.85rem;display:flex;align-items:flex-start;gap:.75rem}
+.highlight-box i{font-size:16px;margin-top:.1rem;flex-shrink:0}
+.highlight-box p{font-size:.82rem;line-height:1.65;margin:0}
+.green-box{background:var(--green-lt);border:1.5px solid #bbf7d0;color:var(--green)}
+.red-box{background:var(--red-lt);border:1.5px solid #fecaca;color:var(--red)}
+.gold-box{background:#fef3c7;border:1.5px solid #fde68a;color:#92400e}
+.blue-box{background:var(--blue-lt);border:1.5px solid var(--blue-md);color:var(--blue)}
+.step-row{display:flex;gap:.85rem;align-items:flex-start;margin-bottom:1rem}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--blue);color:white;font-size:.75rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-content{flex:1}
+.step-content strong{font-size:.875rem;color:var(--text);display:block;margin-bottom:.2rem}
+.step-content p{font-size:.82rem;color:var(--gray);line-height:1.6;margin:0}
+.status-grid{display:grid;grid-template-columns:1fr 1fr;gap:.65rem;margin-top:.5rem}
+@media(max-width:480px){.status-grid{grid-template-columns:1fr}}
+.status-card{border-radius:12px;padding:.85rem;border:1.5px solid}
+.status-card.can{background:var(--green-lt);border-color:#bbf7d0}
+.status-card.cannot{background:var(--red-lt);border-color:#fecaca}
+.status-card h4{font-size:.78rem;font-weight:800;margin-bottom:.5rem;display:flex;align-items:center;gap:.35rem}
+.status-card.can h4{color:var(--green)}
+.status-card.cannot h4{color:var(--red)}
+.status-card ul{padding-left:1rem;font-size:.75rem;line-height:1.7;color:#374151}
+.contact-box{background:var(--blue-lt);border:1.5px solid var(--blue-md);border-radius:16px;padding:1.25rem;display:flex;align-items:flex-start;gap:.85rem;margin-top:2rem}
+.contact-icon{width:42px;height:42px;background:var(--blue);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-size:17px;flex-shrink:0}
+.contact-text h4{font-size:.875rem;font-weight:700;color:var(--text);margin-bottom:.25rem}
+.contact-text p{font-size:.8rem;color:var(--gray);line-height:1.55;margin:0}
+</style>
+</head>
+<body>
+
+<header class="top-header">
+  <div class="header-inner">
+    <button class="back-btn" onclick="history.back()"><i class="fas fa-arrow-left"></i></button>
+    <div class="header-logo">MC<span>Store</span></div>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-icon"><i class="fas fa-rotate-left"></i></div>
+    <h1>Refund & Returns</h1>
+    <p>Our commitment to making things right when something goes wrong.</p>
+    <div class="hero-date"><i class="fas fa-calendar"></i> Last updated: January 2025</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="highlight-box green-box">
+    <i class="fas fa-circle-check"></i>
+    <p>We want you to be completely happy with your MC Store purchase. If something isn't right, we'll do our best to fix it — quickly and fairly.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><i class="fas fa-clock"></i> Return Window</div>
+    <div class="section-body">
+      <p>You may request a return or refund within <strong>7 days of receiving your order</strong>. Requests made after 7 days will not be accepted except in cases of confirmed product defects or wrong items delivered.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title"><i class="fas fa-list-check"></i> What Can & Cannot Be Returned</div>
+    <div class="section-body" style="margin-bottom:0">
+      <div class="status-grid">
+        <div class="status-card can">
+          <h4><i class="fas fa-check"></i> Eligible for Return</h4>
+          <ul>
+            <li>Wrong item delivered</li>
+            <li>Damaged or defective items</li>
+            <li>Items not as described</li>
+            <li>Sealed items unopened</li>
+            <li>Items in original packaging</li>
+          </ul>
+        </div>
+        <div class="status-card cannot">
+          <h4><i class="fas fa-xmark"></i> Not Eligible</h4>
+          <ul>
+            <li>Opened food & groceries</li>
+            <li>Used beauty/hygiene items</li>
+            <li>Items without original tags</li>
+            <li>Digital products</li>
+            <li>Items returned after 7 days</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title"><i class="fas fa-route"></i> How to Request a Return</div>
+    <div class="section-body">
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <strong>Contact Support</strong>
+          <p>Reach out via <a href="https://wa.me/2348056230366" target="_blank" style="color:var(--blue);font-weight:700">WhatsApp</a> or the support section in the app within 7 days of receiving your order.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <strong>Provide Details</strong>
+          <p>Share your order number, the item(s) you want to return, and a clear photo or video showing the issue.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <strong>Await Approval</strong>
+          <p>Our team will review your request within 24–48 hours and confirm if your return is approved.</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <strong>Return the Item</strong>
+          <p>We'll arrange a pickup or guide you to drop off the item at our Bodija, Ibadan store location.</p>
+        </div>
+      </div>
+      <div class="step-row" style="margin-bottom:0">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <strong>Receive Your Refund</strong>
+          <p>Once we receive and inspect the item, your refund will be processed within 3–5 business days.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title"><i class="fas fa-money-bill-transfer"></i> Refund Methods</div>
+    <div class="section-body">
+      <p>Approved refunds will be processed as follows:</p>
+      <ul>
+        <li><strong>Online payments (Paystack)</strong> — refunded to your original payment method within 3–5 business days</li>
+        <li><strong>Cash on Delivery orders</strong> — refunded via bank transfer to your provided account number within 3–5 business days</li>
+        <li><strong>Store credit</strong> — available as an alternative, credited to your MC Store account immediately</li>
+      </ul>
+      <p>Delivery fees are non-refundable unless the return is due to our error (wrong item, damaged goods).</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title"><i class="fas fa-circle-xmark"></i> Order Cancellations</div>
+    <div class="section-body">
+      <div class="highlight-box gold-box" style="margin-bottom:.85rem">
+        <i class="fas fa-triangle-exclamation"></i>
+        <p>Orders can only be cancelled <strong>before they are shipped</strong>. Once an order is shipped, it can no longer be cancelled.</p>
+      </div>
+      <p>To cancel an order, contact us immediately via <a href="https://wa.me/2348056230366" target="_blank" style="color:var(--blue);font-weight:700">WhatsApp</a> with your order number. If your payment has already been processed, a full refund will be issued within 3–5 business days.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title"><i class="fas fa-truck-fast"></i> Damaged or Wrong Items</div>
+    <div class="section-body">
+      <p>If you receive a damaged, defective, or wrong item, please:</p>
+      <ul>
+        <li>Take clear photos or a video of the item immediately</li>
+        <li>Do not use or open the item further</li>
+        <li>Contact us within <strong>48 hours</strong> of delivery</li>
+      </ul>
+      <p>We will arrange a free pickup and send the correct item or issue a full refund at no extra cost to you.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title"><i class="fas fa-hourglass-half"></i> Refund Timeline</div>
+    <div class="section-body">
+      <ul>
+        <li><strong>Return request review:</strong> 24–48 hours</li>
+        <li><strong>Item inspection after receipt:</strong> 1–2 business days</li>
+        <li><strong>Refund processing:</strong> 3–5 business days</li>
+        <li><strong>Bank transfer arrival:</strong> Depends on your bank, usually same day</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="contact-box">
+    <div class="contact-icon"><i class="fas fa-headset"></i></div>
+    <div class="contact-text">
+      <h4>Need to request a return?</h4>
+      <p>Contact us via <a href="https://wa.me/2348056230366" target="_blank" style="color:var(--blue);font-weight:700">WhatsApp</a> or through the Support section in the app. Have your order number and photos ready for a faster resolution.</p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
