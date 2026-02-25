@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Store — Cart</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:    #1a56db;
+  --blue-dk: #1347c8;
+  --blue-lt: #eff6ff;
+  --blue-md: #dbeafe;
+  --gold:    #f5a623;
+  --red:     #ef4444;
+  --red-lt:  #fef2f2;
+  --green:   #16a34a;
+  --green-lt:#f0fdf4;
+  --white:   #ffffff;
+  --gray:    #6b7280;
+  --gray-lt: #f9fafb;
+  --text:    #0f172a;
+  --border:  #e5e7eb;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: #f8fafc; color: var(--text); }
+
+.page { height: 100vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+
+/* ── HEADER ── */
+.top-header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--white); border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(26,86,219,0.06); padding: 0 1rem;
+}
+.header-inner {
+  max-width: 1200px; margin: 0 auto;
+  height: 56px; display: flex; align-items: center; gap: 0.75rem;
+}
+.header-logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 900; color: var(--text); }
+.header-logo span { color: var(--gold); }
+.header-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; flex: 1; text-align: center; }
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 10px; border: none;
+  background: var(--gray-lt); color: var(--gray); font-size: 15px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.icon-btn:hover { background: var(--red-lt); color: var(--red); }
+
+/* ── MAIN ── */
+.main { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+
+/* ── STEP INDICATOR ── */
+.steps {
+  display: flex; align-items: center; justify-content: center;
+  gap: 0; margin-bottom: 1.25rem;
+  animation: fadeUp 0.3s ease both;
+}
+.step {
+  display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  flex: 1; position: relative;
+}
+.step:not(:last-child)::after {
+  content: ''; position: absolute;
+  top: 14px; left: 60%; width: 80%;
+  height: 2px; background: var(--border);
+  z-index: 0;
+}
+.step.done:not(:last-child)::after,
+.step.active:not(:last-child)::after { background: var(--blue); }
+.step-circle {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--gray-lt); border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: var(--gray);
+  z-index: 1; transition: all 0.3s;
+}
+.step.active .step-circle { background: var(--blue); border-color: var(--blue); color: white; }
+.step.done .step-circle { background: var(--green); border-color: var(--green); color: white; }
+.step-label { font-size: 0.65rem; font-weight: 600; color: var(--gray); text-align: center; }
+.step.active .step-label { color: var(--blue); }
+.step.done .step-label { color: var(--green); }
+
+/* ── SECTION CARD ── */
+.section-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 18px; padding: 1rem; margin-bottom: 1rem;
+  animation: fadeUp 0.35s ease both;
+}
+.section-card-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem; font-weight: 800; color: var(--text);
+  margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.5rem;
+}
+.section-card-title i { color: var(--blue); font-size: 15px; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── CART ITEM ── */
+.cart-item {
+  display: flex; gap: 0.75rem; padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border); position: relative;
+}
+.cart-item:last-child { border-bottom: none; padding-bottom: 0; }
+.item-img {
+  width: 70px; height: 70px; border-radius: 12px;
+  background: var(--gray-lt); flex-shrink: 0; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border);
+}
+.item-img img { width: 100%; height: 100%; object-fit: cover; }
+.item-img i { font-size: 1.5rem; color: var(--blue); }
+.item-info { flex: 1; min-width: 0; }
+.item-name {
+  font-size: 0.82rem; font-weight: 600; color: var(--text);
+  margin-bottom: 0.2rem; line-height: 1.35;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.item-price { font-size: 0.92rem; font-weight: 800; color: var(--blue); margin-bottom: 0.4rem; }
+.item-controls { display: flex; align-items: center; gap: 0.5rem; }
+.qty-btn {
+  width: 26px; height: 26px; border-radius: 8px;
+  border: 1.5px solid var(--border); background: var(--gray-lt);
+  color: var(--text); font-size: 13px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.qty-btn:hover { background: var(--blue-lt); border-color: var(--blue); color: var(--blue); }
+.qty-value { font-size: 0.85rem; font-weight: 700; min-width: 22px; text-align: center; }
+.item-total { font-size: 0.78rem; color: var(--gray); margin-left: auto; font-weight: 600; white-space: nowrap; }
+.remove-item-btn {
+  position: absolute; top: 0.75rem; right: 0;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--red-lt); border: none;
+  color: var(--red); font-size: 11px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+}
+.remove-item-btn:hover { background: var(--red); color: white; }
+
+/* ── DELIVERY METHOD ── */
+.method-options { display: flex; flex-direction: column; gap: 0.6rem; }
+.method-option {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.85rem 1rem; border-radius: 14px;
+  border: 2px solid var(--border); cursor: pointer;
+  transition: all 0.25s; position: relative;
+}
+.method-option:hover { border-color: var(--blue-md); background: var(--blue-lt); }
+.method-option.selected { border-color: var(--blue); background: var(--blue-lt); }
+.method-option input[type="radio"] { display: none; }
+.method-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: var(--blue-lt); color: var(--blue);
+  display: flex; align-items: center; justify-content: center; font-size: 18px;
+  flex-shrink: 0; transition: all 0.25s;
+}
+.method-option.selected .method-icon { background: var(--blue); color: white; }
+.method-info { flex: 1; }
+.method-label { font-size: 0.875rem; font-weight: 700; color: var(--text); }
+.method-sub { font-size: 0.75rem; color: var(--gray); margin-top: 0.1rem; }
+.method-price {
+  font-size: 0.875rem; font-weight: 800;
+  color: var(--blue); white-space: nowrap;
+}
+.method-price.free { color: var(--green); }
+.selected-check {
+  position: absolute; top: 8px; right: 10px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--blue); color: white;
+  font-size: 9px; display: none;
+  align-items: center; justify-content: center;
+}
+.method-option.selected .selected-check { display: flex; }
+
+/* ── ADDRESS FORM ── */
+.address-form { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-top: 0.85rem; }
+@media (max-width: 480px) { .address-form { grid-template-columns: 1fr; } }
+.form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+.form-group.full { grid-column: 1/-1; }
+.form-label { font-size: 0.72rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; }
+.form-input, .form-select {
+  border: 1.5px solid var(--border); border-radius: 10px;
+  padding: 0.6rem 0.75rem; font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem; color: var(--text); background: var(--white);
+  outline: none; transition: all 0.2s; width: 100%;
+}
+.form-input:focus, .form-select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,86,219,0.08); }
+.form-input::placeholder { color: #9ca3af; }
+
+/* delivery rate result */
+.rate-result {
+  margin-top: 0.85rem; padding: 0.85rem 1rem;
+  background: var(--green-lt); border: 1.5px solid #bbf7d0;
+  border-radius: 12px; display: none;
+}
+.rate-result.show { display: flex; align-items: center; gap: 0.75rem; }
+.rate-icon { width: 36px; height: 36px; background: var(--green); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 15px; flex-shrink: 0; }
+.rate-info h4 { font-size: 0.85rem; font-weight: 700; color: var(--green); }
+.rate-info p { font-size: 0.75rem; color: var(--gray); }
+.rate-fee { margin-left: auto; font-size: 1rem; font-weight: 800; color: var(--green); white-space: nowrap; }
+
+/* loading spinner */
+.rate-loading { margin-top: 0.85rem; display: none; align-items: center; gap: 0.6rem; color: var(--gray); font-size: 0.8rem; }
+.rate-loading.show { display: flex; }
+
+/* ── PAYMENT METHOD ── */
+.payment-option {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.85rem 1rem; border-radius: 14px;
+  border: 2px solid var(--border); cursor: pointer;
+  transition: all 0.25s; margin-bottom: 0.6rem; position: relative;
+}
+.payment-option:last-child { margin-bottom: 0; }
+.payment-option:hover:not(.disabled) { border-color: var(--blue-md); background: var(--blue-lt); }
+.payment-option.selected { border-color: var(--blue); background: var(--blue-lt); }
+.payment-option.disabled { opacity: 0.5; cursor: not-allowed; }
+.pay-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: var(--blue-lt); color: var(--blue);
+  display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;
+}
+.payment-option.selected .pay-icon { background: var(--blue); color: white; }
+.pay-info { flex: 1; }
+.pay-label { font-size: 0.875rem; font-weight: 700; color: var(--text); }
+.pay-sub { font-size: 0.72rem; color: var(--gray); margin-top: 0.1rem; }
+.pay-disabled-note { font-size: 0.68rem; color: var(--red); font-weight: 600; margin-top: 0.2rem; }
+
+/* ── ORDER SUMMARY ── */
+.summary-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.45rem 0; font-size: 0.85rem;
+}
+.summary-row.total {
+  border-top: 2px solid var(--border); margin-top: 0.5rem; padding-top: 0.85rem;
+  font-size: 1rem; font-weight: 800;
+}
+.summary-label { color: var(--gray); }
+.summary-value { font-weight: 700; color: var(--text); }
+.summary-value.blue { color: var(--blue); }
+.summary-value.green { color: var(--green); }
+.summary-value.total { font-size: 1.1rem; color: var(--blue); }
+
+/* ── PLACE ORDER BUTTON ── */
+.place-order-btn {
+  width: 100%; background: var(--blue); color: white;
+  border: none; border-radius: 14px; padding: 1rem;
+  font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 800;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  transition: all 0.25s; margin-top: 1rem;
+  box-shadow: 0 6px 20px rgba(26,86,219,0.3);
+}
+.place-order-btn:hover { background: var(--blue-dk); transform: translateY(-2px); box-shadow: 0 10px 28px rgba(26,86,219,0.35); }
+.place-order-btn:disabled { opacity: 0.6; pointer-events: none; transform: none; }
+.place-order-btn.loading { pointer-events: none; }
+
+/* ── SKELETON ── */
+.skeleton { background: linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* ── EMPTY CART ── */
+.empty-wrap {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 4rem 2rem; text-align: center;
+}
+.empty-icon { width: 90px; height: 90px; background: var(--blue-lt); border-radius: 28px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--blue); margin-bottom: 1.25rem; animation: iconFloat 3s ease-in-out infinite; box-shadow: 0 8px 24px rgba(26,86,219,0.15); }
+@keyframes iconFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+.empty-wrap h2 { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+.empty-wrap p { font-size: 0.85rem; color: var(--gray); max-width: 220px; line-height: 1.6; margin-bottom: 1.5rem; }
+.shop-btn { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--blue); color: white; border: none; border-radius: 50px; padding: 0.7rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 700; cursor: pointer; box-shadow: 0 6px 18px rgba(26,86,219,0.3); transition: all 0.2s; }
+.shop-btn:hover { background: var(--blue-dk); transform: translateY(-2px); }
+
+/* ── SUCCESS SCREEN ── */
+.success-wrap {
+  display: none; flex-direction: column; align-items: center;
+  justify-content: center; padding: 3rem 2rem; text-align: center;
+  animation: fadeUp 0.5s ease both;
+}
+.success-wrap.show { display: flex; }
+.success-icon { width: 90px; height: 90px; background: var(--green-lt); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: var(--green); margin-bottom: 1.25rem; box-shadow: 0 8px 24px rgba(22,163,74,0.2); animation: successPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275) both; }
+@keyframes successPop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.success-wrap h2 { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 900; margin-bottom: 0.5rem; color: var(--green); }
+.success-wrap p { font-size: 0.85rem; color: var(--gray); max-width: 260px; line-height: 1.6; margin-bottom: 0.5rem; }
+.order-ref { background: var(--blue-lt); border: 1px solid var(--blue-md); border-radius: 10px; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 700; color: var(--blue); margin: 0.5rem 0 1.5rem; }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 88px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: #0f172a; color: white; padding: 0.6rem 1.2rem;
+  border-radius: 50px; font-size: 0.8rem; font-weight: 600;
+  z-index: 9999; opacity: 0; transition: all 0.3s ease;
+  white-space: nowrap; display: flex; align-items: center; gap: 0.45rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2); pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success i { color: #4ade80; }
+.toast.error   i { color: #f87171; }
+.toast.info    i { color: #60a5fa; }
+
+.pb-nav { padding-bottom: 1.5rem; }
+</style>
+</head>
+<body>
+
+<div class="page" id="cartPage">
+
+  <!-- HEADER -->
+  <header class="top-header">
+    <div class="header-inner">
+      <div class="header-logo">MC<span>Store</span></div>
+      <div class="header-title">My Cart</div>
+      <button class="icon-btn" id="clearCartBtn" title="Clear cart">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="main" id="mainContent">
+
+    <!-- STEP INDICATOR -->
+    <div class="steps" id="stepsBar">
+      <div class="step active" id="step1">
+        <div class="step-circle">1</div>
+        <div class="step-label">Cart</div>
+      </div>
+      <div class="step" id="step2">
+        <div class="step-circle">2</div>
+        <div class="step-label">Delivery</div>
+      </div>
+      <div class="step" id="step3">
+        <div class="step-circle">3</div>
+        <div class="step-label">Payment</div>
+      </div>
+    </div>
+
+    <!-- ══ STEP 1: CART ITEMS ══ -->
+    <div id="stepCartItems">
+
+      <!-- Cart items -->
+      <div class="section-card">
+        <div class="section-card-title">
+          <i class="fas fa-cart-shopping"></i> Cart Items
+          <span id="cartCountLabel" style="font-size:0.78rem;color:var(--gray);font-family:'DM Sans',sans-serif;font-weight:600;margin-left:auto"></span>
+        </div>
+        <div id="cartItemsList">
+          <!-- Skeleton -->
+          <div style="display:flex;gap:0.75rem;padding:0.75rem 0;border-bottom:1px solid var(--border)">
+            <div class="skeleton" style="width:70px;height:70px;border-radius:12px;flex-shrink:0"></div>
+            <div style="flex:1"><div class="skeleton" style="height:12px;width:80%;margin-bottom:8px"></div><div class="skeleton" style="height:12px;width:50%"></div></div>
+          </div>
+          <div style="display:flex;gap:0.75rem;padding:0.75rem 0">
+            <div class="skeleton" style="width:70px;height:70px;border-radius:12px;flex-shrink:0"></div>
+            <div style="flex:1"><div class="skeleton" style="height:12px;width:70%;margin-bottom:8px"></div><div class="skeleton" style="height:12px;width:45%"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Continue button -->
+      <button class="place-order-btn" id="continueToDeliveryBtn" style="display:none" onclick="goToStep(2)">
+        Continue to Delivery <i class="fas fa-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- ══ STEP 2: DELIVERY ══ -->
+    <div id="stepDelivery" style="display:none">
+
+      <!-- Delivery method -->
+      <div class="section-card">
+        <div class="section-card-title"><i class="fas fa-truck"></i> Delivery Method</div>
+        <div class="method-options">
+
+          <!-- PICKUP -->
+          <div class="method-option" id="pickupOption" onclick="selectDelivery('pickup')">
+            <input type="radio" name="delivery" value="pickup">
+            <div class="method-icon"><i class="fas fa-store"></i></div>
+            <div class="method-info">
+              <div class="method-label">Store Pickup</div>
+              <div class="method-sub">Opposite Bovas Filling Station, Bodija, Ibadan</div>
+            </div>
+            <div class="method-price free">Free</div>
+            <div class="selected-check"><i class="fas fa-check"></i></div>
+          </div>
+
+          <!-- DELIVERY -->
+          <div class="method-option" id="deliveryOption" onclick="selectDelivery('delivery')">
+            <input type="radio" name="delivery" value="delivery">
+            <div class="method-icon"><i class="fas fa-truck-fast"></i></div>
+            <div class="method-info">
+              <div class="method-label">Home Delivery</div>
+              <div class="method-sub">Delivered to your address</div>
+            </div>
+            <div class="method-price" id="deliveryFeeLabel">Calculate →</div>
+            <div class="selected-check"><i class="fas fa-check"></i></div>
+          </div>
+
+        </div>
+
+        <!-- Address form (shown when delivery selected) -->
+        <div id="addressFormWrap" style="display:none">
+          <div style="height:1px;background:var(--border);margin:0.85rem 0"></div>
+          <div style="font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:0.75rem">
+            <i class="fas fa-location-dot" style="color:var(--blue)"></i> Delivery Address
+          </div>
+          <div class="address-form">
+            <div class="form-group full">
+              <label class="form-label">Full Name</label>
+              <input class="form-input" id="addrName" placeholder="Enter your full name" type="text">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone</label>
+              <input class="form-input" id="addrPhone" placeholder="08012345678" type="tel">
+            </div>
+            <div class="form-group">
+              <label class="form-label">State</label>
+              <select class="form-select" id="addrState">
+                <option value="">Select State</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">City / Area</label>
+              <input class="form-input" id="addrCity" placeholder="e.g. Victoria Island" type="text">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Landmark</label>
+              <input class="form-input" id="addrLandmark" placeholder="Nearest landmark" type="text">
+            </div>
+            <div class="form-group full">
+              <label class="form-label">Street Address</label>
+              <input class="form-input" id="addrStreet" placeholder="House/plot number & street" type="text">
+            </div>
+          </div>
+
+          <!-- Calculate button -->
+          <button style="margin-top:0.85rem;width:100%;background:var(--blue-lt);color:var(--blue);border:1.5px solid var(--blue-md);border-radius:10px;padding:0.65rem;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.4rem;transition:all 0.2s"
+            id="calcRateBtn" onclick="calculateDelivery()">
+            <i class="fas fa-calculator"></i> Calculate Delivery Fee
+          </button>
+
+          <!-- Loading -->
+          <div class="rate-loading" id="rateLoading">
+            <i class="fas fa-spinner fa-spin" style="color:var(--blue)"></i>
+            <span>Calculating delivery rate...</span>
+          </div>
+
+          <!-- Rate result -->
+          <div class="rate-result" id="rateResult">
+            <div class="rate-icon"><i class="fas fa-truck-fast"></i></div>
+            <div class="rate-info">
+              <h4 id="rateCourier">Courier</h4>
+              <p id="rateETA">Estimated delivery time</p>
+            </div>
+            <div class="rate-fee" id="rateFee">₦0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back & Continue -->
+      <div style="display:flex;gap:0.6rem">
+        <button onclick="goToStep(1)" style="flex:1;background:var(--gray-lt);color:var(--text);border:1.5px solid var(--border);border-radius:14px;padding:0.85rem;font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:700;cursor:pointer;transition:all 0.2s">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <button class="place-order-btn" id="continueToPaymentBtn" onclick="goToStep(3)" style="flex:2;margin-top:0">
+          Continue to Payment <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ STEP 3: PAYMENT ══ -->
+    <div id="stepPayment" style="display:none">
+
+      <!-- Order Summary -->
+      <div class="section-card">
+        <div class="section-card-title"><i class="fas fa-receipt"></i> Order Summary</div>
+        <div class="summary-row">
+          <span class="summary-label">Subtotal (<span id="summaryItemCount">0</span> items)</span>
+          <span class="summary-value blue" id="summarySubtotal">₦0</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Delivery Fee</span>
+          <span class="summary-value green" id="summaryDelivery">Free</span>
+        </div>
+        <div class="summary-row total">
+          <span style="font-weight:800">Total</span>
+          <span class="summary-value total" id="summaryTotal">₦0</span>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="section-card">
+        <div class="section-card-title"><i class="fas fa-wallet"></i> Payment Method</div>
+
+        <!-- Pay Online -->
+        <div class="payment-option" id="payOnlineOption" onclick="selectPayment('online')">
+          <div class="pay-icon"><i class="fas fa-credit-card"></i></div>
+          <div class="pay-info">
+            <div class="pay-label">Pay Online</div>
+            <div class="pay-sub">Card, Bank Transfer, USSD via Paystack</div>
+          </div>
+          <div class="selected-check"><i class="fas fa-check"></i></div>
+        </div>
+
+        <!-- Cash on Delivery -->
+        <div class="payment-option" id="payCODOption" onclick="selectPayment('cod')">
+          <div class="pay-icon"><i class="fas fa-money-bill-wave"></i></div>
+          <div class="pay-info">
+            <div class="pay-label">Cash on Delivery</div>
+            <div class="pay-sub" id="codSubLabel">Pay when your order arrives</div>
+            <div class="pay-disabled-note" id="codDisabledNote" style="display:none"></div>
+          </div>
+          <div class="selected-check"><i class="fas fa-check"></i></div>
+        </div>
+      </div>
+
+      <!-- Back & Place Order -->
+      <div style="display:flex;gap:0.6rem">
+        <button onclick="goToStep(2)" style="flex:1;background:var(--gray-lt);color:var(--text);border:1.5px solid var(--border);border-radius:14px;padding:0.85rem;font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:700;cursor:pointer">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+        <button class="place-order-btn" id="placeOrderBtn" onclick="placeOrderNow()" style="flex:2;margin-top:0">
+          <i class="fas fa-lock"></i> Place Order
+        </button>
+      </div>
+    </div>
+
+    <!-- ══ SUCCESS SCREEN ══ -->
+    <div class="success-wrap" id="successScreen">
+      <div class="success-icon"><i class="fas fa-check"></i></div>
+      <h2>Order Placed! 🎉</h2>
+      <p>Your order has been placed successfully. We'll notify you once it's confirmed.</p>
+      <div class="order-ref" id="successOrderRef"></div>
+      <button class="shop-btn" onclick="goHome()">
+        <i class="fas fa-store"></i> Continue Shopping
+      </button>
+    </div>
+
+    <div class="pb-nav"></div>
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script type="module">
+import { getSession }                          from './session.js';
+import { getCart, removeFromCart, updateCartQuantity, clearCart, getCartCount, placeOrder, formatPrice } from './product.js';
+import { getRates, getPickupInfo, formatDeliveryFee, estimateWeight, NIGERIAN_STATES } from './shipping.js';
+import { getAvailablePaymentMethods, initiatePayment, processCOD, validateCOD, COD_MIN, COD_MAX } from './payment.js';
+
+// ── STATE ──
+let currentUser    = null;
+let cartItems      = [];
+let currentStep    = 1;
+let deliveryMethod = 'pickup';
+let selectedRate   = null;
+let deliveryFee    = 0;
+let paymentMethod  = null;
+let subtotal       = 0;
+
+// ── INIT ──
+async function init() {
+  const session = await getSession();
+  if (!session || !session.uid) { showEmpty(); return; }
+  currentUser = session;
+
+  // Pre-fill name & phone from session
+  document.getElementById('addrName').value  = session.fullName || '';
+  document.getElementById('addrPhone').value = session.phone    || '';
+
+  // Populate state dropdown
+  const stateSelect = document.getElementById('addrState');
+  NIGERIAN_STATES.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s; opt.textContent = s;
+    stateSelect.appendChild(opt);
+  });
+  // Pre-select Oyo if address has it
+  if (session.address && session.address.toLowerCase().includes('oyo')) {
+    stateSelect.value = 'Oyo';
+  }
+
+  await loadCart();
+}
+
+// ── LOAD CART ──
+async function loadCart() {
+  try {
+    cartItems = await getCart(currentUser.uid) || [];
+    if (cartItems.length === 0) { showEmpty(); return; }
+    renderCartItems();
+    updateCartBadge();
+  } catch(e) {
+    showEmpty();
+  }
+}
+
+// ── RENDER CART ITEMS ──
+function renderCartItems() {
+  const list = document.getElementById('cartItemsList');
+  subtotal   = cartItems.reduce((s, i) => s + (i.price * i.quantity), 0);
+
+  document.getElementById('cartCountLabel').textContent =
+    `${cartItems.length} item${cartItems.length > 1 ? 's' : ''}`;
+
+  list.innerHTML = cartItems.map(item => {
+    const icon = categoryIcon(item.category);
+    const imgHTML = item.image_url
+      ? `<img src="${item.image_url}" alt="${item.name}" loading="lazy"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      : '';
+    return `
+    <div class="cart-item" id="cartItem-${item.product_id}">
+      <div class="item-img">
+        ${imgHTML}
+        <i class="${icon}" style="${item.image_url?'display:none':''}"></i>
+      </div>
+      <div class="item-info">
+        <div class="item-name">${item.name}</div>
+        <div class="item-price">${formatPrice(item.price)}</div>
+        <div class="item-controls">
+          <button class="qty-btn" onclick="changeQty('${item.product_id}', ${item.quantity - 1})">
+            <i class="fas fa-minus"></i>
+          </button>
+          <span class="qty-value" id="qty-${item.product_id}">${item.quantity}</span>
+          <button class="qty-btn" onclick="changeQty('${item.product_id}', ${item.quantity + 1})">
+            <i class="fas fa-plus"></i>
+          </button>
+          <span class="item-total">${formatPrice(item.price * item.quantity)}</span>
+        </div>
+      </div>
+      <button class="remove-item-btn" onclick="removeItem('${item.product_id}')">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>`;
+  }).join('');
+
+  document.getElementById('continueToDeliveryBtn').style.display = 'flex';
+}
+
+// ── CHANGE QUANTITY ──
+window.changeQty = async function(productId, newQty) {
+  if (newQty <= 0) { removeItem(productId); return; }
+  try {
+    await updateCartQuantity(currentUser.uid, productId, newQty);
+    const item = cartItems.find(i => i.product_id === productId);
+    if (item) item.quantity = newQty;
+    renderCartItems();
+  } catch(e) {
+    showToast('Could not update quantity', 'error');
+  }
+};
+
+// ── REMOVE ITEM ──
+window.removeItem = async function(productId) {
+  try {
+    await removeFromCart(currentUser.uid, productId);
+    cartItems = cartItems.filter(i => i.product_id !== productId);
+    if (cartItems.length === 0) { showEmpty(); return; }
+    renderCartItems();
+    updateCartBadge();
+    showToast('Item removed', 'info');
+  } catch(e) {
+    showToast('Could not remove item', 'error');
+  }
+};
+
+// ── CLEAR CART ──
+document.getElementById('clearCartBtn').addEventListener('click', async () => {
+  if (!cartItems.length) return;
+  if (!confirm('Clear all items from cart?')) return;
+  await clearCart(currentUser.uid);
+  cartItems = [];
+  showEmpty();
+  updateCartBadge();
+});
+
+// ── GO TO STEP ──
+window.goToStep = function(step) {
+  // Validate step 2 before proceeding to step 3
+  if (step === 3) {
+    if (deliveryMethod === 'delivery' && !selectedRate) {
+      showToast('Please calculate delivery rate first', 'error');
+      return;
+    }
+    if (deliveryMethod === 'delivery') {
+      const name  = document.getElementById('addrName').value.trim();
+      const phone = document.getElementById('addrPhone').value.trim();
+      const state = document.getElementById('addrState').value;
+      const city  = document.getElementById('addrCity').value.trim();
+      const street= document.getElementById('addrStreet').value.trim();
+      if (!name || !phone || !state || !city || !street) {
+        showToast('Please fill in your delivery address', 'error');
+        return;
+      }
+    }
+    updateSummary();
+    updatePaymentOptions();
+  }
+
+  currentStep = step;
+
+  // Update step indicators
+  document.querySelectorAll('.step').forEach((el, i) => {
+    const n = i + 1;
+    el.classList.remove('active','done');
+    if (n < step) el.classList.add('done');
+    if (n === step) el.classList.add('active');
+  });
+
+  // Show/hide sections
+  document.getElementById('stepCartItems').style.display  = step === 1 ? 'block' : 'none';
+  document.getElementById('stepDelivery').style.display   = step === 2 ? 'block' : 'none';
+  document.getElementById('stepPayment').style.display    = step === 3 ? 'block' : 'none';
+
+  // Scroll to top
+  document.getElementById('cartPage').scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// ── SELECT DELIVERY METHOD ──
+window.selectDelivery = function(method) {
+  deliveryMethod = method;
+
+  document.getElementById('pickupOption').classList.toggle('selected', method === 'pickup');
+  document.getElementById('deliveryOption').classList.toggle('selected', method === 'delivery');
+  document.getElementById('addressFormWrap').style.display = method === 'delivery' ? 'block' : 'none';
+
+  if (method === 'pickup') {
+    deliveryFee  = 0;
+    selectedRate = getPickupInfo();
+  } else {
+    selectedRate = null;
+    deliveryFee  = 0;
+  }
+};
+
+// ── CALCULATE DELIVERY ──
+window.calculateDelivery = async function() {
+  const name   = document.getElementById('addrName').value.trim();
+  const phone  = document.getElementById('addrPhone').value.trim();
+  const state  = document.getElementById('addrState').value;
+  const city   = document.getElementById('addrCity').value.trim();
+  const street = document.getElementById('addrStreet').value.trim();
+
+  if (!state || !city || !street) {
+    showToast('Please fill in State, City and Street first', 'error');
+    return;
+  }
+
+  document.getElementById('rateLoading').classList.add('show');
+  document.getElementById('rateResult').classList.remove('show');
+  document.getElementById('calcRateBtn').disabled = true;
+
+  try {
+    const weight = estimateWeight(cartItems);
+    const rates  = await getRates({
+      recipientAddress: { fullName: name, phone, street, city, state, email: currentUser.email || '' },
+      items:  cartItems.map(i => ({ name: i.name, quantity: i.quantity, weight: 0.3 })),
+      totalWeight: weight
+    });
+
+    if (!rates || rates.length === 0) throw new Error('No rates found');
+
+    // Pick cheapest
+    const best = rates.sort((a,b) => a.delivery_fee - b.delivery_fee)[0];
+    selectedRate = best;
+    deliveryFee  = best.delivery_fee;
+
+    // Show result
+    document.getElementById('rateCourier').textContent  = best.courier_name;
+    document.getElementById('rateETA').textContent      = best.eta;
+    document.getElementById('rateFee').textContent      = formatDeliveryFee(best.delivery_fee);
+    document.getElementById('deliveryFeeLabel').textContent = formatDeliveryFee(best.delivery_fee);
+    document.getElementById('rateResult').classList.add('show');
+
+    showToast('Delivery rate calculated! ✅', 'success');
+  } catch(e) {
+    showToast('Could not calculate rate. Check address and try again.', 'error');
+  }
+
+  document.getElementById('rateLoading').classList.remove('show');
+  document.getElementById('calcRateBtn').disabled = false;
+};
+
+// ── UPDATE SUMMARY ──
+function updateSummary() {
+  const total = subtotal + deliveryFee;
+  const count = cartItems.reduce((s,i) => s + i.quantity, 0);
+
+  document.getElementById('summaryItemCount').textContent = count;
+  document.getElementById('summarySubtotal').textContent  = formatPrice(subtotal);
+  document.getElementById('summaryDelivery').textContent  =
+    deliveryFee > 0 ? formatPrice(deliveryFee) : 'Free';
+  document.getElementById('summaryTotal').textContent     = formatPrice(total);
+}
+
+// ── UPDATE PAYMENT OPTIONS ──
+function updatePaymentOptions() {
+  const total   = subtotal + deliveryFee;
+  const methods = getAvailablePaymentMethods(total);
+  const cod     = methods.cash_on_delivery;
+
+  const codOption = document.getElementById('payCODOption');
+  const codNote   = document.getElementById('codDisabledNote');
+  const codSub    = document.getElementById('codSubLabel');
+
+  if (!cod.available) {
+    codOption.classList.add('disabled');
+    codNote.style.display = 'block';
+    codNote.textContent   = cod.disabled_reason || '';
+    codSub.textContent    = `Min ₦${COD_MIN.toLocaleString()} — Max ₦${COD_MAX.toLocaleString()}`;
+    if (paymentMethod === 'cod') {
+      paymentMethod = null;
+      codOption.classList.remove('selected');
+    }
+  } else {
+    codOption.classList.remove('disabled');
+    codNote.style.display = 'none';
+    codSub.textContent    = 'Pay when your order arrives';
+  }
+}
+
+// ── SELECT PAYMENT ──
+window.selectPayment = function(method) {
+  const total = subtotal + deliveryFee;
+  if (method === 'cod') {
+    const check = validateCOD(total);
+    if (!check.valid) { showToast(check.reason, 'error'); return; }
+  }
+
+  paymentMethod = method;
+  document.getElementById('payOnlineOption').classList.toggle('selected', method === 'online');
+  document.getElementById('payCODOption').classList.toggle('selected', method === 'cod');
+};
+
+// ── PLACE ORDER ──
+window.placeOrderNow = async function() {
+  if (!paymentMethod) { showToast('Please select a payment method', 'error'); return; }
+
+  const total = subtotal + deliveryFee;
+  const btn   = document.getElementById('placeOrderBtn');
+
+  const deliveryAddress = deliveryMethod === 'delivery' ? {
+    street:   document.getElementById('addrStreet').value.trim(),
+    city:     document.getElementById('addrCity').value.trim(),
+    state:    document.getElementById('addrState').value,
+    landmark: document.getElementById('addrLandmark').value.trim()
+  } : {
+    street:   'Opposite Bovas Filling Station, Bodija',
+    city:     'Ibadan',
+    state:    'Oyo',
+    landmark: 'Near Bovas Filling Station'
+  };
+
+  if (paymentMethod === 'online') {
+    // Paystack payment
+    btn.disabled     = true;
+    btn.innerHTML    = '<i class="fas fa-spinner fa-spin"></i> Opening Payment...';
+
+    try {
+      await initiatePayment({
+        email:        currentUser.email,
+        amount:       total,
+        orderId:      `ORD-${Date.now()}`,
+        customerName: currentUser.fullName,
+        phone:        currentUser.phone,
+        onSuccess: async (paymentResult) => {
+          await saveOrder(deliveryAddress, 'online', paymentResult.reference, 'paid', total);
+        },
+        onCancel: () => {
+          btn.disabled  = false;
+          btn.innerHTML = '<i class="fas fa-lock"></i> Place Order';
+          showToast('Payment cancelled', 'info');
+        }
+      });
+    } catch(e) {
+      btn.disabled  = false;
+      btn.innerHTML = '<i class="fas fa-lock"></i> Place Order';
+      showToast(e.message || 'Payment failed. Try again.', 'error');
+    }
+
+  } else if (paymentMethod === 'cod') {
+    // Cash on delivery
+    btn.disabled  = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Placing Order...';
+
+    try {
+      const codResult = processCOD(total);
+      await saveOrder(deliveryAddress, 'cash_on_delivery', codResult.reference, 'pending', total);
+    } catch(e) {
+      btn.disabled  = false;
+      btn.innerHTML = '<i class="fas fa-lock"></i> Place Order';
+      showToast(e.message || 'Could not place order', 'error');
+    }
+  }
+};
+
+// ── SAVE ORDER TO SUPABASE ──
+async function saveOrder(deliveryAddress, payMethod, payRef, payStatus, total) {
+  try {
+    const order = await placeOrder({
+      uid:              currentUser.uid,
+      customerName:     currentUser.fullName,
+      customerEmail:    currentUser.email,
+      customerPhone:    currentUser.phone || document.getElementById('addrPhone').value,
+      items:            cartItems,
+      deliveryStreet:   deliveryAddress.street,
+      deliveryCity:     deliveryAddress.city,
+      deliveryState:    deliveryAddress.state,
+      deliveryLandmark: deliveryAddress.landmark,
+      paymentMethod:    payMethod,
+      paymentRef:       payRef,
+      subtotal,
+      deliveryFee,
+      total
+    });
+
+    // Update badges
+    window.parent.postMessage({ type: 'cartUpdate', count: 0 }, '*');
+
+    // Show success
+    showSuccess(order?.order_number || payRef);
+
+  } catch(e) {
+    showToast('Could not save order. Contact support.', 'error');
+    document.getElementById('placeOrderBtn').disabled  = false;
+    document.getElementById('placeOrderBtn').innerHTML = '<i class="fas fa-lock"></i> Place Order';
+  }
+}
+
+// ── SHOW SUCCESS ──
+function showSuccess(orderNumber) {
+  document.getElementById('stepsBar').style.display    = 'none';
+  document.getElementById('stepCartItems').style.display = 'none';
+  document.getElementById('stepDelivery').style.display  = 'none';
+  document.getElementById('stepPayment').style.display   = 'none';
+  document.getElementById('successOrderRef').textContent = `Order #${orderNumber}`;
+  document.getElementById('successScreen').classList.add('show');
+}
+
+// ── SHOW EMPTY ──
+function showEmpty() {
+  document.getElementById('stepsBar').style.display = 'none';
+  document.getElementById('stepCartItems').innerHTML = `
+    <div class="empty-wrap">
+      <div class="empty-icon"><i class="fas fa-cart-shopping"></i></div>
+      <h2>Your Cart is Empty</h2>
+      <p>Add items from the shop to get started!</p>
+      <button class="shop-btn" onclick="goHome()">
+        <i class="fas fa-store"></i> Start Shopping
+      </button>
+    </div>`;
+}
+
+// ── GO HOME ──
+window.goHome = function() {
+  window.parent.postMessage({ type: 'switchTab', target: 'home' }, '*');
+};
+
+// ── CATEGORY ICON ──
+function categoryIcon(cat) {
+  const map = {
+    'Electronics & Gadgets': 'fas fa-mobile-screen',
+    'Fashion & Clothing':    'fas fa-shirt',
+    'Food & Groceries':      'fas fa-basket-shopping',
+    'Beauty & Health':       'fas fa-pump-soap',
+    'Home & Kitchen':        'fas fa-couch',
+    'Sports & Fitness':      'fas fa-dumbbell',
+    'Books & Stationery':    'fas fa-book-open',
+    'Baby & Kids':           'fas fa-baby'
+  };
+  return map[cat] || 'fas fa-tag';
+}
+
+// ── UPDATE CART BADGE ──
+function updateCartBadge() {
+  const count = cartItems.reduce((s,i) => s + i.quantity, 0);
+  window.parent.postMessage({ type: 'cartUpdate', count }, '*');
+}
+
+// ── TOAST ──
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.className = `toast ${type} show`;
+  t.querySelector('i').className =
+    type === 'success' ? 'fas fa-check-circle' :
+    type === 'error'   ? 'fas fa-exclamation-circle' :
+                         'fas fa-circle-info';
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Start delivery method as pickup by default
+selectDelivery('pickup');
+init();
+</script>
+</body>
+</html>
