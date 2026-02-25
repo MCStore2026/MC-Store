@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Store — Account</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:     #1a56db;
+  --blue-dk:  #1347c8;
+  --blue-lt:  #eff6ff;
+  --blue-md:  #dbeafe;
+  --gold:     #f5a623;
+  --gold-lt:  #fef3c7;
+  --red:      #ef4444;
+  --red-lt:   #fef2f2;
+  --green:    #16a34a;
+  --green-lt: #f0fdf4;
+  --white:    #ffffff;
+  --gray:     #6b7280;
+  --gray-lt:  #f9fafb;
+  --text:     #0f172a;
+  --border:   #e5e7eb;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: #f8fafc; color: var(--text); }
+
+.page { height: 100vh; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+
+/* ── HEADER ── */
+.top-header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--white); border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(26,86,219,0.06); padding: 0 1rem;
+}
+.header-inner {
+  max-width: 600px; margin: 0 auto;
+  height: 56px; display: flex; align-items: center; gap: 0.75rem;
+}
+.header-logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 900; color: var(--text); }
+.header-logo span { color: var(--gold); }
+.header-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; flex: 1; text-align: center; }
+
+/* ── MAIN ── */
+.main { max-width: 600px; margin: 0 auto; padding: 1rem; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+
+/* ── PROFILE HERO ── */
+.profile-hero {
+  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dk) 100%);
+  border-radius: 20px; padding: 1.5rem 1rem 1rem;
+  margin-bottom: 1rem; position: relative; overflow: hidden;
+  animation: fadeUp 0.3s ease both;
+}
+.profile-hero::before {
+  content: ''; position: absolute;
+  right: -30px; top: -30px;
+  width: 180px; height: 180px; border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+}
+.profile-hero::after {
+  content: ''; position: absolute;
+  right: 50px; bottom: -40px;
+  width: 120px; height: 120px; border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+}
+
+.profile-top {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 1rem; position: relative; z-index: 2;
+}
+.avatar-wrap { position: relative; flex-shrink: 0; }
+.avatar {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 3px solid rgba(255,255,255,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem; font-weight: 800; color: white;
+  overflow: hidden; cursor: pointer;
+  transition: all 0.2s;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar:hover { border-color: var(--gold); }
+.avatar-edit {
+  position: absolute; bottom: 0; right: 0;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--gold); border: 2px solid white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: white; cursor: pointer;
+}
+#photoInput { display: none; }
+
+.profile-info { flex: 1; min-width: 0; }
+.profile-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem; font-weight: 800; color: white;
+  margin-bottom: 0.15rem; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.profile-email { font-size: 0.75rem; color: rgba(255,255,255,0.75); margin-bottom: 0.4rem; }
+.profile-role {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  background: rgba(255,255,255,0.15); backdrop-filter: blur(8px);
+  color: white; font-size: 0.68rem; font-weight: 700;
+  padding: 0.2rem 0.6rem; border-radius: 50px;
+}
+
+/* stats row */
+.profile-stats {
+  display: flex; gap: 0; position: relative; z-index: 2;
+  background: rgba(255,255,255,0.1); border-radius: 14px; overflow: hidden;
+}
+.stat-item {
+  flex: 1; padding: 0.65rem 0.5rem; text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.15);
+  cursor: pointer; transition: all 0.2s;
+}
+.stat-item:last-child { border-right: none; }
+.stat-item:hover { background: rgba(255,255,255,0.1); }
+.stat-value { font-size: 1.1rem; font-weight: 800; color: white; }
+.stat-label { font-size: 0.62rem; color: rgba(255,255,255,0.7); margin-top: 0.1rem; }
+
+/* ── SECTION CARD ── */
+.section-card {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 18px; overflow: hidden;
+  margin-bottom: 0.85rem;
+  animation: fadeUp 0.4s ease both;
+}
+.section-label {
+  font-size: 0.68rem; font-weight: 800; color: var(--gray);
+  text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 0.75rem 1rem 0.4rem;
+}
+
+/* ── MENU ITEM ── */
+.menu-item {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 0.82rem 1rem; cursor: pointer;
+  border-top: 1px solid var(--border); transition: all 0.2s;
+  position: relative;
+}
+.menu-item:first-of-type { border-top: none; }
+.menu-item:hover { background: var(--gray-lt); }
+.menu-item:active { background: var(--blue-lt); }
+
+.menu-icon {
+  width: 38px; height: 38px; border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0; transition: all 0.2s;
+}
+.menu-item:hover .menu-icon { transform: scale(1.08); }
+
+.menu-icon.blue   { background: var(--blue-lt);  color: var(--blue); }
+.menu-icon.gold   { background: var(--gold-lt);  color: #b45309; }
+.menu-icon.green  { background: var(--green-lt); color: var(--green); }
+.menu-icon.red    { background: var(--red-lt);   color: var(--red); }
+.menu-icon.gray   { background: var(--gray-lt);  color: var(--gray); }
+.menu-icon.purple { background: #f5f3ff;         color: #7c3aed; }
+
+.menu-text { flex: 1; min-width: 0; }
+.menu-label { font-size: 0.875rem; font-weight: 600; color: var(--text); }
+.menu-sub   { font-size: 0.72rem; color: var(--gray); margin-top: 0.08rem; }
+
+.menu-right {
+  display: flex; align-items: center; gap: 0.5rem;
+  color: var(--gray); font-size: 13px;
+}
+.menu-badge {
+  background: var(--blue); color: white;
+  font-size: 0.65rem; font-weight: 800;
+  padding: 0.15rem 0.45rem; border-radius: 50px;
+}
+.menu-badge.gold { background: var(--gold); }
+
+/* toggle switch */
+.toggle {
+  width: 42px; height: 24px; border-radius: 12px;
+  background: var(--border); position: relative;
+  cursor: pointer; transition: background 0.3s; flex-shrink: 0;
+  border: none;
+}
+.toggle.on { background: var(--blue); }
+.toggle::after {
+  content: ''; position: absolute;
+  top: 3px; left: 3px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: white; transition: transform 0.3s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.toggle.on::after { transform: translateX(18px); }
+
+/* ── MODALS ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  z-index: 999; display: flex; align-items: flex-end;
+  justify-content: center; opacity: 0; pointer-events: none;
+  transition: opacity 0.3s; backdrop-filter: blur(4px);
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--white); border-radius: 24px 24px 0 0;
+  width: 100%; max-width: 600px; max-height: 90vh;
+  overflow-y: auto; padding: 0 0 2rem;
+  transform: translateY(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+
+.modal-handle {
+  width: 40px; height: 4px; border-radius: 2px;
+  background: var(--border); margin: 0.75rem auto 0;
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border);
+}
+.modal-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--gray-lt); border: none; color: var(--gray);
+  font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.modal-close:hover { background: var(--red-lt); color: var(--red); }
+.modal-body { padding: 1.25rem; }
+
+/* form fields */
+.form-group { margin-bottom: 0.85rem; }
+.form-label { font-size: 0.72rem; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.04em; display: block; margin-bottom: 0.35rem; }
+.form-input {
+  width: 100%; border: 1.5px solid var(--border); border-radius: 12px;
+  padding: 0.65rem 0.85rem; font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem; color: var(--text); background: var(--white);
+  outline: none; transition: all 0.2s;
+}
+.form-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,86,219,0.08); }
+.form-input::placeholder { color: #9ca3af; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; }
+
+.save-btn {
+  width: 100%; background: var(--blue); color: white;
+  border: none; border-radius: 12px; padding: 0.85rem;
+  font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; margin-top: 0.5rem;
+  display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+}
+.save-btn:hover { background: var(--blue-dk); }
+.save-btn:disabled { opacity: 0.6; pointer-events: none; }
+
+/* ── FAQ ── */
+.faq-item {
+  border-bottom: 1px solid var(--border); cursor: pointer;
+}
+.faq-item:last-child { border-bottom: none; }
+.faq-q {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.85rem 0; font-size: 0.875rem; font-weight: 600; color: var(--text);
+  gap: 0.5rem;
+}
+.faq-q i { color: var(--blue); font-size: 13px; transition: transform 0.3s; flex-shrink: 0; }
+.faq-item.open .faq-q i { transform: rotate(180deg); }
+.faq-a {
+  font-size: 0.82rem; color: var(--gray); line-height: 1.65;
+  padding: 0 0 0.85rem; display: none;
+}
+.faq-item.open .faq-a { display: block; }
+
+/* ── ADDRESSES ── */
+.address-card {
+  border: 1.5px solid var(--border); border-radius: 14px;
+  padding: 0.85rem; margin-bottom: 0.65rem; position: relative;
+  transition: all 0.2s;
+}
+.address-card.default { border-color: var(--blue); background: var(--blue-lt); }
+.address-top { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; }
+.address-label {
+  font-size: 0.75rem; font-weight: 800; color: var(--blue);
+  background: var(--blue-md); padding: 0.15rem 0.5rem; border-radius: 50px;
+}
+.default-badge {
+  font-size: 0.65rem; font-weight: 800; color: var(--green);
+  background: var(--green-lt); padding: 0.15rem 0.5rem; border-radius: 50px;
+}
+.address-text { font-size: 0.82rem; color: var(--text); line-height: 1.5; }
+.address-actions { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
+.addr-btn {
+  font-size: 0.72rem; font-weight: 600; padding: 0.3rem 0.7rem;
+  border-radius: 8px; border: 1.5px solid var(--border);
+  cursor: pointer; transition: all 0.2s; background: var(--white); color: var(--gray);
+  font-family: 'DM Sans', sans-serif;
+}
+.addr-btn:hover { background: var(--blue-lt); border-color: var(--blue); color: var(--blue); }
+.addr-btn.del:hover { background: var(--red-lt); border-color: var(--red); color: var(--red); }
+.add-addr-btn {
+  width: 100%; border: 2px dashed var(--border); border-radius: 14px;
+  padding: 0.85rem; background: none; color: var(--gray);
+  font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+}
+.add-addr-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-lt); }
+
+/* ── LOGOUT ── */
+.logout-btn {
+  width: 100%; background: var(--red-lt); color: var(--red);
+  border: 1.5px solid #fecaca; border-radius: 14px;
+  padding: 0.9rem; font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  transition: all 0.2s; margin-bottom: 0.85rem;
+  animation: fadeUp 0.5s ease both;
+}
+.logout-btn:hover { background: var(--red); color: white; border-color: var(--red); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 88px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: #0f172a; color: white; padding: 0.6rem 1.2rem;
+  border-radius: 50px; font-size: 0.8rem; font-weight: 600;
+  z-index: 9999; opacity: 0; transition: all 0.3s ease;
+  white-space: nowrap; display: flex; align-items: center; gap: 0.45rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2); pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success i { color: #4ade80; }
+.toast.error   i { color: #f87171; }
+.toast.info    i { color: #60a5fa; }
+
+.app-version { text-align: center; font-size: 0.72rem; color: var(--gray); padding: 0.5rem 0 0.25rem; }
+.pb-nav { padding-bottom: 1.5rem; }
+</style>
+</head>
+<body>
+
+<div class="page" id="accountPage">
+
+  <!-- HEADER -->
+  <header class="top-header">
+    <div class="header-inner">
+      <div class="header-logo">MC<span>Store</span></div>
+      <div class="header-title">My Account</div>
+      <div style="width:38px"></div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- ── PROFILE HERO ── -->
+    <div class="profile-hero">
+      <div class="profile-top">
+        <div class="avatar-wrap">
+          <div class="avatar" id="avatarEl" onclick="document.getElementById('photoInput').click()">
+            <span id="avatarInitials">MC</span>
+          </div>
+          <div class="avatar-edit" onclick="document.getElementById('photoInput').click()">
+            <i class="fas fa-camera"></i>
+          </div>
+          <input type="file" id="photoInput" accept="image/*" onchange="handlePhotoUpload(event)">
+        </div>
+        <div class="profile-info">
+          <div class="profile-name" id="profileName">Loading...</div>
+          <div class="profile-email" id="profileEmail">...</div>
+          <div class="profile-role"><i class="fas fa-shield-halved"></i> Customer</div>
+        </div>
+      </div>
+      <div class="profile-stats">
+        <div class="stat-item" onclick="switchToOrders()">
+          <div class="stat-value" id="statOrders">0</div>
+          <div class="stat-label">Orders</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statSpent">₦0</div>
+          <div class="stat-label">Total Spent</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statPoints">0</div>
+          <div class="stat-label">Points</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ACCOUNT SETTINGS ── -->
+    <div class="section-card" style="animation-delay:0.05s">
+      <div class="section-label">Account</div>
+      <div class="menu-item" onclick="openModal('editProfileModal')">
+        <div class="menu-icon blue"><i class="fas fa-user-pen"></i></div>
+        <div class="menu-text">
+          <div class="menu-label">Edit Profile</div>
+          <div class="menu-sub">Update your name, phone, gender</div>
+        </div>
+        <div class="menu-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="openModal('addressModal')">
+        <div class="menu-icon green"><i class="fas fa-location-dot"></i></div>
+        <div class="menu-text">
+          <div class="menu-label">Saved Addresses</div>
+          <div class="menu-sub">Manage delivery addresses</div>
+        </div>
+        <div class="menu-right">
+          <span class="menu-badge" id="addrCount">0</span>
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+      <div class="menu-item" onclick="openModal('passwordModal')">
+        <div class="menu-icon purple"><i class="fas fa-lock"></i></div>
+        <div class="menu-text">
+          <div class="menu-label">Change Password</div>
+          <div class="menu-sub">Update your account password</div>
+        </div>
+        <div class="menu-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+    </div>
+
+    <!-- ── PREFERENCES ── -->
+    <div class="section-card" style="animation-delay:0.1s">
+      <div class="section-label">Preferences</div>
+      <div class="menu-item">
+        <div class="menu-icon gold"><i class="fas fa-bell"></i></div>
+        <div class="menu-text">
+          <div class="menu-label">Push Notifications</div>
+          <div class="menu-sub">Order updates and alerts</div>
+        </div>
+        <button class="toggle on" id="notifToggle" onclick="togglePref('notif_enabled', this)"></button>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon blue"><i class="fas fa-envelope"></i></div>
+        <div class="menu-text">
+          <div class="menu-label">Newsletter</div>
+          <div class="menu-sub">Deals and promotions via email</div>
+        </div>
+        <button class="toggle" id="newsletterToggle" onclick="togglePref('newsletter', this)"></button>
+      </div>
+      <div class="menu-item">
+        <div class="menu-icon green"><i class="fas fa-comment-sms"></i></div>
+        <div class="menu-text">
+          <div class="menu-label">SMS Alerts</div>
+          <div class="menu-sub">Order notifications via SMS</div>
+        </div>
+        <button class="toggle" id="smsToggle" onclick="togglePref('sms_alerts', this)"></button>
+      </div>
+    </div>
+
+    <!-- ── SUPPORT ── -->
+    <div class="section-card" style="animation-delay:0.15s">
+      <div class="section-label">Support</div>
+      <div class="menu-item" onclick="openModal('faqModal')">
+        <div class="menu-icon blue"><i class="fas fa-circle-question"></i></div>
+        <div class="menu-text">
+          <div class="menu-label">FAQs</div>
+          <div class="menu-sub">Frequently asked questions</div>
+        </div>
+        <div class="menu-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+      <div class="menu-item" onclick="contactSupport()">
+        <div class="menu-icon green"><i class="fas fa-headset"></i></div>
+        <div class="menu-text">
+          <div class="menu-label">Contact Support</div>
+          <div class="menu-sub">Chat with us on WhatsApp</div>
+        </div>
+        <div class="menu-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+    </div>
+
+    <!-- ── LEGAL ── -->
+    <div class="section-card" style="animation-delay:0.2s">
+      <div class="section-label">Legal</div>
+      <div class="menu-item" onclick="openPolicy('privacy')">
+        <div class="menu-icon gray"><i class="fas fa-shield-halved"></i></div>
+        <div class="menu-text"><div class="menu-label">Privacy Policy</div></div>
+        <div class="menu-right"><i class="fas fa-arrow-up-right-from-square" style="font-size:11px"></i></div>
+      </div>
+      <div class="menu-item" onclick="openPolicy('terms')">
+        <div class="menu-icon gray"><i class="fas fa-file-lines"></i></div>
+        <div class="menu-text"><div class="menu-label">Terms of Service</div></div>
+        <div class="menu-right"><i class="fas fa-arrow-up-right-from-square" style="font-size:11px"></i></div>
+      </div>
+      <div class="menu-item" onclick="openPolicy('refund')">
+        <div class="menu-icon gray"><i class="fas fa-rotate-left"></i></div>
+        <div class="menu-text"><div class="menu-label">Refund Policy</div></div>
+        <div class="menu-right"><i class="fas fa-arrow-up-right-from-square" style="font-size:11px"></i></div>
+      </div>
+    </div>
+
+    <!-- ── DANGER ZONE ── -->
+    <div class="section-card" style="animation-delay:0.25s">
+      <div class="section-label">Danger Zone</div>
+      <div class="menu-item" onclick="confirmDeleteAccount()">
+        <div class="menu-icon red"><i class="fas fa-trash-can"></i></div>
+        <div class="menu-text">
+          <div class="menu-label" style="color:var(--red)">Delete Account</div>
+          <div class="menu-sub">Permanently remove your account</div>
+        </div>
+        <div class="menu-right"><i class="fas fa-chevron-right"></i></div>
+      </div>
+    </div>
+
+    <!-- LOGOUT -->
+    <button class="logout-btn" onclick="handleLogout()">
+      <i class="fas fa-right-from-bracket"></i> Log Out
+    </button>
+
+    <div class="app-version">MC Store v1.0 · Made with ❤️ in Nigeria</div>
+    <div class="pb-nav"></div>
+  </main>
+</div>
+
+
+<!-- ══ EDIT PROFILE MODAL ══ -->
+<div class="modal-overlay" id="editProfileModal" onclick="closeOnOverlay(event,'editProfileModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">Edit Profile</div>
+      <button class="modal-close" onclick="closeModal('editProfileModal')"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">First Name</label>
+          <input class="form-input" id="editFirstName" placeholder="First name" type="text">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Last Name</label>
+          <input class="form-input" id="editLastName" placeholder="Last name" type="text">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input class="form-input" id="editPhone" placeholder="08012345678" type="tel">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Gender</label>
+        <select class="form-input" id="editGender">
+          <option value="">Select gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+          <option value="other">Prefer not to say</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" id="editEmail" placeholder="Email" type="email" disabled style="opacity:0.6;cursor:not-allowed">
+        <div style="font-size:0.7rem;color:var(--gray);margin-top:0.25rem">
+          <i class="fas fa-circle-info"></i> Email cannot be changed here
+        </div>
+      </div>
+      <button class="save-btn" id="saveProfileBtn" onclick="saveProfile()">
+        <i class="fas fa-check"></i> Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ ADDRESSES MODAL ══ -->
+<div class="modal-overlay" id="addressModal" onclick="closeOnOverlay(event,'addressModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">Saved Addresses</div>
+      <button class="modal-close" onclick="closeModal('addressModal')"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div id="addressList"></div>
+      <button class="add-addr-btn" onclick="openModal('addAddressModal')">
+        <i class="fas fa-plus"></i> Add New Address
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ ADD ADDRESS MODAL ══ -->
+<div class="modal-overlay" id="addAddressModal" onclick="closeOnOverlay(event,'addAddressModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">Add Address</div>
+      <button class="modal-close" onclick="closeModal('addAddressModal')"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Label</label>
+        <select class="form-input" id="newAddrLabel">
+          <option value="Home">🏠 Home</option>
+          <option value="Office">🏢 Office</option>
+          <option value="Other">📍 Other</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Street Address</label>
+        <input class="form-input" id="newAddrStreet" placeholder="House/plot number & street" type="text">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">City / Area</label>
+          <input class="form-input" id="newAddrCity" placeholder="e.g. Bodija" type="text">
+        </div>
+        <div class="form-group">
+          <label class="form-label">State</label>
+          <select class="form-input" id="newAddrState">
+            <option value="">Select State</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Landmark</label>
+        <input class="form-input" id="newAddrLandmark" placeholder="Nearest landmark" type="text">
+      </div>
+      <div class="form-group" style="display:flex;align-items:center;gap:0.6rem">
+        <input type="checkbox" id="newAddrDefault" style="width:16px;height:16px;accent-color:var(--blue)">
+        <label for="newAddrDefault" style="font-size:0.82rem;font-weight:600;cursor:pointer">Set as default address</label>
+      </div>
+      <button class="save-btn" onclick="saveAddress()">
+        <i class="fas fa-location-dot"></i> Save Address
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ CHANGE PASSWORD MODAL ══ -->
+<div class="modal-overlay" id="passwordModal" onclick="closeOnOverlay(event,'passwordModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">Change Password</div>
+      <button class="modal-close" onclick="closeModal('passwordModal')"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--blue-lt);border:1px solid var(--blue-md);border-radius:12px;padding:0.85rem;margin-bottom:1rem;font-size:0.8rem;color:var(--blue)">
+        <i class="fas fa-circle-info"></i> A password reset link will be sent to your email address.
+      </div>
+      <div class="form-group">
+        <label class="form-label">Your Email</label>
+        <input class="form-input" id="resetEmailInput" type="email" disabled style="opacity:0.7">
+      </div>
+      <button class="save-btn" onclick="sendPasswordReset()">
+        <i class="fas fa-paper-plane"></i> Send Reset Link
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ FAQ MODAL ══ -->
+<div class="modal-overlay" id="faqModal" onclick="closeOnOverlay(event,'faqModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title">FAQs</div>
+      <button class="modal-close" onclick="closeModal('faqModal')"><i class="fas fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-q">How do I track my order? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">Go to the Orders tab and tap on any order to see its live status. If your order has been shipped, you'll see a <strong>Track Order</strong> button that shows real-time delivery updates from our courier.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-q">How do I return an item? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">Returns are accepted within 7 days of delivery for items in their original condition. Contact our support team via WhatsApp with your order number and reason for return. We'll arrange a pickup or guide you through the process.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-q">What payment methods do you accept? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">We accept <strong>online payments</strong> via Paystack — including debit/credit cards, bank transfers, and USSD. We also accept <strong>Cash on Delivery</strong> for orders between ₦7,000 and ₦50,000.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-q">How long does delivery take? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">Delivery typically takes <strong>1–3 business days</strong> depending on your location. Orders within Ibadan may arrive same day or next day. You'll receive real-time tracking updates once your order ships.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFAQ(this)">
+        <div class="faq-q">How do I cancel an order? <i class="fas fa-chevron-down"></i></div>
+        <div class="faq-a">Orders can be cancelled before they are shipped. Go to <strong>Orders</strong>, tap the order you want to cancel, and contact support immediately via WhatsApp. Once an order is shipped, it can no longer be cancelled but may be returned after delivery.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMsg"></span>
+</div>
+
+
+<script type="module">
+import { getSession, clearSession }              from './session.js';
+import { getCustomerProfile, updateCustomerProfile, uploadProfilePhoto } from './product.js';
+import { mcLogout, mcForgotPassword }            from './auth.js';
+import { NIGERIAN_STATES }                       from './shipping.js';
+
+// ── STATE ──
+let currentUser = null;
+let profile     = null;
+let addresses   = [];
+
+// ── INIT ──
+async function init() {
+  const session = await getSession();
+  if (!session || !session.uid) return;
+  currentUser = session;
+
+  // Populate state dropdowns
+  const stateSelects = document.querySelectorAll('#newAddrState');
+  stateSelects.forEach(sel => {
+    NIGERIAN_STATES.forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = s; opt.textContent = s;
+      sel.appendChild(opt);
+    });
+  });
+
+  // Pre-fill password reset email
+  document.getElementById('resetEmailInput').value = session.email || '';
+
+  // Load full profile from Supabase
+  try {
+    profile = await getCustomerProfile(session.uid);
+    renderProfile(profile || session);
+    renderStats(profile);
+    loadAddresses();
+  } catch(e) {
+    renderProfile(session);
+  }
+}
+
+// ── RENDER PROFILE ──
+function renderProfile(p) {
+  const fullName   = p.full_name || p.fullName || 'Customer';
+  const email      = p.email     || '';
+  const initials   = fullName.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+
+  document.getElementById('profileName').textContent  = fullName;
+  document.getElementById('profileEmail').textContent = email;
+  document.getElementById('editEmail').value          = email;
+  document.getElementById('resetEmailInput').value    = email;
+
+  // Avatar
+  const avatar = document.getElementById('avatarEl');
+  if (p.photo_url) {
+    avatar.innerHTML = `<img src="${p.photo_url}" alt="${fullName}">`;
+  } else {
+    document.getElementById('avatarInitials').textContent = initials;
+  }
+
+  // Edit form
+  document.getElementById('editFirstName').value = p.first_name || fullName.split(' ')[0] || '';
+  document.getElementById('editLastName').value  = p.last_name  || fullName.split(' ').slice(1).join(' ') || '';
+  document.getElementById('editPhone').value     = p.phone      || '';
+  document.getElementById('editGender').value    = p.gender     || '';
+}
+
+// ── RENDER STATS ──
+function renderStats(p) {
+  if (!p) return;
+  document.getElementById('statOrders').textContent = p.total_orders || 0;
+  document.getElementById('statPoints').textContent = p.loyalty_points || 0;
+  const spent = p.total_spent || 0;
+  document.getElementById('statSpent').textContent =
+    spent >= 1000 ? '₦' + (spent/1000).toFixed(1) + 'k' : '₦' + spent;
+}
+
+// ── SAVE PROFILE ──
+window.saveProfile = async function() {
+  const btn       = document.getElementById('saveProfileBtn');
+  const firstName = document.getElementById('editFirstName').value.trim();
+  const lastName  = document.getElementById('editLastName').value.trim();
+  const phone     = document.getElementById('editPhone').value.trim();
+  const gender    = document.getElementById('editGender').value;
+
+  if (!firstName) { showToast('Please enter your first name', 'error'); return; }
+
+  btn.disabled  = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+
+  try {
+    const fullName = `${firstName} ${lastName}`.trim();
+    await updateCustomerProfile(currentUser.uid, {
+      full_name:  fullName,
+      first_name: firstName,
+      last_name:  lastName,
+      phone,
+      gender
+    });
+
+    document.getElementById('profileName').textContent = fullName;
+    closeModal('editProfileModal');
+    showToast('Profile updated! ✅', 'success');
+  } catch(e) {
+    showToast('Could not save profile', 'error');
+  }
+
+  btn.disabled  = false;
+  btn.innerHTML = '<i class="fas fa-check"></i> Save Changes';
+};
+
+// ── UPLOAD PHOTO ──
+window.handlePhotoUpload = async function(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('Photo must be under 5MB', 'error'); return; }
+
+  showToast('Uploading photo...', 'info');
+  try {
+    const url = await uploadProfilePhoto(currentUser.uid, file);
+    await updateCustomerProfile(currentUser.uid, { photo_url: url });
+    document.getElementById('avatarEl').innerHTML = `<img src="${url}" alt="Profile">`;
+    showToast('Photo updated! 📸', 'success');
+  } catch(e) {
+    showToast('Could not upload photo', 'error');
+  }
+};
+
+// ── PASSWORD RESET ──
+window.sendPasswordReset = async function() {
+  try {
+    await mcForgotPassword(currentUser.email);
+    showToast('Reset link sent to your email! 📧', 'success');
+    closeModal('passwordModal');
+  } catch(e) {
+    showToast(e.message || 'Could not send reset link', 'error');
+  }
+};
+
+// ── LOAD ADDRESSES ──
+async function loadAddresses() {
+  try {
+    const { default: sb } = await import('./product.js');
+    // Use supabase fetch directly
+    const res = await fetch(
+      `https://kswikkoqfpyxuurzxail.supabase.co/rest/v1/saved_addresses?uid=eq.${currentUser.uid}&order=is_default.desc`,
+      {
+        headers: {
+          apikey:        'SUPABASE_ANON_PLACEHOLDER',
+          Authorization: 'Bearer SUPABASE_ANON_PLACEHOLDER'
+        }
+      }
+    );
+    addresses = res.ok ? await res.json() : [];
+  } catch(e) {
+    addresses = [];
+  }
+  renderAddresses();
+}
+
+// ── RENDER ADDRESSES ──
+function renderAddresses() {
+  const list = document.getElementById('addressList');
+  document.getElementById('addrCount').textContent = addresses.length;
+
+  if (!addresses || addresses.length === 0) {
+    list.innerHTML = `<div style="text-align:center;padding:1.5rem 0;color:var(--gray);font-size:0.85rem">
+      <i class="fas fa-location-dot" style="font-size:2rem;margin-bottom:0.5rem;display:block;color:var(--blue-md)"></i>
+      No saved addresses yet
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = addresses.map(addr => `
+    <div class="address-card ${addr.is_default ? 'default' : ''}">
+      <div class="address-top">
+        <span class="address-label"><i class="fas fa-location-dot"></i> ${addr.label}</span>
+        ${addr.is_default ? '<span class="default-badge">✓ Default</span>' : ''}
+      </div>
+      <div class="address-text">
+        ${addr.street}, ${addr.city}, ${addr.state}
+        ${addr.landmark ? `<br><span style="color:var(--gray)">Near ${addr.landmark}</span>` : ''}
+      </div>
+      <div class="address-actions">
+        ${!addr.is_default ? `<button class="addr-btn" onclick="setDefaultAddress('${addr.id}')">Set Default</button>` : ''}
+        <button class="addr-btn del" onclick="deleteAddress('${addr.id}')"><i class="fas fa-trash"></i> Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+// ── SAVE ADDRESS ──
+window.saveAddress = async function() {
+  const label    = document.getElementById('newAddrLabel').value;
+  const street   = document.getElementById('newAddrStreet').value.trim();
+  const city     = document.getElementById('newAddrCity').value.trim();
+  const state    = document.getElementById('newAddrState').value;
+  const landmark = document.getElementById('newAddrLandmark').value.trim();
+  const isDefault = document.getElementById('newAddrDefault').checked;
+
+  if (!street || !city || !state) { showToast('Please fill in street, city and state', 'error'); return; }
+
+  try {
+    const res = await fetch(
+      `https://kswikkoqfpyxuurzxail.supabase.co/rest/v1/saved_addresses`,
+      {
+        method: 'POST',
+        headers: {
+          apikey:         'SUPABASE_ANON_PLACEHOLDER',
+          Authorization:  'Bearer SUPABASE_ANON_PLACEHOLDER',
+          'Content-Type': 'application/json',
+          Prefer:         'return=representation'
+        },
+        body: JSON.stringify({ uid: currentUser.uid, label, street, city, state, landmark, is_default: isDefault })
+      }
+    );
+    if (!res.ok) throw new Error();
+    await loadAddresses();
+    closeModal('addAddressModal');
+    showToast('Address saved! 📍', 'success');
+    // Clear form
+    ['newAddrStreet','newAddrCity','newAddrLandmark'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('newAddrDefault').checked = false;
+  } catch(e) {
+    showToast('Could not save address', 'error');
+  }
+};
+
+// ── SET DEFAULT ADDRESS ──
+window.setDefaultAddress = async function(addrId) {
+  try {
+    // Clear all defaults first
+    await fetch(
+      `https://kswikkoqfpyxuurzxail.supabase.co/rest/v1/saved_addresses?uid=eq.${currentUser.uid}`,
+      { method: 'PATCH', headers: { apikey: 'SUPABASE_ANON_PLACEHOLDER', Authorization: 'Bearer SUPABASE_ANON_PLACEHOLDER', 'Content-Type': 'application/json' }, body: JSON.stringify({ is_default: false }) }
+    );
+    await fetch(
+      `https://kswikkoqfpyxuurzxail.supabase.co/rest/v1/saved_addresses?id=eq.${addrId}`,
+      { method: 'PATCH', headers: { apikey: 'SUPABASE_ANON_PLACEHOLDER', Authorization: 'Bearer SUPABASE_ANON_PLACEHOLDER', 'Content-Type': 'application/json' }, body: JSON.stringify({ is_default: true }) }
+    );
+    await loadAddresses();
+    showToast('Default address updated!', 'success');
+  } catch(e) {
+    showToast('Could not update address', 'error');
+  }
+};
+
+// ── DELETE ADDRESS ──
+window.deleteAddress = async function(addrId) {
+  if (!confirm('Remove this address?')) return;
+  try {
+    await fetch(
+      `https://kswikkoqfpyxuurzxail.supabase.co/rest/v1/saved_addresses?id=eq.${addrId}`,
+      { method: 'DELETE', headers: { apikey: 'SUPABASE_ANON_PLACEHOLDER', Authorization: 'Bearer SUPABASE_ANON_PLACEHOLDER' } }
+    );
+    await loadAddresses();
+    showToast('Address removed', 'info');
+  } catch(e) {
+    showToast('Could not remove address', 'error');
+  }
+};
+
+// ── TOGGLE PREFERENCE ──
+window.togglePref = async function(field, btn) {
+  btn.classList.toggle('on');
+  const isOn = btn.classList.contains('on');
+  try {
+    await updateCustomerProfile(currentUser.uid, { [field]: isOn });
+  } catch(e) {
+    btn.classList.toggle('on'); // revert
+  }
+};
+
+// ── CONTACT SUPPORT ──
+window.contactSupport = function() {
+  const msg = encodeURIComponent(`Hello MC Store Support! I need help with my order.`);
+  window.open(`https://wa.me/2348000000000?text=${msg}`, '_blank');
+};
+
+// ── OPEN POLICY ──
+window.openPolicy = function(type) {
+  const urls = {
+    privacy: '/privacy-policy.html',
+    terms:   '/terms-of-service.html',
+    refund:  '/refund-policy.html'
+  };
+  window.open(urls[type], '_blank');
+};
+
+// ── DELETE ACCOUNT ──
+window.confirmDeleteAccount = function() {
+  if (confirm('Are you sure you want to permanently delete your account? This cannot be undone.')) {
+    showToast('Please contact support to delete your account', 'info');
+    setTimeout(() => contactSupport(), 1500);
+  }
+};
+
+// ── LOGOUT ──
+window.handleLogout = async function() {
+  if (!confirm('Are you sure you want to log out?')) return;
+  try {
+    await mcLogout();
+  } catch(e) {
+    await clearSession();
+    window.location.href = 'index.html';
+  }
+};
+
+// ── SWITCH TO ORDERS ──
+window.switchToOrders = function() {
+  window.parent.postMessage({ type: 'switchTab', target: 'orders' }, '*');
+};
+
+// ── FAQ TOGGLE ──
+window.toggleFAQ = function(item) {
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(f => f.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+};
+
+// ── MODALS ──
+window.openModal = function(id) {
+  document.getElementById(id).classList.add('open');
+};
+window.closeModal = function(id) {
+  document.getElementById(id).classList.remove('open');
+};
+window.closeOnOverlay = function(e, id) {
+  if (e.target === document.getElementById(id)) closeModal(id);
+};
+
+// ── TOAST ──
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.className = `toast ${type} show`;
+  t.querySelector('i').className =
+    type === 'success' ? 'fas fa-check-circle' :
+    type === 'error'   ? 'fas fa-exclamation-circle' : 'fas fa-circle-info';
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+init();
+</script>
+</body>
+</html>
