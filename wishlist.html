@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Store — Wishlist</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --blue:     #1a56db;
+  --blue-dk:  #1347c8;
+  --blue-lt:  #eff6ff;
+  --blue-mid: #dbeafe;
+  --gold:     #f5a623;
+  --red:      #ef4444;
+  --red-lt:   #fef2f2;
+  --green:    #16a34a;
+  --white:    #ffffff;
+  --gray:     #6b7280;
+  --gray-lt:  #f9fafb;
+  --text:     #0f172a;
+  --border:   #e5e7eb;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #f8fafc;
+  color: var(--text);
+}
+
+.page {
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── HEADER ── */
+.top-header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(26,86,219,0.06);
+  padding: 0 1rem;
+}
+.header-inner {
+  max-width: 1200px; margin: 0 auto;
+  height: 56px; display: flex; align-items: center; gap: 0.75rem;
+}
+.header-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem; font-weight: 900; color: var(--text);
+}
+.header-logo span { color: var(--gold); }
+.header-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem; font-weight: 800; color: var(--text);
+  flex: 1; text-align: center;
+}
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 10px;
+  border: none; background: var(--gray-lt); color: var(--gray);
+  font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.icon-btn:hover { background: var(--red-lt); color: var(--red); }
+.icon-btn.blue:hover { background: var(--blue-lt); color: var(--blue); }
+
+/* ── MAIN ── */
+.main {
+  max-width: 1200px; margin: 0 auto;
+  padding: 1rem;
+}
+
+/* ── SUMMARY BAR ── */
+.summary-bar {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  animation: fadeUp 0.3s ease both;
+}
+.summary-left {
+  display: flex; align-items: center; gap: 0.6rem;
+}
+.summary-icon {
+  width: 38px; height: 38px;
+  background: var(--red-lt);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--red); font-size: 16px;
+}
+.summary-text h3 {
+  font-size: 0.92rem; font-weight: 700; color: var(--text);
+}
+.summary-text p {
+  font-size: 0.75rem; color: var(--gray);
+}
+.move-all-btn {
+  display: flex; align-items: center; gap: 0.4rem;
+  background: var(--blue); color: white;
+  border: none; border-radius: 10px;
+  padding: 0.5rem 0.9rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.75rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s;
+  white-space: nowrap;
+}
+.move-all-btn:hover { background: var(--blue-dk); transform: scale(1.02); }
+.move-all-btn:disabled { opacity: 0.5; pointer-events: none; }
+
+/* ── PRODUCT GRID ── */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+@media (min-width: 640px)  { .product-grid { grid-template-columns: repeat(3,1fr); } }
+@media (min-width: 1024px) { .product-grid { grid-template-columns: repeat(4,1fr); } }
+
+/* ── WISHLIST CARD ── */
+.wish-card {
+  background: var(--white);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+  animation: fadeUp 0.4s ease both;
+  position: relative;
+}
+.wish-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(26,86,219,0.1);
+  border-color: var(--blue-mid);
+}
+.wish-card.removing {
+  animation: slideOut 0.35s ease forwards;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes slideOut {
+  to { opacity:0; transform:scale(0.88) translateY(10px); }
+}
+
+/* card image */
+.card-img-wrap {
+  width: 100%; aspect-ratio: 1;
+  background: var(--gray-lt);
+  position: relative; overflow: hidden;
+}
+.card-img-wrap img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.wish-card:hover .card-img-wrap img { transform: scale(1.06); }
+
+.card-img-placeholder {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem; color: var(--blue);
+  background: linear-gradient(135deg, var(--blue-lt), var(--blue-mid));
+}
+
+/* remove btn */
+.remove-btn {
+  position: absolute; top: 8px; right: 8px;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: white; border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: var(--gray); cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1); transition: all 0.2s;
+}
+.remove-btn:hover { background: var(--red-lt); color: var(--red); }
+
+/* discount badge */
+.discount-badge {
+  position: absolute; top: 8px; left: 8px;
+  background: var(--red); color: white;
+  font-size: 0.63rem; font-weight: 800;
+  padding: 0.18rem 0.38rem; border-radius: 6px;
+}
+
+/* card body */
+.card-body { padding: 0.65rem 0.7rem 0.7rem; }
+.card-name {
+  font-size: 0.8rem; font-weight: 600; color: var(--text);
+  line-height: 1.35; margin-bottom: 0.28rem;
+  display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-category {
+  display: inline-flex; align-items: center; gap: 0.25rem;
+  font-size: 0.67rem; font-weight: 600; color: var(--blue);
+  background: var(--blue-lt); border-radius: 50px;
+  padding: 0.15rem 0.45rem; margin-bottom: 0.4rem;
+}
+.card-prices {
+  display: flex; align-items: center; gap: 0.35rem;
+  margin-bottom: 0.5rem; flex-wrap: wrap;
+}
+.card-price { font-size: 0.92rem; font-weight: 800; color: var(--blue); }
+.card-original { font-size: 0.7rem; color: #9ca3af; text-decoration: line-through; }
+
+/* stock status */
+.stock-status {
+  display: flex; align-items: center; gap: 0.25rem;
+  font-size: 0.68rem; font-weight: 600; margin-bottom: 0.5rem;
+}
+.stock-status.in-stock { color: var(--green); }
+.stock-status.out-stock { color: var(--red); }
+
+/* action buttons */
+.card-actions { display: flex; gap: 0.4rem; }
+.add-cart-btn {
+  flex: 1; background: var(--blue); color: white;
+  border: none; border-radius: 8px; padding: 0.42rem 0.5rem;
+  font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.3rem;
+  transition: all 0.2s;
+}
+.add-cart-btn:hover { background: var(--blue-dk); }
+.add-cart-btn.adding { background: var(--green); pointer-events: none; }
+.add-cart-btn:disabled { opacity: 0.5; pointer-events: none; }
+
+/* ── SKELETON ── */
+.skeleton {
+  background: linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skeleton-card {
+  background: white; border-radius: 16px;
+  overflow: hidden; border: 1.5px solid var(--border);
+}
+.skeleton-img { aspect-ratio: 1; width: 100%; }
+.skeleton-body { padding: 0.65rem 0.7rem; }
+.skeleton-line { height: 11px; margin-bottom: 7px; }
+
+/* ── EMPTY STATE ── */
+.empty-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 4rem 2rem; text-align: center;
+  animation: fadeUp 0.4s ease both;
+}
+.empty-icon-wrap {
+  width: 90px; height: 90px;
+  background: var(--red-lt);
+  border-radius: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.5rem; color: var(--red);
+  margin-bottom: 1.25rem;
+  animation: iconFloat 3s ease-in-out infinite;
+  box-shadow: 0 8px 24px rgba(239,68,68,0.15);
+}
+@keyframes iconFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+.empty-wrap h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.25rem; font-weight: 800;
+  color: var(--text); margin-bottom: 0.5rem;
+}
+.empty-wrap p {
+  font-size: 0.85rem; color: var(--gray);
+  max-width: 240px; line-height: 1.6; margin-bottom: 1.5rem;
+}
+.shop-now-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  background: var(--blue); color: white;
+  border: none; border-radius: 50px;
+  padding: 0.7rem 1.5rem;
+  font-family: 'DM Sans', sans-serif; font-size: 0.875rem; font-weight: 700;
+  cursor: pointer; transition: all 0.25s;
+  box-shadow: 0 6px 18px rgba(26,86,219,0.3);
+}
+.shop-now-btn:hover { background: var(--blue-dk); transform: translateY(-2px); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 88px; left: 50%;
+  transform: translateX(-50%) translateY(16px);
+  background: #0f172a; color: white;
+  padding: 0.6rem 1.2rem; border-radius: 50px;
+  font-size: 0.8rem; font-weight: 600;
+  z-index: 9999; opacity: 0;
+  transition: all 0.3s ease; white-space: nowrap;
+  display: flex; align-items: center; gap: 0.45rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.success i { color: #4ade80; }
+.toast.error   i { color: #f87171; }
+.toast.info    i { color: #60a5fa; }
+
+.pb-nav { padding-bottom: 1.5rem; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="top-header">
+    <div class="header-inner">
+      <div class="header-logo">MC<span>Store</span></div>
+      <div class="header-title">My Wishlist</div>
+      <button class="icon-btn blue" id="shareBtn" title="Share wishlist">
+        <i class="fas fa-share-nodes"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- SUMMARY BAR -->
+    <div class="summary-bar" id="summaryBar" style="display:none">
+      <div class="summary-left">
+        <div class="summary-icon">
+          <i class="fas fa-heart"></i>
+        </div>
+        <div class="summary-text">
+          <h3 id="itemCountText">0 items saved</h3>
+          <p>Move all to cart at once</p>
+        </div>
+      </div>
+      <button class="move-all-btn" id="moveAllBtn">
+        <i class="fas fa-cart-shopping"></i> Move All to Cart
+      </button>
+    </div>
+
+    <!-- WISHLIST GRID -->
+    <div class="product-grid" id="wishGrid">
+      <!-- Skeleton loaders -->
+      <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton-body"><div class="skeleton skeleton-line" style="width:85%"></div><div class="skeleton skeleton-line" style="width:50%"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton-body"><div class="skeleton skeleton-line" style="width:80%"></div><div class="skeleton skeleton-line" style="width:55%"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton-body"><div class="skeleton skeleton-line" style="width:90%"></div><div class="skeleton skeleton-line" style="width:45%"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton-body"><div class="skeleton skeleton-line" style="width:75%"></div><div class="skeleton skeleton-line" style="width:60%"></div></div></div>
+    </div>
+
+    <div class="pb-nav"></div>
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script type="module">
+import { getSession } from './session.js';
+import {
+  getWishlist, removeFromWishlist,
+  addToCart, getCartCount,
+  formatPrice
+} from './product.js';
+
+// ── STATE ──
+let currentUser   = null;
+let wishlistItems = [];
+
+// ── INIT ──
+async function init() {
+  const session = await getSession();
+  if (!session || !session.uid) {
+    renderEmpty();
+    return;
+  }
+  currentUser = session;
+  await loadWishlist();
+}
+
+// ── LOAD WISHLIST ──
+async function loadWishlist() {
+  try {
+    wishlistItems = await getWishlist(currentUser.uid) || [];
+    renderWishlist();
+  } catch(e) {
+    console.error('loadWishlist error:', e);
+    renderEmpty();
+  }
+}
+
+// ── RENDER WISHLIST ── 
+function renderWishlist() {
+  const grid    = document.getElementById('wishGrid');
+  const summary = document.getElementById('summaryBar');
+  const count   = document.getElementById('itemCountText');
+
+  if (!wishlistItems || wishlistItems.length === 0) {
+    summary.style.display = 'none';
+    renderEmpty();
+    return;
+  }
+
+  // Show summary bar
+  summary.style.display = 'flex';
+  count.textContent = `${wishlistItems.length} item${wishlistItems.length > 1 ? 's' : ''} saved`;
+
+  // Update parent wishlist badge
+  window.parent.postMessage({ type: 'wishlistUpdate', count: wishlistItems.length }, '*');
+
+  grid.innerHTML = wishlistItems.map((item, i) => wishCardHTML(item, i)).join('');
+}
+
+// ── WISHLIST CARD HTML ──
+function wishCardHTML(item, i) {
+  const price    = formatPrice(item.price || 0);
+  const original = item.original_price > item.price
+    ? formatPrice(item.original_price) : '';
+  const catIcon  = categoryIcon(item.category);
+  const inStock  = item.stock === undefined || item.stock > 0;
+  const delay    = `animation-delay:${i * 0.06}s`;
+
+  const imgHTML = item.image_url
+    ? `<img src="${item.image_url}" alt="${item.name}" loading="lazy"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    : '';
+
+  return `
+  <div class="wish-card" id="card-${item.product_id || item.id}" style="${delay}">
+    <div class="card-img-wrap">
+      ${imgHTML}
+      <div class="card-img-placeholder" style="${item.image_url?'display:none':''}">
+        <i class="${catIcon}" style="font-size:2.2rem"></i>
+      </div>
+      ${item.discount > 0 ? `<div class="discount-badge">-${item.discount}%</div>` : ''}
+      <button class="remove-btn"
+        onclick="removeItem('${item.product_id || item.id}')"
+        title="Remove from wishlist">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+    <div class="card-body">
+      ${item.category ? `
+      <div class="card-category">
+        <i class="${catIcon}" style="font-size:9px"></i>
+        ${item.category}
+      </div>` : ''}
+      <div class="card-name">${item.name}</div>
+      <div class="card-prices">
+        <span class="card-price">${price}</span>
+        ${original ? `<span class="card-original">${original}</span>` : ''}
+      </div>
+      <div class="stock-status ${inStock ? 'in-stock' : 'out-stock'}">
+        <i class="fas fa-circle" style="font-size:6px"></i>
+        ${inStock ? 'In Stock' : 'Out of Stock'}
+      </div>
+      <div class="card-actions">
+        <button class="add-cart-btn"
+          id="cartBtn-${item.product_id || item.id}"
+          onclick="moveToCartSingle('${item.product_id || item.id}')"
+          ${!inStock ? 'disabled' : ''}>
+          <i class="fas fa-cart-plus"></i>
+          ${inStock ? 'Add to Cart' : 'Out of Stock'}
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── CATEGORY ICON ──
+function categoryIcon(cat) {
+  const map = {
+    'Electronics & Gadgets': 'fas fa-mobile-screen',
+    'Fashion & Clothing':    'fas fa-shirt',
+    'Food & Groceries':      'fas fa-basket-shopping',
+    'Beauty & Health':       'fas fa-pump-soap',
+    'Home & Kitchen':        'fas fa-couch',
+    'Sports & Fitness':      'fas fa-dumbbell',
+    'Books & Stationery':    'fas fa-book-open',
+    'Baby & Kids':           'fas fa-baby'
+  };
+  return map[cat] || 'fas fa-tag';
+}
+
+// ── REMOVE ITEM ──
+window.removeItem = async function(productId) {
+  const card = document.getElementById(`card-${productId}`);
+  if (card) card.classList.add('removing');
+
+  try {
+    await removeFromWishlist(currentUser.uid, productId);
+    wishlistItems = wishlistItems.filter(
+      i => (i.product_id || i.id) !== productId
+    );
+
+    setTimeout(() => {
+      renderWishlist();
+      showToast('Removed from wishlist', 'info');
+    }, 350);
+  } catch(e) {
+    if (card) card.classList.remove('removing');
+    showToast('Could not remove item', 'error');
+  }
+};
+
+// ── MOVE SINGLE ITEM TO CART ──
+window.moveToCartSingle = async function(productId) {
+  const btn  = document.getElementById(`cartBtn-${productId}`);
+  const item = wishlistItems.find(i => (i.product_id || i.id) === productId);
+  if (!item || !btn) return;
+
+  btn.classList.add('adding');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+  try {
+    await addToCart(currentUser.uid, {
+      id:        item.product_id || item.id,
+      name:      item.name,
+      price:     item.price,
+      image_url: item.image_url || ''
+    });
+
+    btn.innerHTML = '<i class="fas fa-check"></i> Added!';
+
+    // Update cart badge in parent
+    const count = await getCartCount(currentUser.uid);
+    window.parent.postMessage({ type: 'cartUpdate', count }, '*');
+
+    showToast('Added to cart! 🛒', 'success');
+
+    setTimeout(() => {
+      btn.classList.remove('adding');
+      btn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+    }, 2000);
+  } catch(e) {
+    btn.classList.remove('adding');
+    btn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
+    showToast('Could not add to cart', 'error');
+  }
+};
+
+// ── MOVE ALL TO CART ──
+document.getElementById('moveAllBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('moveAllBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding all...';
+
+  try {
+    let added = 0;
+    for (const item of wishlistItems) {
+      try {
+        await addToCart(currentUser.uid, {
+          id:        item.product_id || item.id,
+          name:      item.name,
+          price:     item.price,
+          image_url: item.image_url || ''
+        });
+        added++;
+      } catch(e) { /* skip failed items */ }
+    }
+
+    // Update cart badge
+    const count = await getCartCount(currentUser.uid);
+    window.parent.postMessage({ type: 'cartUpdate', count }, '*');
+
+    showToast(`${added} item${added > 1 ? 's' : ''} added to cart! 🛒`, 'success');
+  } catch(e) {
+    showToast('Something went wrong', 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-cart-shopping"></i> Move All to Cart';
+});
+
+// ── SHARE WISHLIST ──
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  const text = wishlistItems.length > 0
+    ? `Check out my MC Store wishlist with ${wishlistItems.length} item(s)!`
+    : 'Check out MC Store!';
+
+  if (navigator.share) {
+    try {
+      await navigator.share({ title: 'My MC Store Wishlist', text, url: window.location.href });
+    } catch(e) { /* cancelled */ }
+  } else {
+    await navigator.clipboard.writeText(text).catch(() => {});
+    showToast('Link copied!', 'info');
+  }
+});
+
+// ── EMPTY STATE ──
+function renderEmpty() {
+  document.getElementById('wishGrid').innerHTML = `
+    <div class="empty-wrap" style="grid-column:1/-1">
+      <div class="empty-icon-wrap">
+        <i class="fas fa-heart"></i>
+      </div>
+      <h2>Your Wishlist is Empty</h2>
+      <p>Save items you love by tapping the heart icon on any product.</p>
+      <button class="shop-now-btn" onclick="goHome()">
+        <i class="fas fa-store"></i> Start Shopping
+      </button>
+    </div>`;
+}
+
+// ── GO HOME ──
+window.goHome = function() {
+  window.parent.postMessage({ type: 'switchTab', target: 'home' }, '*');
+};
+
+// ── TOAST ──
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.className = `toast ${type} show`;
+  t.querySelector('i').className =
+    type === 'success' ? 'fas fa-check-circle'  :
+    type === 'error'   ? 'fas fa-exclamation-circle' :
+                         'fas fa-circle-info';
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+init();
+</script>
+</body>
+</html>
