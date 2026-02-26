@@ -66,14 +66,27 @@ async function getProducts({ category, featured, search, limit } = {}) {
 
     if (category) query += `&category=eq.${encodeURIComponent(category)}`;
     if (featured)  query += `&is_featured=eq.true`;
-    if (search)    query += `&name=ilike.${encodeURIComponent("%" + search + "%")}`;
+    if (search)    query += `&title=ilike.${encodeURIComponent("%" + search + "%")}`;
     if (limit)     query += `&limit=${limit}`;
 
-    return await sbFetch(query);
+    const rows = await sbFetch(query);
+    return (rows || []).map(normalizeProduct);
   } catch (error) {
     console.error("getProducts error:", error);
     return [];
   }
+}
+
+// ── Normalize product columns ──
+// Database uses: title, images[]
+// Frontend uses: name, image_url
+function normalizeProduct(p) {
+  if (!p) return p;
+  return {
+    ...p,
+    name:      p.name      || p.title || "Unnamed Product",
+    image_url: p.image_url || (Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null) || p.image || null,
+  };
 }
 
 
@@ -83,7 +96,7 @@ async function getProducts({ category, featured, search, limit } = {}) {
 async function getProductById(productId) {
   try {
     const rows = await sbFetch(`products?select=*&id=eq.${productId}`);
-    return rows && rows.length > 0 ? rows[0] : null;
+    return rows && rows.length > 0 ? normalizeProduct(rows[0]) : null;
   } catch (error) {
     console.error("getProductById error:", error);
     return null;
@@ -94,7 +107,7 @@ async function getProductById(productId) {
 // ─────────────────────────────────────────
 //  GET PRODUCTS BY CATEGORY
 // ─────────────────────────────────────────
-async function getProductsByCategory(category, limit = 20) {
+async function getProductsByCategory(category, limit = 50) {
   return getProducts({ category, limit });
 }
 
@@ -103,7 +116,7 @@ async function getProductsByCategory(category, limit = 20) {
 //  GET FEATURED PRODUCTS
 //  Used on home page hero/banner section
 // ─────────────────────────────────────────
-async function getFeaturedProducts(limit = 10) {
+async function getFeaturedProducts(limit = 50) {
   return getProducts({ featured: true, limit });
 }
 
@@ -111,7 +124,7 @@ async function getFeaturedProducts(limit = 10) {
 // ─────────────────────────────────────────
 //  SEARCH PRODUCTS
 // ─────────────────────────────────────────
-async function searchProducts(query, limit = 30) {
+async function searchProducts(query, limit = 100) {
   return getProducts({ search: query, limit });
 }
 
@@ -179,8 +192,8 @@ async function addToCart(uid, product, quantity = 1) {
       body:    JSON.stringify({
         uid,
         product_id: product.id,
-        name:       product.name,
-        image_url:  product.image_url || "",
+        name:       product.name || product.title,
+        image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || "",
         price:      product.price,
         quantity
       })
@@ -296,8 +309,8 @@ async function addToWishlist(uid, product) {
       body:    JSON.stringify({
         uid,
         product_id: product.id,
-        name:       product.name,
-        image_url:  product.image_url || "",
+        name:       product.name || product.title,
+        image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || "",
         price:      product.price
       })
     });
