@@ -60,20 +60,22 @@ async function sbFetch(endpoint, options = {}) {
 //    getProducts({ search: 'samsung' })     → search by name
 //    getProducts({ limit: 10 })             → limit results
 // ─────────────────────────────────────────
-async function getProducts({ category, featured, search, limit } = {}) {
+async function getProducts({ category, featured, search, section, limit } = {}) {
   try {
     let query = "products?select=*&is_active=eq.true&order=created_at.desc";
 
     if (category) query += `&category=eq.${encodeURIComponent(category)}`;
-    if (featured)  query += `&is_featured=eq.true`;
-    if (search)    query += `&title=ilike.${encodeURIComponent("%" + search + "%")}`;
-    if (limit)     query += `&limit=${limit}`;
+    if (section)  query += `&section=eq.${encodeURIComponent(section)}`;
+    if (search)   query += `&title=ilike.${encodeURIComponent("%" + search + "%")}`;
+    if (limit)    query += `&limit=${limit}`;
 
     const rows = await sbFetch(query);
     return (rows || []).map(normalizeProduct);
   } catch (error) {
     console.error("getProducts error:", error);
     return [];
+  }
+}
   }
 }
 
@@ -117,7 +119,8 @@ async function getProductsByCategory(category, limit = 50) {
 //  Used on home page hero/banner section
 // ─────────────────────────────────────────
 async function getFeaturedProducts(limit = 50) {
-  return getProducts({ featured: true, limit });
+  // Show ALL active products — no is_featured restriction
+  return getProducts({ limit });
 }
 
 
