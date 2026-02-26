@@ -2,18 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+    <!-- FAVICON -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <meta name="theme-color" content="#1a56db">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MC Store — Home</title>
-<!-- FAVICON -->
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
-<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<meta name="theme-color" content="#1a56db">
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
 :root {
   --blue:      #1a56db;
@@ -610,37 +609,65 @@ body {
           <div class="cat-icon"><i class="fas fa-store"></i></div>
           <div class="cat-label">All</div>
         </div>
-        <div class="cat-chip" data-cat="Electronics & Gadgets" onclick="filterCategory('Electronics & Gadgets')">
-          <div class="cat-icon"><i class="fas fa-mobile-screen"></i></div>
+        <div class="cat-chip" data-cat="Electronics" onclick="filterCategory('Electronics')">
+          <div class="cat-icon"><i class="fas fa-desktop"></i></div>
           <div class="cat-label">Electronics</div>
         </div>
-        <div class="cat-chip" data-cat="Fashion & Clothing" onclick="filterCategory('Fashion & Clothing')">
+        <div class="cat-chip" data-cat="Mobile Phones" onclick="filterCategory('Mobile Phones')">
+          <div class="cat-icon"><i class="fas fa-mobile-screen"></i></div>
+          <div class="cat-label">Phones</div>
+        </div>
+        <div class="cat-chip" data-cat="Phone Accessories" onclick="filterCategory('Phone Accessories')">
+          <div class="cat-icon"><i class="fas fa-headphones"></i></div>
+          <div class="cat-label">Accessories</div>
+        </div>
+        <div class="cat-chip" data-cat="Laptops or accessories" onclick="filterCategory('Laptops or accessories')">
+          <div class="cat-icon"><i class="fas fa-laptop"></i></div>
+          <div class="cat-label">Laptops</div>
+        </div>
+        <div class="cat-chip" data-cat="Tablets" onclick="filterCategory('Tablets')">
+          <div class="cat-icon"><i class="fas fa-tablet-screen-button"></i></div>
+          <div class="cat-label">Tablets</div>
+        </div>
+        <div class="cat-chip" data-cat="Cameras" onclick="filterCategory('Cameras')">
+          <div class="cat-icon"><i class="fas fa-camera"></i></div>
+          <div class="cat-label">Cameras</div>
+        </div>
+        <div class="cat-chip" data-cat="Home Appliances" onclick="filterCategory('Home Appliances')">
+          <div class="cat-icon"><i class="fas fa-house"></i></div>
+          <div class="cat-label">Home</div>
+        </div>
+        <div class="cat-chip" data-cat="Fashion" onclick="filterCategory('Fashion')">
           <div class="cat-icon"><i class="fas fa-shirt"></i></div>
           <div class="cat-label">Fashion</div>
         </div>
-        <div class="cat-chip" data-cat="Food & Groceries" onclick="filterCategory('Food & Groceries')">
-          <div class="cat-icon"><i class="fas fa-basket-shopping"></i></div>
-          <div class="cat-label">Groceries</div>
+        <div class="cat-chip" data-cat="Shoes" onclick="filterCategory('Shoes')">
+          <div class="cat-icon"><i class="fas fa-shoe-prints"></i></div>
+          <div class="cat-label">Shoes</div>
         </div>
-        <div class="cat-chip" data-cat="Beauty & Health" onclick="filterCategory('Beauty & Health')">
-          <div class="cat-icon"><i class="fas fa-pump-soap"></i></div>
-          <div class="cat-label">Beauty</div>
+        <div class="cat-chip" data-cat="Bags & Accessories" onclick="filterCategory('Bags & Accessories')">
+          <div class="cat-icon"><i class="fas fa-bag-shopping"></i></div>
+          <div class="cat-label">Bags</div>
         </div>
-        <div class="cat-chip" data-cat="Home & Kitchen" onclick="filterCategory('Home & Kitchen')">
-          <div class="cat-icon"><i class="fas fa-couch"></i></div>
-          <div class="cat-label">Home</div>
-        </div>
-        <div class="cat-chip" data-cat="Sports & Fitness" onclick="filterCategory('Sports & Fitness')">
+        <div class="cat-chip" data-cat="Sports & Outdoors" onclick="filterCategory('Sports & Outdoors')">
           <div class="cat-icon"><i class="fas fa-dumbbell"></i></div>
           <div class="cat-label">Sports</div>
+        </div>
+        <div class="cat-chip" data-cat="Toys & Games" onclick="filterCategory('Toys & Games')">
+          <div class="cat-icon"><i class="fas fa-gamepad"></i></div>
+          <div class="cat-label">Toys</div>
         </div>
         <div class="cat-chip" data-cat="Books & Stationery" onclick="filterCategory('Books & Stationery')">
           <div class="cat-icon"><i class="fas fa-book-open"></i></div>
           <div class="cat-label">Books</div>
         </div>
-        <div class="cat-chip" data-cat="Baby & Kids" onclick="filterCategory('Baby & Kids')">
-          <div class="cat-icon"><i class="fas fa-baby"></i></div>
-          <div class="cat-label">Baby</div>
+        <div class="cat-chip" data-cat="Cars & Vehicles" onclick="filterCategory('Cars & Vehicles')">
+          <div class="cat-icon"><i class="fas fa-car"></i></div>
+          <div class="cat-label">Cars</div>
+        </div>
+        <div class="cat-chip" data-cat="Others" onclick="filterCategory('Others')">
+          <div class="cat-icon"><i class="fas fa-box"></i></div>
+          <div class="cat-label">Others</div>
         </div>
       </div>
     </div>
@@ -807,7 +834,7 @@ function startCountdown() {
 // ── LOAD FEATURED ──
 async function loadFeatured() {
   try {
-    const products = await getFeaturedProducts(8);
+    const products = await getFeaturedProducts(50);
     allProducts = [...allProducts, ...products];
     renderGrid('featuredGrid', products);
   } catch(e) {
@@ -818,7 +845,7 @@ async function loadFeatured() {
 // ── LOAD NEW ARRIVALS ──
 async function loadNewArrivals() {
   try {
-    const products = await getProducts({ limit: 8 });
+    const products = await getProducts({ limit: 50 });
     allProducts = [...new Map([...allProducts, ...products].map(p => [p.id, p])).values()];
     renderGrid('newArrivalsGrid', products);
   } catch(e) {
@@ -829,8 +856,8 @@ async function loadNewArrivals() {
 // ── LOAD FLASH DEALS ──
 async function loadFlashDeals() {
   try {
-    const products = await getProducts({ limit: 20 });
-    const deals    = products.filter(p => p.discount > 0).slice(0, 8);
+    const products = await getProducts({ limit: 100 });
+    const deals    = products.filter(p => p.discount > 0).slice(0, 20);
     if (deals.length === 0) { document.getElementById('flashSection').style.display = 'none'; return; }
     renderFlash(deals);
   } catch(e) {
@@ -933,14 +960,21 @@ function flashCardHTML(p, i) {
 // ── CATEGORY ICON ──
 function categoryIcon(cat) {
   const map = {
-    'Electronics & Gadgets': 'fas fa-mobile-screen',
-    'Fashion & Clothing':    'fas fa-shirt',
-    'Food & Groceries':      'fas fa-basket-shopping',
-    'Beauty & Health':       'fas fa-pump-soap',
-    'Home & Kitchen':        'fas fa-couch',
-    'Sports & Fitness':      'fas fa-dumbbell',
-    'Books & Stationery':    'fas fa-book-open',
-    'Baby & Kids':           'fas fa-baby'
+    'Electronics':            'fas fa-desktop',
+    'Mobile Phones':          'fas fa-mobile-screen',
+    'Phone Accessories':      'fas fa-headphones',
+    'Laptops or accessories': 'fas fa-laptop',
+    'Tablets':                'fas fa-tablet-screen-button',
+    'Cameras':                'fas fa-camera',
+    'Home Appliances':        'fas fa-house',
+    'Fashion':                'fas fa-shirt',
+    'Shoes':                  'fas fa-shoe-prints',
+    'Bags & Accessories':     'fas fa-bag-shopping',
+    'Sports & Outdoors':      'fas fa-dumbbell',
+    'Toys & Games':           'fas fa-gamepad',
+    'Books & Stationery':     'fas fa-book-open',
+    'Cars & Vehicles':        'fas fa-car',
+    'Others':                 'fas fa-box',
   };
   return map[cat] || 'fas fa-tag';
 }
@@ -967,7 +1001,7 @@ window.filterCategory = async function(cat) {
     </div>`).join('');
 
   try {
-    const products = cat ? await getProducts({ category: cat }) : await getFeaturedProducts(8);
+    const products = cat ? await getProducts({ category: cat }) : await getFeaturedProducts(50);
     renderGrid('featuredGrid', products);
   } catch(e) {
     renderEmpty('featuredGrid', 'Could not load products.');
@@ -1027,7 +1061,7 @@ window.toggleWish = async function(btn, productId) {
 };
 
 // ── OPEN PRODUCT ──
-window.openProduct = function(productId) {
+window.openProduct = function(productId) { window.location.href = 'product.html?id=' + productId; };
   // Product detail page — coming soon
   console.log('Product:', productId);
 };
