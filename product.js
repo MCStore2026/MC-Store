@@ -15,7 +15,7 @@
 //  in Vercel → Settings → Environment Variables
 // ─────────────────────────────────────────
 const SUPABASE_URL  = "https://kswikkoqfpyxuurzxail.supabase.co";
-const SUPABASE_ANON = "sb_publishable_71FOcs9JkmXqhGTU8ks-Eg_gQcG8A-D";
+const SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtzd2lra29xZnB5eHV1cnp4YWlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNjEzMDQsImV4cCI6MjA4NjkzNzMwNH0.uuoSKWOTeXot1HJys0EO9OcIRBL0mKrNHIUHIAPCpZ4";
 
 
 // ─────────────────────────────────────────
