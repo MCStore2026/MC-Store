@@ -596,7 +596,7 @@ async function init() {
 // ── LOAD CART ──
 async function loadCart() {
   try {
-    cartItems = await getCart(currentUser.uid) || [];
+    cartItems = await getCart(currentUser.uid || currentUser.id) || [];
     if (cartItems.length === 0) { showEmpty(); return; }
     renderCartItems();
     updateCartBadge();
@@ -652,7 +652,7 @@ function renderCartItems() {
 window.changeQty = async function(productId, newQty) {
   if (newQty <= 0) { removeItem(productId); return; }
   try {
-    await updateCartQuantity(currentUser.uid, productId, newQty);
+    await updateCartQuantity(currentUser.uid || currentUser.id, productId, newQty);
     const item = cartItems.find(i => i.product_id === productId);
     if (item) item.quantity = newQty;
     renderCartItems();
@@ -664,7 +664,7 @@ window.changeQty = async function(productId, newQty) {
 // ── REMOVE ITEM ──
 window.removeItem = async function(productId) {
   try {
-    await removeFromCart(currentUser.uid, productId);
+    await removeFromCart(currentUser.uid || currentUser.id, productId);
     cartItems = cartItems.filter(i => i.product_id !== productId);
     if (cartItems.length === 0) { showEmpty(); return; }
     renderCartItems();
@@ -679,7 +679,7 @@ window.removeItem = async function(productId) {
 document.getElementById('clearCartBtn').addEventListener('click', async () => {
   if (!cartItems.length) return;
   if (!confirm('Clear all items from cart?')) return;
-  await clearCart(currentUser.uid);
+  await clearCart(currentUser.uid || currentUser.id);
   cartItems = [];
   showEmpty();
   updateCartBadge();
@@ -909,7 +909,7 @@ window.placeOrderNow = async function() {
 async function saveOrder(deliveryAddress, payMethod, payRef, payStatus, total) {
   try {
     const order = await placeOrder({
-      uid:              currentUser.uid,
+      uid:              currentUser.uid || currentUser.id,
       customerName:     currentUser.fullName,
       customerEmail:    currentUser.email,
       customerPhone:    currentUser.phone || document.getElementById('addrPhone').value,

@@ -76,18 +76,29 @@ async function getProducts({ category, featured, search, section, limit } = {}) 
     return [];
   }
 }
-  }
-}
 
 // ── Normalize product columns ──
 // Database uses: title, images[]
 // Frontend uses: name, image_url
 function normalizeProduct(p) {
   if (!p) return p;
+  const name      = p.name || p.title || 'Unnamed Product';
+  const image_url = p.image_url
+    || (Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null)
+    || p.image || null;
+
+  // Promo price: admin sets price=12000, promo_price=10000
+  // Customer sees: ₦10,000  ~~₦12,000~~  -17%
+  const price      = Number(p.price) || 0;
+  const promoPrice = p.promo_price ? Number(p.promo_price) : 0;
+  const hasPromo   = promoPrice > 0 && promoPrice < price;
+
   return {
     ...p,
-    name:      p.name      || p.title || "Unnamed Product",
-    image_url: p.image_url || (Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null) || p.image || null,
+    name,
+    image_url,
+    display_price:  hasPromo ? promoPrice : price,
+    original_price: hasPromo ? price : null,
   };
 }
 
@@ -197,7 +208,7 @@ async function addToCart(uid, product, quantity = 1) {
         product_id: product.id,
         name:       product.name || product.title,
         image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || "",
-        price:      product.price,
+        price:      product.display_price || product.promo_price || product.price,
         quantity
       })
     });
@@ -314,7 +325,7 @@ async function addToWishlist(uid, product) {
         product_id: product.id,
         name:       product.name || product.title,
         image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || "",
-        price:      product.price
+        price:      product.display_price || product.price
       })
     });
 
@@ -352,6 +363,11 @@ async function isInWishlist(uid, productId) {
   } catch {
     return false;
   }
+}
+
+// String-normalise a product ID (handles UUID, integer, anything)
+function normaliseId(id) {
+  return id === null || id === undefined ? '' : String(id);
 }
 
 
@@ -726,6 +742,35 @@ function truncate(text, maxLength = 50) {
 }
 
 
+// ─────────────────────────────────────────
+//  GET ALL ORDERS (admin)
+// ─────────────────────────────────────────
+async function getAllOrders(limit = 200) {
+  try {
+    return await sbFetch(`orders?select=*&order=created_at.desc&limit=${limit}`);
+  } catch (error) {
+    console.error("getAllOrders error:", error);
+    return [];
+  }
+}
+
+// ─────────────────────────────────────────
+//  UPDATE ORDER STATUS (admin confirmation)
+// ─────────────────────────────────────────
+async function updateOrderStatus(orderId, status) {
+  try {
+    await sbFetch(`orders?id=eq.${orderId}`, {
+      method: "PATCH",
+      body:   JSON.stringify({ status, updated_at: new Date().toISOString() })
+    });
+    return true;
+  } catch (error) {
+    console.error("updateOrderStatus error:", error);
+    throw new Error("Could not update order.");
+  }
+}
+
+
 // ============================================================
 //  EXPORTS
 // ============================================================
@@ -758,6 +803,8 @@ export {
   placeOrder,
   getMyOrders,
   getOrderById,
+  getAllOrders,
+  updateOrderStatus,
 
   // Reviews
   getReviews,
@@ -777,6 +824,7 @@ export {
   getImageUrl,
 
   // Utilities
+  normaliseId,
   formatPrice,
   calcDiscount,
   calcCartTotal,

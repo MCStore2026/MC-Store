@@ -389,7 +389,7 @@ let wishlistItems = [];
 // ── INIT ──
 async function init() {
   const session = await getSession();
-  if (!session || !session.uid) {
+  if (!session || (!session.uid && !session.id)) {
     renderEmpty();
     return;
   }
@@ -400,7 +400,7 @@ async function init() {
 // ── LOAD WISHLIST ──
 async function loadWishlist() {
   try {
-    wishlistItems = await getWishlist(currentUser.uid) || [];
+    wishlistItems = await getWishlist(currentUser.uid || currentUser.id) || [];
     renderWishlist();
   } catch(e) {
     console.error('loadWishlist error:', e);
@@ -507,7 +507,7 @@ window.removeItem = async function(productId) {
   if (card) card.classList.add('removing');
 
   try {
-    await removeFromWishlist(currentUser.uid, productId);
+    await removeFromWishlist(currentUser.uid || currentUser.id, productId);
     wishlistItems = wishlistItems.filter(
       i => (i.product_id || i.id) !== productId
     );
@@ -532,7 +532,7 @@ window.moveToCartSingle = async function(productId) {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
 
   try {
-    await addToCart(currentUser.uid, {
+    await addToCart(currentUser.uid || currentUser.id, {
       id:        item.product_id || item.id,
       name:      item.name,
       price:     item.price,
@@ -542,7 +542,7 @@ window.moveToCartSingle = async function(productId) {
     btn.innerHTML = '<i class="fas fa-check"></i> Added!';
 
     // Update cart badge in parent
-    const count = await getCartCount(currentUser.uid);
+    const count = await getCartCount(currentUser.uid || currentUser.id);
     window.parent.postMessage({ type: 'cartUpdate', count }, '*');
 
     showToast('Added to cart! 🛒', 'success');
@@ -568,7 +568,7 @@ document.getElementById('moveAllBtn').addEventListener('click', async () => {
     let added = 0;
     for (const item of wishlistItems) {
       try {
-        await addToCart(currentUser.uid, {
+        await addToCart(currentUser.uid || currentUser.id, {
           id:        item.product_id || item.id,
           name:      item.name,
           price:     item.price,
@@ -579,7 +579,7 @@ document.getElementById('moveAllBtn').addEventListener('click', async () => {
     }
 
     // Update cart badge
-    const count = await getCartCount(currentUser.uid);
+    const count = await getCartCount(currentUser.uid || currentUser.id);
     window.parent.postMessage({ type: 'cartUpdate', count }, '*');
 
     showToast(`${added} item${added > 1 ? 's' : ''} added to cart! 🛒`, 'success');

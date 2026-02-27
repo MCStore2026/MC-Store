@@ -388,10 +388,10 @@ let expandedId    = null;
 // ── INIT ──
 async function init() {
   const session = await getSession();
-  if (!session || !session.uid) { renderEmpty(); return; }
-
+  if (!session || (!session.uid && !session.id)) { renderEmpty(); return; }
+  const uid = session.uid || session.id;
   try {
-    allOrders = await getMyOrders(session.uid) || [];
+    allOrders = await getMyOrders(uid) || [];
     updateCounts();
     renderOrders('all');
   } catch(e) {
