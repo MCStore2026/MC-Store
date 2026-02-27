@@ -76,6 +76,8 @@ async function getProducts({ category, featured, search, section, limit } = {}) 
     return [];
   }
 }
+  }
+}
 
 // ── Normalize product columns ──
 // Database uses: title, images[]
@@ -447,6 +449,21 @@ async function placeOrder({
 
     // Clear cart after successful order
     await clearCart(uid);
+
+    // Reduce stock for each ordered item
+    for (const item of items) {
+      try {
+        const rows = await sbFetch(`products?select=stock&id=eq.${item.product_id || item.id}`);
+        if (rows && rows.length > 0) {
+          const currentStock = rows[0].stock || 0;
+          const newStock = Math.max(0, currentStock - (item.quantity || 1));
+          await sbFetch(`products?id=eq.${item.product_id || item.id}`, {
+            method: 'PATCH',
+            body: JSON.stringify({ stock: newStock })
+          });
+        }
+      } catch(e) { /* don't block order if stock update fails */ }
+    }
 
     // Update customer total orders and spent
     await sbFetch(`customers?uid=eq.${uid}`, {
