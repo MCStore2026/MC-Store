@@ -14,8 +14,8 @@
 //  Set SUPABASE_URL and SUPABASE_ANON_KEY
 //  in Vercel → Settings → Environment Variables
 // ─────────────────────────────────────────
-const SUPABASE_URL  = "SUPABASE_URL_PLACEHOLDER";
-const SUPABASE_ANON = "SUPABASE_ANON_PLACEHOLDER";
+const SUPABASE_URL  = "https://kswikkoqfpyxuurzxail.supabase.co";
+const SUPABASE_ANON = "sb_publishable_71FOcs9JkmXqhGTU8ks-Eg_gQcG8A-D";
 
 
 // ─────────────────────────────────────────
