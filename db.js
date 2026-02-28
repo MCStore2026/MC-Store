@@ -225,13 +225,13 @@ export async function db_getReviews(productId) {
 
 export async function db_addReview({ uid, productId, userName, rating, comment }) {
   try {
+    // Send only columns we know exist — uid as text (Firebase UID)
     await sb('reviews', {
       method:  'POST',
       headers: { Prefer: 'return=minimal' },
       body:    JSON.stringify({
-        uid,
-        product_id:    productId,
-        user_id:       uid,
+        uid:           String(uid),
+        product_id:    String(productId),
         user_name:     userName || 'Customer',
         customer_name: userName || 'Customer',
         rating:        Number(rating),
@@ -243,7 +243,7 @@ export async function db_addReview({ uid, productId, userName, rating, comment }
     return true;
   } catch(e) {
     console.error('db_addReview:', e);
-    throw new Error('Could not post review. Please try again.');
+    throw new Error(e.message || 'Could not post review. Please try again.');
   }
 }
 
