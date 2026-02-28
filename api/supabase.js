@@ -282,4 +282,4 @@ export default async function handler(req, res) {
     console.error(`[api/db] ${action} error:`, err.message);
     return res.status(500).json({ ok: false, error: err.message });
   }
-}
+    }
