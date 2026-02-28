@@ -31,12 +31,7 @@ async function sb(endpoint, options = {}) {
   });
   if (!res.ok) {
     const err = await res.text();
-    // Show error visibly on screen for debugging
-    const div = document.createElement('div');
-    div.style.cssText = 'position:fixed;top:0;left:0;right:0;background:red;color:white;padding:12px;font-size:11px;z-index:99999;word-break:break-all;max-height:40vh;overflow:auto';
-    div.innerHTML = '<b>DB ERROR (tap to close):</b><br>' + endpoint + '<br>' + err;
-    div.onclick = () => div.remove();
-    document.body.appendChild(div);
+    console.error('Supabase error:', endpoint, err);
     throw new Error(err);
   }
   const t = await res.text();
@@ -100,15 +95,17 @@ export async function db_getCart(uid) {
 export async function db_addToCart(uid, product, quantity = 1) {
   try {
     const pid      = String(product.id);
+    // First try to update existing item
     const existing = await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}`);
     if (existing && existing.length > 0) {
-      const newQty = existing[0].quantity + quantity;
+      const newQty = (existing[0].quantity || 1) + quantity;
       await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}`, {
         method: 'PATCH',
         body:   JSON.stringify({ quantity: newQty })
       });
       return { action: 'updated', quantity: newQty };
     }
+    // Insert new item
     await sb('cart', {
       method:  'POST',
       headers: { Prefer: 'return=minimal' },
@@ -118,7 +115,8 @@ export async function db_addToCart(uid, product, quantity = 1) {
         name:       product.name || product.title || '',
         image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
         price:      product.display_price || product.promo_price || product.price || 0,
-        quantity
+        quantity,
+        added_at:   new Date().toISOString()
       })
     });
     return { action: 'added', quantity };
@@ -170,12 +168,11 @@ export async function db_getWishlist(uid) {
 
 export async function db_addToWishlist(uid, product) {
   try {
-    const pid      = String(product.id);
-    const existing = await sb(`wishlist?uid=eq.${uid}&product_id=eq.${pid}`);
-    if (existing && existing.length > 0) return { action: 'already_exists' };
+    const pid = String(product.id);
+    // Use ON CONFLICT DO NOTHING — handles duplicates gracefully
     await sb('wishlist', {
       method:  'POST',
-      headers: { Prefer: 'return=minimal' },
+      headers: { Prefer: 'return=minimal', Resolution: 'ignore-duplicates' },
       body:    JSON.stringify({
         uid,
         product_id: pid,
@@ -186,6 +183,8 @@ export async function db_addToWishlist(uid, product) {
     });
     return { action: 'added' };
   } catch(e) {
+    // If duplicate key — it's already in wishlist, not a real error
+    if (e.message && e.message.includes('duplicate')) return { action: 'already_exists' };
     console.error('db_addToWishlist:', e);
     throw new Error('Could not save to wishlist. Please try again.');
   }
