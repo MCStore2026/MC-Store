@@ -85,59 +85,21 @@ async function validateAddress(address) {
 // ─────────────────────────────────────────
 async function getRates({ recipientAddress, items = [], totalWeight = 0.5 }) {
   try {
-    const payload = {
-      sender: {
-        name:    STORE_ADDRESS.name,
-        email:   STORE_ADDRESS.email,
-        phone:   STORE_ADDRESS.phone,
-        address: STORE_ADDRESS.address,
-        city:    STORE_ADDRESS.city,
-        state:   STORE_ADDRESS.state,
-        country: STORE_ADDRESS.country
-      },
-      recipient: {
-        name:    recipientAddress.fullName  || "Customer",
-        email:   recipientAddress.email     || "",
-        phone:   recipientAddress.phone     || "",
-        address: recipientAddress.street    || "",
-        city:    recipientAddress.city      || "",
-        state:   recipientAddress.state     || "",
-        country: "NG"
-      },
-      package: {
-        weight:   totalWeight || 0.5,
-        length:   20,
-        width:    15,
-        height:   10,
-        items:    items.map(i => ({
-          name:     i.name,
-          quantity: i.quantity || 1,
-          weight:   i.weight  || 0.3
-        }))
-      }
-    };
-
-    const res = await sbShip("/shipping/fetch-rates", {
-      method: "POST",
-      body:   JSON.stringify(payload)
+    // Call /api/shipping (Vercel serverless) — fixes CORS
+    const res = await fetch('/api/shipping', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        action: 'getRates',
+        payload: { recipientAddress, items, totalWeight }
+      })
     });
-
-    // Return cleaned rates list
-    const rates = res.data || res.rates || [];
-    return rates.map(rate => ({
-      courier_id:   rate.courier_id   || rate.id,
-      courier_name: rate.courier_name || rate.name,
-      delivery_fee: rate.total        || rate.fee || rate.amount,
-      currency:     "NGN",
-      eta:          rate.estimated_days
-        ? `${rate.estimated_days} business day(s)`
-        : rate.eta || "1-3 days",
-      logo:         rate.courier_logo || rate.logo || ""
-    }));
-
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || 'Could not get rates');
+    return data.rates || [];
   } catch(e) {
-    console.error("getRates error:", e);
-    throw new Error("Could not calculate delivery rates. Please check your address.");
+    console.error('getRates error:', e);
+    throw new Error('Could not calculate delivery rates. Please check your address.');
   }
 }
 
