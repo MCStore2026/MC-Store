@@ -31,7 +31,12 @@ async function sb(endpoint, options = {}) {
   });
   if (!res.ok) {
     const err = await res.text();
-    console.error('Supabase error:', endpoint, err);
+    // Show error visibly on screen for debugging
+    const div = document.createElement('div');
+    div.style.cssText = 'position:fixed;top:0;left:0;right:0;background:red;color:white;padding:12px;font-size:11px;z-index:99999;word-break:break-all;max-height:40vh;overflow:auto';
+    div.innerHTML = '<b>DB ERROR (tap to close):</b><br>' + endpoint + '<br>' + err;
+    div.onclick = () => div.remove();
+    document.body.appendChild(div);
     throw new Error(err);
   }
   const t = await res.text();
