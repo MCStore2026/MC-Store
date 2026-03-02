@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MC Store — No Connection</title>
+<link rel="icon" href="/favicon.ico">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1a56db">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'DM Sans',system-ui,sans-serif;
+  background:#f0f7ff;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:2rem;
+  text-align:center;
+}
+.icon-wrap{
+  width:90px;height:90px;border-radius:24px;
+  background:#fff;border:2px solid #e2e8f0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.5rem;margin-bottom:1.5rem;
+  box-shadow:0 4px 20px rgba(26,86,219,.1);
+}
+h1{font-size:1.3rem;font-weight:800;color:#0f172a;margin-bottom:.5rem;}
+p{font-size:.9rem;color:#64748b;line-height:1.6;max-width:280px;margin:0 auto 2rem;}
+.btn{
+  display:inline-flex;align-items:center;gap:.5rem;
+  padding:.75rem 1.75rem;background:#1a56db;color:white;
+  border:none;border-radius:12px;font-size:.9rem;font-weight:700;
+  cursor:pointer;font-family:inherit;
+  box-shadow:0 4px 14px rgba(26,86,219,.35);
+  text-decoration:none;
+}
+.btn:active{transform:scale(.97);}
+.signal{margin-top:2.5rem;display:flex;align-items:flex-end;gap:4px;justify-content:center;}
+.bar{width:8px;border-radius:3px;background:#cbd5e1;}
+.bar:nth-child(1){height:10px;}
+.bar:nth-child(2){height:16px;}
+.bar:nth-child(3){height:22px;background:#e2e8f0;}
+.bar:nth-child(4){height:28px;background:#e2e8f0;}
+.signal p{font-size:.7rem;color:#94a3b8;margin-left:.5rem;align-self:center;}
+</style>
+</head>
+<body>
+  <div class="icon-wrap">📦</div>
+  <h1>You're offline</h1>
+  <p>No internet connection right now. Please check your network and try again.</p>
+  <button class="btn" onclick="window.location.reload()">
+    <span>↺</span> Try Again
+  </button>
+  <div class="signal">
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <div class="bar"></div>
+    <p>Waiting for connection…</p>
+  </div>
+
+  <script>
+    // Auto-reload when connection returns
+    window.addEventListener('online', () => window.location.reload());
+  </script>
+</body>
+</html>
