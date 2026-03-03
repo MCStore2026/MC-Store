@@ -87,7 +87,7 @@ async function mcSetPersistence(rememberMe) {
 //  SIGN UP
 //  Called after Step 2 of signup.html
 // ─────────────────────────────────────────
-async function mcSignUp({ fullName, email, password, phone, address }) {
+async function mcSignUp({ fullName, email, password, phone, address, refCode }) {
   try {
     const credential = await createUserWithEmailAndPassword(auth, email, password);
     const user = credential.user;
@@ -114,6 +114,34 @@ async function mcSignUp({ fullName, email, password, phone, address }) {
       address,
       loginAt:  new Date().toISOString()
     });
+
+    // ── Generate referral code for new user ──
+    try {
+      await fetch('/api/referral', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ action: 'getCode', uid: user.uid })
+      });
+    } catch {}
+
+    // ── Track if they came via referral link ──
+    const ref = refCode || localStorage.getItem('mc_ref') || '';
+    if (ref) {
+      try {
+        await fetch('/api/referral', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            action:        'trackSignup',
+            code:          ref,
+            referredUid:   user.uid,
+            referredEmail: email,
+            referredName:  fullName
+          })
+        });
+        localStorage.removeItem('mc_ref');
+      } catch {}
+    }
 
     window.location.href = "app-skeleton.html";
 
