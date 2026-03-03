@@ -86,28 +86,49 @@ self.addEventListener('fetch', event => {
 
 // ── PUSH NOTIFICATIONS ──
 self.addEventListener('push', event => {
-  let data = { title: 'MC Store', body: 'You have a new message!', icon: '/favicon-192.png' };
+  let data = {
+    title: 'MC Store 🛍️',
+    body:  'You have a new message!',
+    icon:  '/favicon-192.png',
+    url:   '/app-skeleton.html'
+  };
 
   try {
-    if (event.data) data = { ...data, ...event.data.json() };
-  } catch {}
+    if (event.data) {
+      const raw = event.data.json();
+      data = { ...data, ...raw };
+    }
+  } catch(e) {
+    try { data.body = event.data.text(); } catch {}
+  }
 
   const options = {
-    body:              data.body,
-    icon:              data.icon || '/favicon-192.png',
-    badge:             '/favicon-192.png',
-    vibrate:           [200, 100, 200],
-    data:              { url: data.url || '/app-skeleton.html' },
+    body:               data.body,
+    icon:               data.icon || '/favicon-192.png',
+    badge:              '/favicon-192.png',
+    image:              data.image || undefined,
+    vibrate:            [200, 100, 200, 100, 200],
+    data:               { url: data.url || '/app-skeleton.html' },
     actions: [
-      { action: 'open',    title: 'Open App' },
-      { action: 'dismiss', title: 'Dismiss'  }
+      { action: 'open',    title: '🛍️ Open App' },
+      { action: 'dismiss', title: 'Dismiss'      }
     ],
     requireInteraction: false,
-    tag:               'mcstore-notif'
+    renotify:           true,
+    tag:                'mcstore-notif-' + Date.now(),
+    timestamp:          Date.now(),
+    silent:             false
   };
 
   event.waitUntil(
     self.registration.showNotification(data.title, options)
+  );
+
+  // Also post to open app windows so bell updates immediately
+  event.waitUntil(
+    self.clients.matchAll({ type:'window' }).then(clients => {
+      clients.forEach(c => c.postMessage({ type:'pushReceived', data }));
+    })
   );
 });
 
