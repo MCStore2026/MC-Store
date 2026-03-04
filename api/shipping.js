@@ -4,7 +4,7 @@
 //  Store keys never exposed to browser
 // ============================================================
 
-const SHIPBUBBLE_KEY  = process.env.SHIPBUBBLE_API_KEY || "sb_prod_4e080eb614d512ca670304775edc1cee9c75df92bf3c06fe82fee00714b44b3a";
+const SHIPBUBBLE_KEY  = "sb_prod_4e080eb614d512ca670304775edc1cee9c75df92bf3c06fe82fee00714b44b3a";
 const SHIPBUBBLE_BASE = "https://api.shipbubble.com/v1";
 const WEBHOOK_URL = "https://mc-store-delivery.vercel.app/api/shipbubble/webhook";
 
@@ -159,11 +159,7 @@ export default async function handler(req, res) {
             weight:   0.3
           }))
         },
-        ...(order.shipbubble_service_code ? { service_code: order.shipbubble_service_code } : {}),
-        ...(order.payment_method === 'cash_on_delivery'
-          ? { payment_type: 'COD', cod_amount: Number(order.total) }
-          : { payment_type: 'prepaid' }),
-        webhook_url: WEBHOOK_URL
+        ...(order.shipbubble_service_code ? { service_code: order.shipbubble_service_code } : {})
       });
 
       if (!ok || !data.data) {
@@ -195,4 +191,4 @@ export default async function handler(req, res) {
       error:  e.message
     });
   }
-        }
+                           }
