@@ -75,38 +75,31 @@ export async function db_getCart(uid) {
 
 export async function db_addToCart(uid, product, quantity = 1) {
   const pid = String(product.id);
-  try {
-    // Check if item already in cart
-    const existing = await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}&select=id,quantity`);
-    if (existing && existing.length > 0) {
-      // Already in cart — increase quantity
-      const newQty = (existing[0].quantity || 1) + quantity;
-      await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}`, {
-        method: 'PATCH',
-        body:   JSON.stringify({ quantity: newQty })
-      });
-      return { action: 'updated', quantity: newQty };
-    } else {
-      // Not in cart — insert new row
-      await sb('cart', {
-        method:  'POST',
-        headers: { Prefer: 'return=minimal' },
-        body: JSON.stringify({
-          uid,
-          product_id: pid,
-          name:       product.name || product.title || '',
-          image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
-          price:      product.display_price || product.promo_price || product.price || 0,
-          quantity,
-          added_at:   new Date().toISOString()
-        })
-      });
-      return { action: 'added' };
-    }
-  } catch(e) {
-    console.error('addToCart error:', e);
-    throw e;
+  // Check if already in cart first
+  const existing = await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}&select=id,quantity`).catch(() => []);
+  if (existing && existing.length > 0) {
+    // Already in cart — just increase quantity
+    await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}`, {
+      method: 'PATCH',
+      body:   JSON.stringify({ quantity: (existing[0].quantity || 1) + quantity })
+    });
+  } else {
+    // Not in cart — insert new row
+    await sb('cart', {
+      method:  'POST',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({
+        uid,
+        product_id: pid,
+        name:       product.name || product.title || '',
+        image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
+        price:      product.display_price || product.promo_price || product.price || 0,
+        quantity,
+        added_at:   new Date().toISOString()
+      })
+    });
   }
+  return { action: 'added' };
 }
 
 export async function db_updateCartQty(uid, productId, quantity) {
@@ -145,23 +138,21 @@ export async function db_getWishlist(uid) {
 
 export async function db_addToWishlist(uid, product) {
   const pid = String(product.id);
-  try {
-    const existing = await sb(`wishlist?uid=eq.${uid}&product_id=eq.${pid}&select=id`);
-    if (existing && existing.length > 0) return { action: 'already_exists' };
-    await sb('wishlist', {
-      method:  'POST',
-      headers: { Prefer: 'return=minimal' },
-      body: JSON.stringify({
-        uid,
-        product_id: pid,
-        name:       product.name || product.title || '',
-        image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
-        price:      product.display_price || product.price || 0,
-        added_at:   new Date().toISOString()
-      })
-    });
-    return { action: 'added' };
-  } catch(e) { console.error('addToWishlist:', e); throw e; }
+  const existing = await sb(`wishlist?uid=eq.${uid}&product_id=eq.${pid}&select=id`).catch(() => []);
+  if (existing && existing.length > 0) return { action: 'already_exists' };
+  await sb('wishlist', {
+    method:  'POST',
+    headers: { Prefer: 'return=minimal' },
+    body: JSON.stringify({
+      uid,
+      product_id: pid,
+      name:       product.name || product.title || '',
+      image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
+      price:      product.display_price || product.price || 0,
+      added_at:   new Date().toISOString()
+    })
+  });
+  return { action: 'added' };
 }
 
 export async function db_removeFromWishlist(uid, productId) {
