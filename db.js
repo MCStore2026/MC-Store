@@ -46,10 +46,10 @@ function normalise(p) {
 
 export async function db_getProducts({ category, section, search, limit } = {}) {
   try {
-    let q = 'products?select=*&is_active=eq.true&order=created_at.desc';
+    let q = 'products?select=*&is_active=not.eq.false&order=created_at.desc';
     if (category) q += `&category=eq.${encodeURIComponent(category)}`;
     if (section)  q += `&section=eq.${encodeURIComponent(section)}`;
-    if (search)   q += `&name=ilike.${encodeURIComponent('%'+search+'%')}`;
+    if (search)   q += `&or=(name.ilike.${encodeURIComponent('%'+search+'%')},title.ilike.${encodeURIComponent('%'+search+'%')})`;
     if (limit)    q += `&limit=${limit}`;
     return ((await sb(q)) || []).map(normalise);
   } catch(e) { console.error('getProducts:', e); return []; }

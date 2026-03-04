@@ -3,12 +3,13 @@
 //  Handles: caching, offline fallback, push notifications
 // ============================================================
 
-const CACHE_NAME    = 'mcstore-v1';
+const CACHE_NAME    = 'mcstore-v2';
 const OFFLINE_URL   = '/offline.html';
 
 // Files to cache immediately on install
 const PRECACHE = [
   '/app-skeleton.html',
+  '/referral.html',
   '/home.html',
   '/offline.html',
   '/manifest.json',

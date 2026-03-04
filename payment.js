@@ -7,7 +7,7 @@
 //  - Online Payment: any amount via Paystack
 // ============================================================
 
-const PAYSTACK_PUBLIC_KEY = "pk_test_c1fbe834d4efeaf1ce6f128a588dcb80154edfc9";
+const PAYSTACK_PUBLIC_KEY = "pk_live_a3d8865c5d9d8c6416bedee8fc0bbdd3b239e55f";
 const PAYSTACK_BASE       = "https://api.paystack.co";
 
 // ── PAYMENT METHODS ──
