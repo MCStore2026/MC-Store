@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Invite Friends — MC Store</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#1a56db;--blue-dk:#1347c8;--blue-lt:#eff6ff;--blue-md:#dbeafe;
+  --gold:#f59e0b;--gold-lt:#fefce8;--gold-dk:#d97706;
+  --green:#16a34a;--green-lt:#f0fdf4;
+  --red:#dc2626;--red-lt:#fef2f2;
+  --text:#0f172a;--muted:#64748b;--border:#e2e8f0;--bg:#f0f7ff;
+  --white:#fff;
+}
+html,body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);min-height:100vh;overscroll-behavior:none;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+@keyframes shine{0%{background-position:-200% center;}100%{background-position:200% center;}}
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes countUp{from{transform:scale(.8);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+/* ── TOPBAR ── */
+.topbar{
+  background:linear-gradient(135deg,#1a56db 0%,#6366f1 100%);
+  padding:0 1rem;padding-top:env(safe-area-inset-top,0);
+  height:calc(56px + env(safe-area-inset-top,0));
+  display:flex;align-items:flex-end;padding-bottom:.75rem;
+  position:sticky;top:0;z-index:50;
+}
+.topbar-inner{display:flex;align-items:center;gap:.75rem;width:100%;}
+.back-btn{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.2);
+  border:1.5px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:white;flex-shrink:0;font-size:.85rem;}
+.topbar-title{flex:1;color:white;font-weight:800;font-size:1rem;}
+.topbar-sub{color:rgba(255,255,255,.75);font-size:.72rem;margin-top:1px;}
+.rules-btn{padding:.3rem .75rem;border-radius:20px;border:1.5px solid rgba(255,255,255,.4);
+  color:white;font-size:.72rem;font-weight:700;cursor:pointer;background:rgba(255,255,255,.1);}
+
+/* ── HERO BANNER ── */
+.hero-banner{
+  background:linear-gradient(135deg,#1a56db 0%,#6366f1 100%);
+  padding:1.25rem 1rem 2.5rem;
+  position:relative;overflow:hidden;
+}
+.hero-banner::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 70% 50%,rgba(255,255,255,.08) 0%,transparent 70%);
+}
+.hero-tagline{color:rgba(255,255,255,.85);font-size:.78rem;font-weight:600;margin-bottom:.25rem;}
+.hero-title{color:white;font-size:1.4rem;font-weight:900;line-height:1.2;margin-bottom:.25rem;}
+.hero-title span{color:#fde68a;}
+.hero-desc{color:rgba(255,255,255,.8);font-size:.78rem;line-height:1.5;}
+
+/* Progress track */
+.progress-track{
+  background:rgba(255,255,255,.15);border-radius:14px;padding:1rem;
+  margin-top:1rem;position:relative;
+}
+.progress-label{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.8);margin-bottom:.6rem;
+  text-transform:uppercase;letter-spacing:.05em;}
+.milestone-dots{display:flex;align-items:center;gap:0;margin-bottom:.5rem;}
+.m-dot{
+  flex:1;height:6px;background:rgba(255,255,255,.2);
+  position:relative;transition:background .4s;
+}
+.m-dot:first-child{border-radius:4px 0 0 4px;}
+.m-dot:last-child{border-radius:0 4px 4px 0;}
+.m-dot.done{background:rgba(255,255,255,.9);}
+.m-dot.active{background:linear-gradient(90deg,rgba(255,255,255,.9),rgba(253,230,138,.9));}
+.m-node{
+  width:24px;height:24px;border-radius:50%;
+  background:rgba(255,255,255,.2);border:2px solid rgba(255,255,255,.4);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;font-weight:800;color:white;flex-shrink:0;
+  transition:all .4s;
+}
+.m-node.done{background:#fde68a;border-color:#f59e0b;color:#92400e;}
+.m-node.active{background:white;border-color:white;color:var(--blue);animation:pulse 1.5s ease infinite;}
+.milestone-row{display:flex;align-items:center;}
+.progress-info{display:flex;justify-content:space-between;align-items:center;margin-top:.5rem;}
+.prog-count{color:white;font-size:.78rem;font-weight:700;}
+.prog-next{color:rgba(255,255,255,.75);font-size:.7rem;}
+
+/* Floating card */
+.floating-card{
+  background:white;border-radius:20px;margin:0 1rem;
+  margin-top:-1.5rem;position:relative;z-index:2;
+  box-shadow:0 8px 32px rgba(26,86,219,.15);
+  padding:1.1rem;
+  animation:fadeUp .3s ease both;
+}
+.card-row{display:flex;gap:.75rem;}
+.stat-box{
+  flex:1;background:var(--bg);border-radius:12px;padding:.75rem .5rem;
+  text-align:center;border:1.5px solid var(--border);
+}
+.stat-box .val{font-size:1.5rem;font-weight:900;color:var(--blue);line-height:1;
+  animation:countUp .4s ease both;}
+.stat-box .lbl{font-size:.62rem;color:var(--muted);margin-top:3px;font-weight:600;
+  text-transform:uppercase;letter-spacing:.04em;}
+.stat-box.gold{background:var(--gold-lt);border-color:#fde68a;}
+.stat-box.gold .val{color:var(--gold-dk);}
+
+/* Share section */
+.share-section{margin-top:1rem;}
+.share-label{font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:.5rem;}
+.link-box{
+  background:var(--bg);border:2px solid var(--blue-md);border-radius:12px;
+  padding:.65rem .85rem;display:flex;align-items:center;gap:.5rem;margin-bottom:.65rem;
+}
+.link-text{flex:1;font-size:.72rem;font-weight:700;color:var(--blue);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:monospace;}
+.copy-btn{
+  padding:.4rem .85rem;background:var(--blue);color:white;border:none;
+  border-radius:9px;font-size:.75rem;font-weight:800;cursor:pointer;
+  font-family:inherit;white-space:nowrap;flex-shrink:0;
+  transition:all .15s;
+}
+.copy-btn:active{transform:scale(.95);}
+.copy-btn.copied{background:var(--green);}
+
+/* Share buttons */
+.share-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;}
+.share-btn{
+  padding:.6rem .4rem;border-radius:12px;border:1.5px solid var(--border);
+  background:white;cursor:pointer;font-family:inherit;font-size:.72rem;
+  font-weight:700;display:flex;flex-direction:column;align-items:center;gap:4px;
+  transition:all .15s;color:var(--text);
+}
+.share-btn:active{transform:scale(.96);}
+.share-btn i{font-size:1.3rem;}
+.share-btn.whatsapp{border-color:#dcfce7;background:#f0fdf4;color:#16a34a;}
+.share-btn.copy-link{border-color:var(--blue-md);background:var(--blue-lt);color:var(--blue);}
+.share-btn.more{border-color:var(--border);background:var(--bg);color:var(--muted);}
+
+/* ── HOW IT WORKS ── */
+.section-card{
+  background:white;border-radius:16px;margin:0 1rem .85rem;
+  padding:1rem;box-shadow:0 2px 12px rgba(0,0,0,.04);
+  border:1.5px solid var(--border);
+  animation:fadeUp .3s ease both;
+}
+.section-title{font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.06em;margin-bottom:.85rem;display:flex;align-items:center;gap:.4rem;}
+.how-steps{display:flex;flex-direction:column;gap:.65rem;}
+.how-step{display:flex;align-items:flex-start;gap:.75rem;}
+.step-num{
+  width:28px;height:28px;border-radius:50%;background:var(--blue);color:white;
+  display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;
+  flex-shrink:0;margin-top:1px;
+}
+.step-text{font-size:.82rem;color:var(--text);line-height:1.4;}
+.step-text b{color:var(--blue);}
+
+/* ── REWARDS CHART ── */
+.reward-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+.reward-row{
+  background:var(--bg);border-radius:10px;padding:.6rem .75rem;
+  border:1.5px solid var(--border);display:flex;align-items:center;gap:.5rem;
+}
+.reward-row.milestone{background:var(--gold-lt);border-color:#fde68a;}
+.reward-num{font-size:.78rem;font-weight:800;color:var(--muted);min-width:24px;}
+.reward-arrow{color:var(--muted);font-size:.7rem;}
+.reward-val{font-size:.78rem;font-weight:800;color:var(--blue);}
+.reward-row.milestone .reward-val{color:var(--gold-dk);}
+.reward-badge{font-size:.6rem;background:var(--gold);color:white;border-radius:4px;
+  padding:1px 4px;font-weight:800;margin-left:auto;}
+
+/* ── REFERRAL HISTORY ── */
+.history-list{display:flex;flex-direction:column;gap:.5rem;}
+.hist-item{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.65rem .75rem;background:var(--bg);border-radius:10px;
+  border:1.5px solid var(--border);
+}
+.hist-avatar{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.85rem;font-weight:800;color:white;flex-shrink:0;
+}
+.hist-info{flex:1;min-width:0;}
+.hist-name{font-size:.82rem;font-weight:700;overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap;}
+.hist-date{font-size:.68rem;color:var(--muted);margin-top:1px;}
+.hist-status{font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+.hist-status.pending{background:#fef9c3;color:#854d0e;}
+.hist-status.rewarded{background:var(--green-lt);color:var(--green);}
+
+/* ── COUPONS ── */
+.coupon-list{display:flex;flex-direction:column;gap:.5rem;}
+.coupon-item{
+  border:2px dashed var(--blue-md);border-radius:12px;
+  padding:.7rem .85rem;background:var(--blue-lt);
+  display:flex;align-items:center;gap:.75rem;
+  position:relative;overflow:hidden;
+}
+.coupon-item::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:var(--blue);
+}
+.coupon-item.milestone::before{background:var(--gold);}
+.coupon-item.used{border-color:var(--border);background:var(--bg);opacity:.6;}
+.coupon-item.expired{border-color:#fecaca;background:var(--red-lt);opacity:.65;}
+.coupon-icon{font-size:1.4rem;flex-shrink:0;}
+.coupon-info{flex:1;min-width:0;}
+.coupon-code{font-size:.88rem;font-weight:800;font-family:monospace;
+  letter-spacing:.06em;color:var(--blue);}
+.coupon-item.used .coupon-code,.coupon-item.expired .coupon-code{color:var(--muted);}
+.coupon-amount{font-size:.72rem;font-weight:700;color:var(--text);margin-top:2px;}
+.coupon-exp{font-size:.65rem;color:var(--muted);margin-top:1px;}
+.coupon-copy-btn{
+  font-size:.7rem;font-weight:800;color:white;background:var(--blue);
+  border:none;border-radius:8px;padding:.3rem .65rem;cursor:pointer;
+  font-family:inherit;flex-shrink:0;transition:all .15s;
+}
+.coupon-copy-btn:active{transform:scale(.95);}
+.coupon-copy-btn.copied{background:var(--green);}
+.coupon-tag{font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:4px;
+  background:var(--gold);color:white;margin-top:2px;display:inline-block;}
+
+/* ── EMPTY / LOADING ── */
+.empty-box{text-align:center;padding:2rem 1rem;color:var(--muted);}
+.empty-box i{font-size:2.2rem;opacity:.2;display:block;margin-bottom:.75rem;}
+.empty-box p{font-size:.82rem;}
+.spinner{width:24px;height:24px;border:3px solid var(--border);border-top-color:var(--blue);
+  border-radius:50%;animation:spin .7s linear infinite;margin:1.5rem auto;}
+
+/* ── RULES MODAL ── */
+.modal-bg{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;
+  display:none;align-items:flex-end;
+}
+.modal-bg.open{display:flex;}
+.modal-sheet{
+  background:white;border-radius:20px 20px 0 0;width:100%;
+  max-height:80vh;overflow-y:auto;padding:1.25rem 1rem 2rem;
+  animation:fadeUp .25s ease;
+}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;
+  margin:0 auto .75rem;}
+.modal-title{font-size:1rem;font-weight:800;text-align:center;margin-bottom:.5rem;}
+.modal-close{position:absolute;right:1rem;top:1rem;width:30px;height:30px;
+  border-radius:50%;background:var(--bg);border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  font-size:.8rem;color:var(--muted);}
+.rule-item{display:flex;gap:.75rem;padding:.65rem 0;border-bottom:1px solid var(--border);}
+.rule-item:last-child{border-bottom:none;}
+.rule-num{width:22px;height:22px;border-radius:50%;background:var(--blue);color:white;
+  font-size:.65rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.rule-text{font-size:.82rem;color:var(--text);line-height:1.5;}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);
+  background:white;border:1.5px solid var(--border);border-radius:12px;
+  padding:.6rem 1.25rem;font-size:.82rem;font-weight:700;
+  box-shadow:0 8px 28px rgba(0,0,0,.12);display:flex;align-items:center;gap:7px;
+  z-index:999;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;
+  max-width:calc(100vw - 2rem);
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.success{border-color:#bbf7d0;color:var(--green);}
+.toast.error{border-color:#fecaca;color:var(--red);}
+.pb{height:calc(4rem + env(safe-area-inset-bottom,0px));}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i></div>
+    <div>
+      <div class="topbar-title">Invite Friends</div>
+      <div class="topbar-sub">Earn rewards for every referral</div>
+    </div>
+    <div class="rules-btn" id="rulesBtn">Rules</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero-banner">
+  <div class="hero-tagline">🎁 Share MC Store with friends</div>
+  <div class="hero-title">Invite & Get <span>Free Coupons</span></div>
+  <div class="hero-desc">Every friend who orders gets you a ₦500 coupon. Hit 5 referrals — get ₦2,000 bonus!</div>
+
+  <!-- Milestone progress -->
+  <div class="progress-track">
+    <div class="progress-label">Your progress to next milestone</div>
+    <div class="milestone-row" id="milestoneRow">
+      <!-- filled by JS -->
+    </div>
+    <div class="progress-info">
+      <div class="prog-count" id="progCount">0 referrals completed</div>
+      <div class="prog-next" id="progNext">5 more for ₦2,000 bonus</div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS FLOATING CARD -->
+<div class="floating-card">
+  <div class="card-row">
+    <div class="stat-box">
+      <div class="val" id="statTotal">0</div>
+      <div class="lbl">Friends Invited</div>
+    </div>
+    <div class="stat-box">
+      <div class="val" id="statRewarded">0</div>
+      <div class="lbl">Completed</div>
+    </div>
+    <div class="stat-box gold">
+      <div class="val" id="statCoupons">0</div>
+      <div class="lbl">Active Coupons</div>
+    </div>
+  </div>
+
+  <!-- Share link -->
+  <div class="share-section">
+    <div class="share-label">Your Referral Link</div>
+    <div class="link-box">
+      <span class="link-text" id="linkText">Loading your link…</span>
+      <button class="copy-btn" id="copyLinkBtn">Copy</button>
+    </div>
+    <div class="share-btns">
+      <button class="share-btn whatsapp" id="shareWhatsapp">
+        <i class="fab fa-whatsapp"></i>
+        WhatsApp
+      </button>
+      <button class="share-btn copy-link" id="shareCopy">
+        <i class="fas fa-link"></i>
+        Copy Link
+      </button>
+      <button class="share-btn more" id="shareMore">
+        <i class="fas fa-share-nodes"></i>
+        More
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="section-card" style="margin-top:.85rem;animation-delay:.05s">
+  <div class="section-title"><i class="fas fa-circle-question"></i> How to Earn</div>
+  <div class="how-steps">
+    <div class="how-step">
+      <div class="step-num">1</div>
+      <div class="step-text">Copy your referral link and <b>share with friends</b> on WhatsApp, Instagram, or anywhere.</div>
+    </div>
+    <div class="how-step">
+      <div class="step-num">2</div>
+      <div class="step-text">Your friend <b>signs up</b> using your link and places their first order on MC Store.</div>
+    </div>
+    <div class="how-step">
+      <div class="step-num">3</div>
+      <div class="step-text">Once their order is <b>delivered</b>, you automatically receive a <b>₦500 coupon code</b> to your account.</div>
+    </div>
+    <div class="how-step">
+      <div class="step-num">4</div>
+      <div class="step-text">Refer <b>5 friends</b> and unlock a special <b>₦2,000 milestone bonus</b> coupon!</div>
+    </div>
+  </div>
+</div>
+
+<!-- REWARD CHART -->
+<div class="section-card" style="animation-delay:.1s">
+  <div class="section-title"><i class="fas fa-trophy"></i> Reward Chart</div>
+  <div class="reward-grid">
+    <div class="reward-row"><div class="reward-num">1×</div><div class="reward-arrow">→</div><div class="reward-val">₦500 coupon</div></div>
+    <div class="reward-row"><div class="reward-num">2×</div><div class="reward-arrow">→</div><div class="reward-val">₦500 coupon</div></div>
+    <div class="reward-row"><div class="reward-num">3×</div><div class="reward-arrow">→</div><div class="reward-val">₦500 coupon</div></div>
+    <div class="reward-row"><div class="reward-num">4×</div><div class="reward-arrow">→</div><div class="reward-val">₦500 coupon</div></div>
+    <div class="reward-row milestone"><div class="reward-num">5×</div><div class="reward-arrow">→</div><div class="reward-val">₦500 + ₦2,000</div><div class="reward-badge">BONUS</div></div>
+    <div class="reward-row"><div class="reward-num">6×</div><div class="reward-arrow">→</div><div class="reward-val">₦500 coupon</div></div>
+    <div class="reward-row"><div class="reward-num">9×</div><div class="reward-arrow">→</div><div class="reward-val">₦500 coupon</div></div>
+    <div class="reward-row milestone"><div class="reward-num">10×</div><div class="reward-arrow">→</div><div class="reward-val">₦500 + ₦2,000</div><div class="reward-badge">BONUS</div></div>
+  </div>
+  <p style="font-size:.7rem;color:var(--muted);margin-top:.75rem;text-align:center">Coupons expire 14 days after being issued. One use per coupon.</p>
+</div>
+
+<!-- REFERRAL HISTORY -->
+<div class="section-card" style="animation-delay:.15s">
+  <div class="section-title"><i class="fas fa-clock-rotate-left"></i> Referral History</div>
+  <div class="history-list" id="historyList">
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<!-- MY COUPONS -->
+<div class="section-card" style="animation-delay:.2s">
+  <div class="section-title"><i class="fas fa-ticket"></i> My Coupons</div>
+  <div class="coupon-list" id="couponList">
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<div class="pb"></div>
+
+<!-- RULES MODAL -->
+<div class="modal-bg" id="rulesModal">
+  <div class="modal-sheet" style="position:relative">
+    <div class="modal-handle"></div>
+    <div class="modal-close" id="closeRules"><i class="fas fa-xmark"></i></div>
+    <div class="modal-title">Official Rules</div>
+    <div class="rule-item"><div class="rule-num">1</div><div class="rule-text">Share your unique referral link with friends and family.</div></div>
+    <div class="rule-item"><div class="rule-num">2</div><div class="rule-text">Friend must sign up for a new MC Store account using your link. Existing accounts do not qualify.</div></div>
+    <div class="rule-item"><div class="rule-num">3</div><div class="rule-text">Friend must place and complete their first order (order must be delivered, not cancelled).</div></div>
+    <div class="rule-item"><div class="rule-num">4</div><div class="rule-text">Reward coupon (₦500) is automatically added to your account when the order is marked as delivered.</div></div>
+    <div class="rule-item"><div class="rule-num">5</div><div class="rule-text">Every 5th successful referral earns you an additional ₦2,000 milestone bonus coupon.</div></div>
+    <div class="rule-item"><div class="rule-num">6</div><div class="rule-text">Coupons expire 14 days after issue. Each coupon is single-use and tied to your account only.</div></div>
+    <div class="rule-item"><div class="rule-num">7</div><div class="rule-text">You cannot refer yourself. Self-referrals will be voided.</div></div>
+    <div class="rule-item"><div class="rule-num">8</div><div class="rule-text">MC Store reserves the right to void referrals suspected of fraud or abuse.</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { getSession } from './session.js';
+
+const SB_URL  = "https://kswikkoqfpyxuurzxail.supabase.co";
+const SB_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtzd2lra29xZnB5eHV1cnp4YWlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNjEzMDQsImV4cCI6MjA4NjkzNzMwNH0.uuoSKWOTeXot1HJys0EO9OcIRBL0mKrNHIUHIAPCpZ4";
+
+let currentUser = null;
+let myRefCode   = '';
+let myRefLink   = '';
+
+// ── TOAST ──
+let _tt;
+function toast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'circle-xmark'}"></i> ${msg}`;
+  el.className = `toast show ${type}`;
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── COPY ──
+function copyText(text, btn, label='Copied!') {
+  navigator.clipboard.writeText(text).catch(() => {
+    const el = document.createElement('textarea');
+    el.value = text; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+  });
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = '✓ ' + label;
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+  }
+  toast('Copied to clipboard!');
+}
+
+// ── AVATAR COLOR ──
+const COLORS = ['#1a56db','#16a34a','#d97706','#7c3aed','#dc2626','#0891b2'];
+function avatarColor(str) { let h=0; for(const c of str) h=(h+c.charCodeAt(0))%COLORS.length; return COLORS[h]; }
+
+// ── FORMAT DATE ──
+function fmtDate(str) {
+  if(!str) return '';
+  const d = new Date(str);
+  return d.toLocaleDateString('en-NG',{day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtAgo(str) {
+  if(!str) return '';
+  const diff = Date.now() - new Date(str).getTime();
+  const m = Math.floor(diff/60000);
+  if(m<1) return 'Just now';
+  if(m<60) return `${m}m ago`;
+  const h=Math.floor(m/60); if(h<24) return `${h}h ago`;
+  const d=Math.floor(h/24); if(d<30) return `${d}d ago`;
+  return fmtDate(str);
+}
+
+// ── MILESTONE ROW ──
+function buildMilestoneRow(rewarded) {
+  const total = 5;
+  const pos   = rewarded % total;
+  let html    = '';
+  for(let i=0; i<total; i++) {
+    const done   = i < pos;
+    const active = i === pos;
+    if(i>0) html += `<div class="m-dot ${done?'done':active?'active':''}"></div>`;
+    html += `<div class="m-node ${done?'done':active?'active':''}">${done?'✓':i+1}</div>`;
+  }
+  document.getElementById('milestoneRow').innerHTML = html;
+
+  // Text
+  const nextMilestone = Math.ceil((rewarded+1)/total)*total;
+  const needed = nextMilestone - rewarded;
+  document.getElementById('progCount').textContent = `${rewarded} referral${rewarded!==1?'s':''} completed`;
+  document.getElementById('progNext').textContent  = needed===0
+    ? '🏆 Milestone reached!'
+    : `${needed} more to unlock ₦2,000 bonus`;
+}
+
+// ── RENDER HISTORY ──
+function renderHistory(refs) {
+  const wrap = document.getElementById('historyList');
+  if(!refs.length) {
+    wrap.innerHTML = `<div class="empty-box"><i class="fas fa-user-plus"></i><p>No referrals yet.<br>Share your link to get started!</p></div>`;
+    return;
+  }
+  wrap.innerHTML = refs.map(r => {
+    const name  = r.referred_name || r.referred_email || 'Friend';
+    const init  = name[0].toUpperCase();
+    const color = avatarColor(name);
+    return `<div class="hist-item">
+      <div class="hist-avatar" style="background:${color}">${init}</div>
+      <div class="hist-info">
+        <div class="hist-name">${name}</div>
+        <div class="hist-date">${fmtAgo(r.created_at)}</div>
+      </div>
+      <div class="hist-status ${r.status}">${r.status==='rewarded'?'✓ Rewarded':'⏳ Pending'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── RENDER COUPONS ──
+function renderCoupons(coupons) {
+  const wrap = document.getElementById('couponList');
+  if(!coupons.length) {
+    wrap.innerHTML = `<div class="empty-box"><i class="fas fa-ticket"></i><p>No coupons yet.<br>Refer a friend to earn your first one!</p></div>`;
+    return;
+  }
+  const now = new Date();
+  wrap.innerHTML = coupons.map(c => {
+    const used    = c.is_used;
+    const expired = !used && new Date(c.expires_at) < now;
+    const active  = !used && !expired;
+    const cls     = used?'used':expired?'expired':c.type==='milestone'?'milestone':'';
+    const expDate = new Date(c.expires_at).toLocaleDateString('en-NG',{day:'2-digit',month:'short'});
+    const status  = used?'Used ✓':expired?'Expired':`Expires ${expDate}`;
+    return `<div class="coupon-item ${cls}">
+      <div class="coupon-icon">${c.type==='milestone'?'🏆':'🎟️'}</div>
+      <div class="coupon-info">
+        <div class="coupon-code">${c.code}</div>
+        <div class="coupon-amount">₦${Number(c.discount).toLocaleString('en-NG')} discount off your order</div>
+        <div class="coupon-exp">${status}</div>
+        ${c.type==='milestone'?'<span class="coupon-tag">MILESTONE BONUS</span>':''}
+      </div>
+      ${active ? `<button class="coupon-copy-btn" data-code="${c.code}">Copy</button>` : ''}
+    </div>`;
+  }).join('');
+
+  // Coupon copy buttons
+  wrap.querySelectorAll('[data-code]').forEach(btn => {
+    btn.addEventListener('click', () => copyText(btn.dataset.code, btn, 'Copied'));
+  });
+}
+
+// ── LOAD DATA ──
+async function loadReferralData(uid) {
+  try {
+    // Get or create code
+    const cRes = await fetch('/api/referral', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'getCode', uid })
+    });
+    const cData = await cRes.json();
+    if(cData.ok) {
+      myRefCode = cData.code;
+      myRefLink = `${window.location.origin}/signup.html?ref=${myRefCode}`;
+      document.getElementById('linkText').textContent = myRefLink;
+    }
+
+    // Get history + coupons
+    const rRes = await fetch('/api/referral', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ action:'getMyReferrals', uid })
+    });
+    const rData = await rRes.json();
+    const refs    = rData.referrals || [];
+    const coupons = rData.coupons   || [];
+    const rewarded = refs.filter(r=>r.status==='rewarded').length;
+    const active   = coupons.filter(c=>!c.is_used && new Date(c.expires_at)>new Date());
+
+    // Stats
+    document.getElementById('statTotal').textContent    = refs.length;
+    document.getElementById('statRewarded').textContent = rewarded;
+    document.getElementById('statCoupons').textContent  = active.length;
+
+    buildMilestoneRow(rewarded);
+    renderHistory(refs);
+    renderCoupons(coupons);
+  } catch(e) {
+    document.getElementById('historyList').innerHTML = `<div class="empty-box"><i class="fas fa-triangle-exclamation"></i><p>Could not load data. Please try again.</p></div>`;
+    document.getElementById('couponList').innerHTML  = `<div class="empty-box"><p>Could not load coupons.</p></div>`;
+    buildMilestoneRow(0);
+  }
+}
+
+// ── SHARE ──
+function shareLink(platform) {
+  const link = myRefLink || window.location.href;
+  const msg  = `🛍️ Shop on MC Store and save money! Use my referral link to sign up: ${link}`;
+  if(platform === 'whatsapp') {
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  } else if(platform === 'copy') {
+    copyText(link, document.getElementById('shareCopy'));
+  } else if(platform === 'more') {
+    if(navigator.share) {
+      navigator.share({ title:'MC Store', text:msg, url:link }).catch(()=>{});
+    } else {
+      copyText(link, document.getElementById('shareMore'), 'Copied');
+    }
+  }
+}
+
+// ── INIT ──
+async function init() {
+  const session = await getSession();
+  if(!session || !session.uid) {
+    window.location.href = 'login.html';
+    return;
+  }
+  currentUser = session;
+  buildMilestoneRow(0); // show empty milestone bar immediately
+  loadReferralData(session.uid);
+}
+
+// ── EVENTS ──
+document.getElementById('backBtn').addEventListener('click', () => history.back());
+document.getElementById('copyLinkBtn').addEventListener('click', () => copyText(myRefLink, document.getElementById('copyLinkBtn')));
+document.getElementById('shareWhatsapp').addEventListener('click', () => shareLink('whatsapp'));
+document.getElementById('shareCopy').addEventListener('click', () => shareLink('copy'));
+document.getElementById('shareMore').addEventListener('click', () => shareLink('more'));
+document.getElementById('rulesBtn').addEventListener('click', () => document.getElementById('rulesModal').classList.add('open'));
+document.getElementById('closeRules').addEventListener('click', () => document.getElementById('rulesModal').classList.remove('open'));
+document.getElementById('rulesModal').addEventListener('click', e => { if(e.target===document.getElementById('rulesModal')) document.getElementById('rulesModal').classList.remove('open'); });
+
+init();
+</script>
+</body>
+</html>

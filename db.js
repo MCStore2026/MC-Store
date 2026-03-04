@@ -49,7 +49,7 @@ export async function db_getProducts({ category, section, search, limit } = {}) 
     let q = 'products?select=*&is_active=not.eq.false&order=created_at.desc';
     if (category) q += `&category=eq.${encodeURIComponent(category)}`;
     if (section)  q += `&section=eq.${encodeURIComponent(section)}`;
-    if (search)   q += `&or=(name.ilike.${encodeURIComponent('%'+search+'%')},title.ilike.${encodeURIComponent('%'+search+'%')})`;
+    if (search)   q += `&name=ilike.${encodeURIComponent('%'+search+'%')}`;
     if (limit)    q += `&limit=${limit}`;
     return ((await sb(q)) || []).map(normalise);
   } catch(e) { console.error('getProducts:', e); return []; }
@@ -74,23 +74,39 @@ export async function db_getCart(uid) {
 }
 
 export async function db_addToCart(uid, product, quantity = 1) {
-  // UPSERT — if product already in cart, increase qty
-  // One call instead of two = 2x faster
   const pid = String(product.id);
-  await sb('cart', {
-    method:  'POST',
-    headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
-    body: JSON.stringify({
-      uid,
-      product_id: pid,
-      name:       product.name || product.title || '',
-      image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
-      price:      product.display_price || product.promo_price || product.price || 0,
-      quantity,
-      added_at:   new Date().toISOString()
-    })
-  });
-  return { action: 'added' };
+  try {
+    // Check if item already in cart
+    const existing = await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}&select=id,quantity`);
+    if (existing && existing.length > 0) {
+      // Already in cart — increase quantity
+      const newQty = (existing[0].quantity || 1) + quantity;
+      await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}`, {
+        method: 'PATCH',
+        body:   JSON.stringify({ quantity: newQty })
+      });
+      return { action: 'updated', quantity: newQty };
+    } else {
+      // Not in cart — insert new row
+      await sb('cart', {
+        method:  'POST',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          uid,
+          product_id: pid,
+          name:       product.name || product.title || '',
+          image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
+          price:      product.display_price || product.promo_price || product.price || 0,
+          quantity,
+          added_at:   new Date().toISOString()
+        })
+      });
+      return { action: 'added' };
+    }
+  } catch(e) {
+    console.error('addToCart error:', e);
+    throw e;
+  }
 }
 
 export async function db_updateCartQty(uid, productId, quantity) {
@@ -129,19 +145,23 @@ export async function db_getWishlist(uid) {
 
 export async function db_addToWishlist(uid, product) {
   const pid = String(product.id);
-  await sb('wishlist', {
-    method:  'POST',
-    headers: { Prefer: 'resolution=ignore-duplicates,return=minimal' },
-    body: JSON.stringify({
-      uid,
-      product_id: pid,
-      name:       product.name || product.title || '',
-      image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
-      price:      product.display_price || product.price || 0,
-      added_at:   new Date().toISOString()
-    })
-  });
-  return { action: 'added' };
+  try {
+    const existing = await sb(`wishlist?uid=eq.${uid}&product_id=eq.${pid}&select=id`);
+    if (existing && existing.length > 0) return { action: 'already_exists' };
+    await sb('wishlist', {
+      method:  'POST',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({
+        uid,
+        product_id: pid,
+        name:       product.name || product.title || '',
+        image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
+        price:      product.display_price || product.price || 0,
+        added_at:   new Date().toISOString()
+      })
+    });
+    return { action: 'added' };
+  } catch(e) { console.error('addToWishlist:', e); throw e; }
 }
 
 export async function db_removeFromWishlist(uid, productId) {
