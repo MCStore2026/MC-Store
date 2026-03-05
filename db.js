@@ -91,6 +91,7 @@ export async function db_addToCart(uid, product, quantity = 1) {
         name:       product.name || product.title || '',
         image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
         price:      product.display_price || product.promo_price || product.price || 0,
+        weight:     product.weight || 0.5,
         quantity
       })
     });
