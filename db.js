@@ -69,7 +69,7 @@ export async function db_getProductById(id) {
 
 export async function db_getCart(uid) {
   try {
-    return await sb(`cart?select=*&uid=eq.${uid}&order=added_at.desc`) || [];
+    return await sb(`cart?select=*&uid=eq.${uid}`) || [];
   } catch(e) { console.error('getCart:', e); return []; }
 }
 
@@ -94,8 +94,7 @@ export async function db_addToCart(uid, product, quantity = 1) {
         name:       product.name || product.title || '',
         image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
         price:      product.display_price || product.promo_price || product.price || 0,
-        quantity,
-        added_at:   new Date().toISOString()
+        quantity
       })
     });
   }
@@ -132,7 +131,7 @@ export async function db_getCartCount(uid) {
 
 export async function db_getWishlist(uid) {
   try {
-    return await sb(`wishlist?select=*&uid=eq.${uid}&order=added_at.desc`) || [];
+    return await sb(`wishlist?select=*&uid=eq.${uid}`) || [];
   } catch(e) { console.error('getWishlist:', e); return []; }
 }
 
@@ -148,8 +147,7 @@ export async function db_addToWishlist(uid, product) {
       product_id: pid,
       name:       product.name || product.title || '',
       image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
-      price:      product.display_price || product.price || 0,
-      added_at:   new Date().toISOString()
+      price:      product.display_price || product.price || 0
     })
   });
   return { action: 'added' };
