@@ -46,7 +46,7 @@ function normalise(p) {
 
 export async function db_getProducts({ category, section, search, limit } = {}) {
   try {
-    let q = 'products?select=*&is_active=not.eq.false&order=created_at.desc';
+    let q = 'products?select=*&is_active=eq.true&order=created_at.desc';
     if (category) q += `&category=eq.${encodeURIComponent(category)}`;
     if (section)  q += `&section=eq.${encodeURIComponent(section)}`;
     if (search)   q += `&name=ilike.${encodeURIComponent('%'+search+'%')}`;
@@ -75,16 +75,13 @@ export async function db_getCart(uid) {
 
 export async function db_addToCart(uid, product, quantity = 1) {
   const pid = String(product.id);
-  // Check if already in cart first
   const existing = await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}&select=id,quantity`).catch(() => []);
   if (existing && existing.length > 0) {
-    // Already in cart — just increase quantity
     await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}`, {
       method: 'PATCH',
       body:   JSON.stringify({ quantity: (existing[0].quantity || 1) + quantity })
     });
   } else {
-    // Not in cart — insert new row
     await sb('cart', {
       method:  'POST',
       headers: { Prefer: 'return=minimal' },
@@ -210,29 +207,26 @@ export async function db_placeOrder(orderData) {
     method:  'POST',
     headers: { Prefer: 'return=representation' },
     body: JSON.stringify({
-      order_number:               `MC-${year}-${num}`,
-      uid:                        String(orderData.uid),
-      customer_name:              orderData.customerName    || '',
-      customer_email:             orderData.customerEmail   || '',
-      customer_phone:             orderData.customerPhone   || '',
-      items:                      JSON.stringify(orderData.items || []),
-      delivery_street:            orderData.deliveryStreet  || '',
-      delivery_city:              orderData.deliveryCity    || '',
-      delivery_state:             orderData.deliveryState   || '',
-      delivery_landmark:          orderData.deliveryLandmark|| '',
-      shipbubble_courier_id:      orderData.shipbubble_courier_id   || '',
-      shipbubble_courier_name:    orderData.shipbubble_courier_name || '',
-      shipbubble_service_code:    orderData.shipbubble_service_code || '',
-      payment_method:             orderData.paymentMethod   || 'paystack',
-      payment_status:             orderData.paymentRef ? 'paid' : 'pending',
-      payment_ref:                orderData.paymentRef      || '',
-      status:                     'processing',
-      subtotal:                   orderData.subtotal        || 0,
-      delivery_fee:               orderData.deliveryFee     || 0,
-      discount:                   orderData.discount        || 0,
-      total:                      orderData.total           || 0,
-      created_at:                 new Date().toISOString(),
-      updated_at:                 new Date().toISOString()
+      order_number:      `MC-${year}-${num}`,
+      uid:               String(orderData.uid),
+      customer_name:     orderData.customerName    || '',
+      customer_email:    orderData.customerEmail   || '',
+      customer_phone:    orderData.customerPhone   || '',
+      items:             JSON.stringify(orderData.items || []),
+      delivery_street:   orderData.deliveryStreet  || '',
+      delivery_city:     orderData.deliveryCity    || '',
+      delivery_state:    orderData.deliveryState   || '',
+      delivery_landmark: orderData.deliveryLandmark|| '',
+      payment_method:    orderData.paymentMethod   || 'paystack',
+      payment_status:    orderData.paymentRef ? 'paid' : 'pending',
+      payment_ref:       orderData.paymentRef      || '',
+      status:            'processing',
+      subtotal:          orderData.subtotal        || 0,
+      delivery_fee:      orderData.deliveryFee     || 0,
+      discount:          orderData.discount        || 0,
+      total:             orderData.total           || 0,
+      created_at:        new Date().toISOString(),
+      updated_at:        new Date().toISOString()
     })
   });
 
