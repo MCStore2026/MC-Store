@@ -1,14 +1,6 @@
-// ============================================================
-//  api/product-share.js
-//  Serves product page WITH Open Graph meta tags for social sharing
-//  When WhatsApp/Instagram/Twitter scrapes the link, it sees:
-//  - Product image
-//  - Product name + price
-//  - MC Store branding
-//
-//  Usage: share link as /api/product-share?id=PRODUCT_ID
-//  The page then redirects to /product.html?id=PRODUCT_ID for real users
-// ============================================================
+// api/product-share.js
+// Makes product links show image + title + price when shared on WhatsApp
+// exactly like Jumia does
 
 const SUPA_URL  = 'https://kswikkoqfpyxuurzxail.supabase.co';
 const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtzd2lra29xZnB5eHV1cnp4YWlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNjEzMDQsImV4cCI6MjA4NjkzNzMwNH0.uuoSKWOTeXot1HJys0EO9OcIRBL0mKrNHIUHIAPCpZ4';
@@ -16,91 +8,93 @@ const SUPA_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIs
 export default async function handler(req, res) {
   const { id } = req.query;
 
-  // Default fallback values
-  let title       = 'MC Store — Quality Products at Great Prices';
+  let name        = 'MC Store';
   let description = 'Shop electronics, phones, accessories and more. Fast delivery across Nigeria.';
-  let image       = 'https://kswikkoqfpyxuurzxail.supabase.co/storage/v1/object/public/product-images/og-default.jpg';
-  let price       = '';
-  let productUrl  = 'https://mcstore.com.ng';
+  let image       = 'https://mc-store-sigma.vercel.app/favicon.ico';
+  let priceText   = '';
+  let productUrl  = 'https://mc-store-sigma.vercel.app';
+  let siteName    = 'mcstore.com.ng';
 
-  // If product ID given, fetch from Supabase
   if (id) {
     try {
       const r = await fetch(
-        `${SUPA_URL}/rest/v1/products?id=eq.${id}&select=name,title,price,promo_price,image_url,description&limit=1`,
+        `${SUPA_URL}/rest/v1/products?id=eq.${encodeURIComponent(id)}&select=name,title,price,promo_price,image_url,description&limit=1`,
         { headers: { apikey: SUPA_ANON, Authorization: `Bearer ${SUPA_ANON}` } }
       );
-      const data = await r.json();
-      if (data && data.length > 0) {
-        const p    = data[0];
-        const name = p.name || p.title || 'Product';
-        const sell = p.promo_price && p.promo_price < p.price ? p.promo_price : p.price;
-        title       = `${name} — MC Store`;
-        description = p.description
-          ? p.description.slice(0, 160)
-          : `Buy ${name} for ₦${Number(sell).toLocaleString()} on MC Store. Fast delivery across Nigeria.`;
+      const rows = await r.json();
+      if (Array.isArray(rows) && rows.length > 0) {
+        const p   = rows[0];
+        name      = p.name || p.title || 'Product';
+        const sell = (p.promo_price && p.promo_price < p.price) ? p.promo_price : p.price;
+        priceText  = `₦${Number(sell).toLocaleString()}`;
+
+        // Description: price first (like Jumia), then product description
+        description = `${priceText} — ${p.description ? p.description.slice(0, 120) : `Buy ${name} on MC Store. Fast delivery across Nigeria.`}`;
+
         if (p.image_url) image = p.image_url;
-        price      = `₦${Number(sell).toLocaleString()}`;
-        productUrl = `https://mcstore.com.ng/product.html?id=${id}`;
+        productUrl = `https://mc-store-sigma.vercel.app/product.html?id=${id}`;
       }
     } catch (e) {
-      console.error('product-share fetch error:', e.message);
+      console.error('product-share error:', e.message);
     }
   }
 
-  // Serve HTML with OG tags + instant JS redirect for real users
+  const title = `${name} | MC Store`;
+
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escHtml(title)}</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)}</title>
 
-  <!-- ── Open Graph (WhatsApp, Facebook, Instagram) ── -->
-  <meta property="og:type"        content="product">
-  <meta property="og:title"       content="${escHtml(title)}">
-  <meta property="og:description" content="${escHtml(description)}">
-  <meta property="og:image"       content="${escHtml(image)}">
-  <meta property="og:image:width" content="800">
-  <meta property="og:image:height"content="800">
-  <meta property="og:url"         content="${escHtml(productUrl)}">
-  <meta property="og:site_name"   content="MC Store">
-  ${price ? `<meta property="product:price:amount"   content="${escHtml(price)}">
-  <meta property="product:price:currency" content="NGN">` : ''}
+<!-- WhatsApp / Facebook / Instagram preview -->
+<meta property="og:type"         content="product">
+<meta property="og:site_name"    content="${esc(siteName)}">
+<meta property="og:title"        content="${esc(name)}">
+<meta property="og:description"  content="${esc(description)}">
+<meta property="og:image"        content="${esc(image)}">
+<meta property="og:image:secure_url" content="${esc(image)}">
+<meta property="og:image:width"  content="800">
+<meta property="og:image:height" content="800">
+<meta property="og:image:type"   content="image/jpeg">
+<meta property="og:url"          content="${esc(productUrl)}">
 
-  <!-- ── Twitter Card ── -->
-  <meta name="twitter:card"        content="summary_large_image">
-  <meta name="twitter:title"       content="${escHtml(title)}">
-  <meta name="twitter:description" content="${escHtml(description)}">
-  <meta name="twitter:image"       content="${escHtml(image)}">
+<!-- Twitter -->
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="${esc(name)}">
+<meta name="twitter:description" content="${esc(description)}">
+<meta name="twitter:image"       content="${esc(image)}">
 
-  <!-- ── General SEO ── -->
-  <meta name="description" content="${escHtml(description)}">
+<!-- SEO -->
+<meta name="description" content="${esc(description)}">
 
-  <!-- ── Redirect real users to the actual product page ── -->
-  <meta http-equiv="refresh" content="0;url=${escHtml(productUrl)}">
-  <script>window.location.replace('${productUrl.replace(/'/g, "\\'")}');</script>
+<!-- Instant redirect for real users — bots stay and read OG tags above -->
+<meta http-equiv="refresh" content="0;url=${esc(productUrl)}">
+<script>window.location.replace("${productUrl.replace(/"/g, '\\"')}");</script>
 </head>
-<body style="background:#f0f7ff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">
-  <div style="text-align:center">
-    <img src="${escHtml(image)}" alt="${escHtml(title)}" style="width:120px;height:120px;object-fit:cover;border-radius:16px;margin-bottom:1rem">
-    <div style="font-weight:800;font-size:1.1rem;color:#0f172a">${escHtml(title)}</div>
-    ${price ? `<div style="color:#1a56db;font-size:1.2rem;font-weight:800;margin:.5rem 0">${escHtml(price)}</div>` : ''}
-    <div style="color:#64748b;font-size:.85rem">Redirecting to MC Store…</div>
+<body style="margin:0;background:#f0f7ff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh">
+  <div style="text-align:center;padding:2rem;max-width:320px">
+    <img src="${esc(image)}" alt="${esc(name)}"
+         style="width:160px;height:160px;object-fit:cover;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.15);margin-bottom:1rem">
+    <div style="font-size:1.1rem;font-weight:800;color:#0f172a;margin-bottom:.4rem">${esc(name)}</div>
+    ${priceText ? `<div style="font-size:1.4rem;font-weight:800;color:#1a56db;margin-bottom:.5rem">${esc(priceText)}</div>` : ''}
+    <div style="font-size:.85rem;color:#64748b;margin-bottom:1.2rem">${esc(siteName)}</div>
+    <div style="font-size:.8rem;color:#94a3b8">Opening product page…</div>
   </div>
 </body>
 </html>`;
 
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
-  // Cache for 1 hour so repeated shares are fast
-  res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
+  // No cache — so every new price/image update shows immediately
+  res.setHeader('Cache-Control', 'no-cache, no-store');
   res.status(200).send(html);
 }
 
-function escHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/"/g,'&quot;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
 }

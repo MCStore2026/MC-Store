@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Track Order — MC Store</title>
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<meta name="theme-color" content="#1a56db">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --blue:#1a56db;--blue-lt:#eff6ff;--blue-md:#dbeafe;
+  --white:#fff;--bg:#f0f7ff;--text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --green:#16a34a;--green-lt:#dcfce7;--red:#dc2626;--red-lt:#fef2f2;
+  --orange:#ea580c;--orange-lt:#fff7ed;--gold:#f59e0b;--gold-lt:#fefce8;
+  --shadow:0 2px 12px rgba(26,86,219,.10);
+}
+html,body{min-height:100vh;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);}
+.app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:.75rem;padding:0 1rem;height:56px;background:var(--white);border-bottom:1.5px solid var(--border);box-shadow:var(--shadow);}
+.icon-btn{width:34px;height:34px;border-radius:10px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.nav-title{font-weight:800;font-size:.95rem;flex:1;}
+.nav-sub{font-size:.72rem;color:var(--muted);font-weight:500;}
+
+.body{padding:1rem;display:flex;flex-direction:column;gap:1rem;padding-bottom:40px;}
+
+/* ORDER HEADER CARD */
+.order-card{background:var(--white);border:1.5px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:var(--shadow);}
+.order-card-top{padding:1.1rem 1.2rem;border-bottom:1px solid var(--border);}
+.order-id{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.order-id span{color:var(--blue);}
+.order-date{font-size:.78rem;color:var(--muted);margin-top:3px;}
+.status-badge{display:inline-flex;align-items:center;gap:5px;padding:.3rem .75rem;border-radius:100px;font-size:.75rem;font-weight:800;margin-top:.6rem;}
+.status-badge.processing{background:var(--gold-lt);color:var(--gold);}
+.status-badge.confirmed{background:var(--blue-lt);color:var(--blue);}
+.status-badge.shipped{background:var(--orange-lt);color:var(--orange);}
+.status-badge.delivered{background:var(--green-lt);color:var(--green);}
+.status-badge.cancelled{background:var(--red-lt);color:var(--red);}
+
+/* ITEMS */
+.order-items{padding:.85rem 1.2rem;display:flex;flex-direction:column;gap:.6rem;}
+.order-item{display:flex;align-items:center;gap:.75rem;}
+.item-img{width:52px;height:52px;border-radius:10px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;background:var(--bg);}
+.item-info{flex:1;min-width:0;}
+.item-name{font-size:.85rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-qty{font-size:.72rem;color:var(--muted);margin-top:2px;}
+.item-price{font-size:.9rem;font-weight:800;color:var(--blue);flex-shrink:0;}
+
+/* TOTAL */
+.order-total{padding:.85rem 1.2rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.total-label{font-size:.82rem;color:var(--muted);font-weight:600;}
+.total-amount{font-size:1.1rem;font-weight:800;color:var(--text);}
+
+/* TRACKING TIMELINE */
+.track-card{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:1.2rem;box-shadow:var(--shadow);}
+.track-title{font-size:.82rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1.2rem;display:flex;align-items:center;gap:6px;}
+
+.timeline{display:flex;flex-direction:column;gap:0;}
+.step{display:flex;gap:.9rem;position:relative;}
+.step:not(:last-child)::after{content:'';position:absolute;left:17px;top:36px;width:2px;bottom:-2px;background:var(--border);}
+.step.done:not(:last-child)::after{background:var(--green);}
+.step.active:not(:last-child)::after{background:linear-gradient(to bottom, var(--blue), var(--border));}
+
+.step-icon{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.85rem;color:var(--muted);transition:all .3s;z-index:1;}
+.step.done .step-icon{background:var(--green);border-color:var(--green);color:white;}
+.step.active .step-icon{background:var(--blue);border-color:var(--blue);color:white;box-shadow:0 0 0 4px var(--blue-md);animation:pulse-icon 2s ease-in-out infinite;}
+@keyframes pulse-icon{0%,100%{box-shadow:0 0 0 4px var(--blue-md);}50%{box-shadow:0 0 0 8px rgba(26,86,219,.1);}}
+
+.step-body{flex:1;padding-bottom:1.4rem;}
+.step-label{font-size:.88rem;font-weight:700;color:var(--muted);}
+.step.done .step-label{color:var(--text);}
+.step.active .step-label{color:var(--blue);}
+.step-desc{font-size:.75rem;color:var(--muted);margin-top:3px;line-height:1.4;}
+.step-time{font-size:.7rem;color:var(--muted);margin-top:4px;font-weight:600;}
+
+/* DELIVERY ADDRESS */
+.address-card{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:1.2rem;box-shadow:var(--shadow);}
+.address-title{font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;display:flex;align-items:center;gap:6px;}
+.address-name{font-size:.9rem;font-weight:700;}
+.address-line{font-size:.82rem;color:var(--muted);margin-top:3px;line-height:1.5;}
+
+/* TRACK BUTTON */
+.track-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:.85rem;background:linear-gradient(148deg,#3b82f6,var(--blue));color:white;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer;text-decoration:none;box-shadow:0 4px 0 #0f3fa6,0 6px 18px rgba(26,86,219,.3);}
+.track-btn:active{transform:translateY(2px);box-shadow:0 2px 0 #0f3fa6;}
+
+.whatsapp-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:.85rem;background:#16a34a;color:white;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer;text-decoration:none;box-shadow:0 4px 0 #14532d;}
+.whatsapp-btn:active{transform:translateY(2px);}
+
+/* ESTIMATED */
+.eta-banner{background:linear-gradient(135deg,var(--blue-lt),var(--blue-md));border:1.5px solid var(--blue-md);border-radius:16px;padding:1rem 1.2rem;display:flex;align-items:center;gap:.8rem;}
+.eta-icon{width:42px;height:42px;background:var(--blue);border-radius:12px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.1rem;flex-shrink:0;}
+.eta-label{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+.eta-date{font-size:.95rem;font-weight:800;color:var(--blue);}
+
+/* LOADING */
+.skeleton{background:linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:12px;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.skel-h{height:16px;margin-bottom:8px;}
+.skel-w100{width:100%;}
+.skel-w70{width:70%;}
+.skel-w50{width:50%;}
+
+.not-found{text-align:center;padding:3rem 2rem;}
+.not-found i{font-size:3rem;color:var(--muted);margin-bottom:1rem;}
+.not-found h2{font-size:1.1rem;font-weight:800;margin-bottom:.5rem;}
+.not-found p{font-size:.85rem;color:var(--muted);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<nav class="nav">
+  <div class="icon-btn" onclick="history.back()"><i class="fas fa-chevron-left" style="font-size:.85rem"></i></div>
+  <div>
+    <div class="nav-title">Track Order</div>
+  </div>
+</nav>
+
+<div class="body" id="bodyEl">
+  <!-- Loading skeleton -->
+  <div class="order-card" id="skeletonCard">
+    <div style="padding:1.2rem">
+      <div class="skeleton skel-h skel-w50"></div>
+      <div class="skeleton skel-h skel-w70" style="margin-top:8px"></div>
+      <div class="skeleton skel-h skel-w100" style="margin-top:16px;height:80px;border-radius:12px"></div>
+    </div>
+  </div>
+  <div class="track-card" id="skeletonTrack">
+    <div class="skeleton skel-h skel-w50" style="margin-bottom:16px"></div>
+    <div class="skeleton skel-h skel-w100"></div>
+    <div class="skeleton skel-h skel-w70" style="margin-top:12px"></div>
+    <div class="skeleton skel-h skel-w100" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<script>
+const { createClient } = supabase;
+const db = createClient(
+  'https://kswikkoqfpyxuurzxail.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtzd2lra29xZnB5eHV1cnp4YWlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzEzNjEzMDQsImV4cCI6MjA4NjkzNzMwNH0.uuoSKWOTeXot1HJys0EO9OcIRBL0mKrNHIUHIAPCpZ4'
+);
+
+const STEPS = [
+  { key:'placed',    label:'Order Placed',        icon:'fas fa-check',          desc:'Your order has been received and confirmed.' },
+  { key:'packed',    label:'Packed & Ready',       icon:'fas fa-box',            desc:'Your items are packed and ready for pickup.' },
+  { key:'shipped',   label:'Picked Up by Courier', icon:'fas fa-truck',          desc:'The courier has collected your package.' },
+  { key:'out',       label:'Out for Delivery',     icon:'fas fa-motorcycle',     desc:'Your package is on its way to you now!' },
+  { key:'delivered', label:'Delivered',            icon:'fas fa-house-chimney-window', desc:'Your order has been delivered successfully.' },
+];
+
+const STATUS_STEP = {
+  'Pending':    0,
+  'Processing': 0,
+  'Confirmed':  1,
+  'Packed':     2,
+  'Shipped':    2,
+  'Out for Delivery': 3,
+  'Delivered':  4,
+  'Cancelled':  -1,
+};
+
+const STATUS_BADGE = {
+  'Pending':    'processing',
+  'Processing': 'processing',
+  'Confirmed':  'confirmed',
+  'Packed':     'confirmed',
+  'Shipped':    'shipped',
+  'Out for Delivery': 'shipped',
+  'Delivered':  'delivered',
+  'Cancelled':  'cancelled',
+};
+
+function formatPrice(n){ return '₦' + Number(n || 0).toLocaleString(); }
+
+function formatDate(d){
+  if (!d) return '';
+  const dt = new Date(d);
+  return dt.toLocaleDateString('en-NG', { weekday:'short', day:'numeric', month:'short', year:'numeric' });
+}
+
+function estimateDelivery(createdAt) {
+  const d = new Date(createdAt || Date.now());
+  d.setDate(d.getDate() + 3);
+  // Skip weekends
+  if (d.getDay() === 0) d.setDate(d.getDate() + 1);
+  if (d.getDay() === 6) d.setDate(d.getDate() + 2);
+  return d.toLocaleDateString('en-NG', { weekday:'long', day:'numeric', month:'long' });
+}
+
+async function init() {
+  const params  = new URLSearchParams(location.search);
+  const orderId = params.get('id');
+
+  if (!orderId) { showNotFound('No order ID provided'); return; }
+
+  const { data: orders, error } = await db
+    .from('orders')
+    .select('*')
+    .eq('id', orderId)
+    .limit(1);
+
+  if (error || !orders || orders.length === 0) {
+    showNotFound('Order not found'); return;
+  }
+
+  const order = orders[0];
+  renderOrder(order);
+}
+
+function renderOrder(order) {
+  const body = document.getElementById('bodyEl');
+  const status     = order.status || 'Pending';
+  const stepIndex  = STATUS_STEP[status] ?? 0;
+  const badgeClass = STATUS_BADGE[status] || 'processing';
+  const items      = (() => { try { return JSON.parse(order.items || '[]'); } catch { return []; } })();
+  const trackingUrl = order.shipbubble_tracking_url || order.tracking_url || '';
+  const cancelled  = status === 'Cancelled';
+
+  // Build timeline HTML
+  let timelineHtml = '';
+  STEPS.forEach((step, i) => {
+    let cls = '';
+    if (cancelled) cls = '';
+    else if (i < stepIndex) cls = 'done';
+    else if (i === stepIndex) cls = 'active';
+
+    timelineHtml += `
+      <div class="step ${cls}">
+        <div class="step-icon"><i class="${step.icon}"></i></div>
+        <div class="step-body">
+          <div class="step-label">${step.label}</div>
+          <div class="step-desc">${cls ? step.desc : ''}</div>
+          ${cls === 'done' ? `<div class="step-time"><i class="fas fa-check" style="font-size:.6rem"></i> Completed</div>` : ''}
+          ${cls === 'active' ? `<div class="step-time" style="color:var(--blue)"><i class="fas fa-circle" style="font-size:.5rem"></i> In progress…</div>` : ''}
+        </div>
+      </div>`;
+  });
+
+  // Build items HTML
+  let itemsHtml = '';
+  items.forEach(item => {
+    itemsHtml += `
+      <div class="order-item">
+        <img class="item-img" src="${item.image_url || item.image || ''}" alt="${item.name || ''}" onerror="this.src='data:image/svg+xml,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'52\' height=\'52\'><rect width=\'52\' height=\'52\' fill=\'%23f1f5f9\'/></svg>'">
+        <div class="item-info">
+          <div class="item-name">${item.name || 'Product'}</div>
+          <div class="item-qty">Qty: ${item.quantity || 1}</div>
+        </div>
+        <div class="item-price">${formatPrice((item.price || 0) * (item.quantity || 1))}</div>
+      </div>`;
+  });
+
+  const addrObj = (() => { try { return typeof order.delivery_address === 'string' ? JSON.parse(order.delivery_address) : (order.delivery_address || {}); } catch { return {}; } })();
+
+  body.innerHTML = `
+    <!-- ETA Banner (only if not delivered/cancelled) -->
+    ${(!cancelled && status !== 'Delivered') ? `
+    <div class="eta-banner">
+      <div class="eta-icon"><i class="fas fa-truck-fast"></i></div>
+      <div>
+        <div class="eta-label">Estimated Delivery</div>
+        <div class="eta-date">${estimateDelivery(order.created_at)}</div>
+      </div>
+    </div>` : ''}
+
+    <!-- Order summary card -->
+    <div class="order-card">
+      <div class="order-card-top">
+        <div class="order-id">Order <span>#${(order.id || '').slice(0,8).toUpperCase()}</span></div>
+        <div class="order-date">${formatDate(order.created_at)}</div>
+        <div class="status-badge ${badgeClass}">
+          <i class="fas fa-circle" style="font-size:.45rem"></i> ${status}
+        </div>
+      </div>
+      <div class="order-items">${itemsHtml || '<div style="color:var(--muted);font-size:.85rem">No items</div>'}</div>
+      <div class="order-total">
+        <div class="total-label">Total Paid</div>
+        <div class="total-amount">${formatPrice(order.total || order.total_amount)}</div>
+      </div>
+    </div>
+
+    <!-- Tracking timeline -->
+    <div class="track-card">
+      <div class="track-title"><i class="fas fa-route"></i> Delivery Progress</div>
+      ${cancelled ? `
+        <div style="text-align:center;padding:1.5rem 0">
+          <i class="fas fa-circle-xmark" style="font-size:2.5rem;color:var(--red);margin-bottom:.75rem;display:block"></i>
+          <div style="font-weight:800;color:var(--red)">Order Cancelled</div>
+          <div style="font-size:.82rem;color:var(--muted);margin-top:.4rem">This order was cancelled.</div>
+        </div>` : `
+        <div class="timeline">${timelineHtml}</div>`}
+    </div>
+
+    <!-- Delivery address -->
+    ${addrObj.name || addrObj.address || addrObj.street ? `
+    <div class="address-card">
+      <div class="address-title"><i class="fas fa-location-dot"></i> Delivery Address</div>
+      <div class="address-name">${addrObj.name || order.customer_name || ''}</div>
+      <div class="address-line">${[addrObj.address || addrObj.street, addrObj.city, addrObj.state].filter(Boolean).join(', ')}</div>
+      ${addrObj.phone || order.customer_phone ? `<div class="address-line" style="margin-top:.4rem"><i class="fas fa-phone" style="font-size:.7rem"></i> ${addrObj.phone || order.customer_phone}</div>` : ''}
+    </div>` : ''}
+
+    <!-- Action buttons -->
+    <div style="display:flex;flex-direction:column;gap:.75rem">
+      ${trackingUrl ? `
+      <a href="${trackingUrl}" target="_blank" class="track-btn">
+        <i class="fas fa-map-location-dot"></i> Track with Courier
+      </a>` : ''}
+      <a href="https://wa.me/2348123456789?text=${encodeURIComponent(`Hi MC Store! I want to ask about my order #${(order.id||'').slice(0,8).toUpperCase()}`)}"
+         target="_blank" class="whatsapp-btn">
+        <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+      </a>
+    </div>
+  `;
+}
+
+function showNotFound(msg) {
+  document.getElementById('bodyEl').innerHTML = `
+    <div class="not-found">
+      <i class="fas fa-box-open"></i>
+      <h2>Order Not Found</h2>
+      <p>${msg || 'We could not find this order.'}</p>
+      <button onclick="history.back()" style="margin-top:1.5rem;padding:.75rem 1.5rem;background:var(--blue);color:white;border:none;border-radius:12px;font-family:inherit;font-weight:700;font-size:.9rem;cursor:pointer">Go Back</button>
+    </div>`;
+}
+
+init();
+</script>
+</body>
+</html>
