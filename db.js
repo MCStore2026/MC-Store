@@ -74,26 +74,29 @@ export async function db_getCart(uid) {
 }
 
 export async function db_addToCart(uid, product, quantity = 1) {
-  const pid = String(product.id);
-  const existing = await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}&select=id,quantity`).catch(() => []);
-  if (existing && existing.length > 0) {
-    await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}`, {
-      method: 'PATCH',
-      body:   JSON.stringify({ quantity: (existing[0].quantity || 1) + quantity })
-    });
-  } else {
+  const pid  = String(product.id);
+  const data = {
+    uid,
+    product_id: pid,
+    name:       product.name || product.title || '',
+    image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
+    price:      product.display_price || product.promo_price || product.price || 0,
+    weight:     product.weight || 0.5,
+    quantity
+  };
+  try {
+    // Try INSERT first — fast path for new items (one call)
     await sb('cart', {
       method:  'POST',
       headers: { Prefer: 'return=minimal' },
-      body: JSON.stringify({
-        uid,
-        product_id: pid,
-        name:       product.name || product.title || '',
-        image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
-        price:      product.display_price || product.promo_price || product.price || 0,
-        weight:     product.weight || 0.5,
-        quantity
-      })
+      body:    JSON.stringify(data)
+    });
+  } catch {
+    // Item already exists — PATCH quantity (second call only when item exists)
+    const rows = await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}&select=quantity`).catch(() => []);
+    await sb(`cart?uid=eq.${uid}&product_id=eq.${pid}`, {
+      method: 'PATCH',
+      body:   JSON.stringify({ quantity: ((rows?.[0]?.quantity) || 1) + quantity })
     });
   }
   return { action: 'added' };
@@ -135,20 +138,22 @@ export async function db_getWishlist(uid) {
 
 export async function db_addToWishlist(uid, product) {
   const pid = String(product.id);
-  const existing = await sb(`wishlist?uid=eq.${uid}&product_id=eq.${pid}&select=id`).catch(() => []);
-  if (existing && existing.length > 0) return { action: 'already_exists' };
-  await sb('wishlist', {
-    method:  'POST',
-    headers: { Prefer: 'return=minimal' },
-    body: JSON.stringify({
-      uid,
-      product_id: pid,
-      name:       product.name || product.title || '',
-      image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
-      price:      product.display_price || product.price || 0
-    })
-  });
-  return { action: 'added' };
+  try {
+    await sb('wishlist', {
+      method:  'POST',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({
+        uid,
+        product_id: pid,
+        name:       product.name || product.title || '',
+        image_url:  product.image_url || (Array.isArray(product.images) && product.images[0]) || '',
+        price:      product.display_price || product.price || 0
+      })
+    });
+    return { action: 'added' };
+  } catch {
+    return { action: 'already_exists' };
+  }
 }
 
 export async function db_removeFromWishlist(uid, productId) {
