@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Store — Electronics, Phones & Accessories Nigeria</title>
+<meta name="description" content="MC Store is Nigeria's trusted online shop for electronics, mobile phones, accessories, fashion and more. Fast delivery across Nigeria. Shop now at mcstore.com.ng">
+<meta name="keywords" content="online shopping Nigeria, buy electronics Nigeria, phones Nigeria, MC Store, cheap electronics Ibadan">
+<meta name="author" content="MC Store">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://mcstore.com.ng/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="MC Store">
+<meta property="og:title" content="MC Store — Electronics, Phones & Accessories Nigeria">
+<meta property="og:description" content="MC Store is Nigeria's trusted online shop for electronics, mobile phones, accessories, fashion and more. Fast delivery across Nigeria.">
+<meta property="og:image" content="https://mcstore.com.ng/apple-touch-icon.png">
+<meta property="og:url" content="https://mcstore.com.ng/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MC Store — Electronics, Phones & Accessories Nigeria">
+<meta name="twitter:description" content="Shop electronics, phones, accessories and more. Fast delivery across Nigeria.">
+<meta name="twitter:image" content="https://mcstore.com.ng/apple-touch-icon.png">
+<link rel="icon" type="image/x-icon" href="/favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#1a56db">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ── VARIABLES — identical to rest of app ── */
+:root {
+  --blue:    #1a56db;
+  --blue-dk: #1347c8;
+  --blue-lt: #eff6ff;
+  --blue-md: #dbeafe;
+  --gold:    #f5a623;
+  --gold-lt: #fef3c7;
+  --green:   #16a34a;
+  --white:   #ffffff;
+  --bg:      #f0f7ff;
+  --text:    #0f172a;
+  --muted:   #64748b;
+  --border:  #e2e8f0;
+  --shadow:  0 2px 12px rgba(26,86,219,.10);
+  --shadow-lg:0 8px 32px rgba(26,86,219,.15);
+  --radius:  16px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.65;}
+img{max-width:100%;display:block;}
+a{text-decoration:none;color:inherit;}
+
+/* ── HEADER — same white style as home/login/cart ── */
+header{
+  position:sticky;top:0;z-index:1000;
+  background:var(--white);
+  border-bottom:1.5px solid var(--border);
+  box-shadow:var(--shadow);
+  padding:0 1.5rem;
+}
+.header-inner{
+  max-width:1200px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:62px;gap:1rem;
+}
+.logo{
+  font-family:'Playfair Display',serif;
+  font-size:1.55rem;font-weight:900;
+  color:var(--text);white-space:nowrap;flex-shrink:0;
+}
+.logo span{color:var(--gold);}
+.header-actions{display:flex;gap:.6rem;align-items:center;flex-shrink:0;}
+.btn-login{
+  color:var(--blue);font-size:.875rem;font-weight:700;
+  padding:.5rem 1.2rem;border-radius:10px;
+  border:1.5px solid var(--blue-md);background:var(--blue-lt);
+  transition:all .2s;white-space:nowrap;
+  min-height:42px;display:inline-flex;align-items:center;
+}
+.btn-login:hover{background:var(--blue-md);border-color:var(--blue);}
+.btn-signup{
+  background:linear-gradient(148deg,#3b82f6,var(--blue),var(--blue-dk));
+  color:white;font-size:.875rem;font-weight:800;
+  padding:.5rem 1.3rem;border-radius:10px;border:none;
+  transition:all .2s;white-space:nowrap;
+  min-height:42px;display:inline-flex;align-items:center;gap:6px;
+  box-shadow:0 4px 0 #0f3fa6,0 6px 18px rgba(26,86,219,.3);
+  cursor:pointer;
+}
+.btn-signup:hover{transform:translateY(-2px);box-shadow:0 6px 0 #0f3fa6,0 10px 24px rgba(26,86,219,.35);}
+.btn-signup:active{transform:translateY(2px);box-shadow:0 1px 0 #0f3fa6;}
+
+/* ── HERO — blue gradient matching app theme ── */
+.hero{
+  position:relative;min-height:92vh;
+  display:flex;align-items:center;overflow:hidden;
+  background:linear-gradient(135deg,#0a1f4e 0%,#1a56db 60%,#1e3a8a 100%);
+}
+.hero-bg{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center top;
+  opacity:0.18;mix-blend-mode:luminosity;
+}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(10,31,78,.92) 0%,rgba(26,86,219,.68) 55%,rgba(10,31,78,.5) 100%);
+}
+.hero-content{
+  position:relative;z-index:2;
+  max-width:1200px;margin:0 auto;
+  padding:5rem 1.5rem 4rem;width:100%;
+}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(245,166,35,.15);border:1.5px solid rgba(245,166,35,.4);
+  color:var(--gold);font-size:.72rem;font-weight:700;
+  padding:.35rem 1rem;border-radius:50px;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.4rem;
+  animation:fadeUp .7s ease both;
+}
+.hero h1{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(2.2rem,6.5vw,4rem);font-weight:900;
+  color:white;line-height:1.1;max-width:680px;margin-bottom:1.3rem;
+  animation:fadeUp .7s .1s ease both;
+}
+.hero h1 em{font-style:normal;color:var(--gold);}
+.hero-desc{
+  color:rgba(255,255,255,.82);font-size:clamp(.95rem,2.2vw,1.15rem);
+  max-width:500px;margin-bottom:2.4rem;
+  animation:fadeUp .7s .2s ease both;
+}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap;animation:fadeUp .7s .3s ease both;}
+.btn-gold{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--gold);color:var(--text);
+  font-weight:800;font-size:1rem;
+  padding:1rem 2.2rem;border-radius:12px;border:none;
+  transition:all .2s;box-shadow:0 6px 0 #b87a0f,0 8px 24px rgba(245,166,35,.4);
+  min-height:54px;cursor:pointer;
+}
+.btn-gold:hover{transform:translateY(-3px);box-shadow:0 8px 0 #b87a0f,0 14px 32px rgba(245,166,35,.45);}
+.btn-gold:active{transform:translateY(2px);box-shadow:0 2px 0 #b87a0f;}
+.btn-outline-white{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  border:2px solid rgba(255,255,255,.45);color:white;
+  font-weight:700;font-size:1rem;
+  padding:1rem 2rem;border-radius:12px;
+  transition:all .2s;min-height:54px;
+}
+.btn-outline-white:hover{border-color:white;background:rgba(255,255,255,.1);transform:translateY(-2px);}
+
+.hero-stats{
+  display:flex;gap:3rem;margin-top:3.5rem;
+  animation:fadeUp .7s .4s ease both;flex-wrap:wrap;
+}
+.hero-stat strong{
+  display:block;font-family:'Playfair Display',serif;
+  font-size:1.8rem;font-weight:900;color:var(--gold);
+  line-height:1;margin-bottom:.2rem;
+}
+.hero-stat span{font-size:.78rem;color:rgba(255,255,255,.6);}
+
+/* ── TRUST STRIP ── */
+.trust-strip{background:var(--white);border-bottom:1.5px solid var(--border);}
+.trust-inner{
+  max-width:1200px;margin:0 auto;
+  padding:0 1.5rem;display:flex;flex-wrap:wrap;
+}
+.trust-item{
+  flex:1;min-width:190px;
+  display:flex;align-items:center;gap:1rem;
+  padding:1.6rem 1.4rem;
+  border-right:1px solid var(--border);transition:all .2s;
+}
+.trust-item:last-child{border-right:none;}
+.trust-item:hover{background:var(--blue-lt);}
+.trust-icon{
+  width:48px;height:48px;
+  background:linear-gradient(135deg,var(--blue),var(--blue-dk));
+  border-radius:12px;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;box-shadow:0 4px 14px rgba(26,86,219,.3);
+}
+.trust-icon i{color:white;font-size:1.1rem;}
+.trust-text strong{display:block;font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:.15rem;}
+.trust-text span{font-size:.76rem;color:var(--muted);}
+
+/* ── SECTION UTILS ── */
+.section{max-width:1200px;margin:0 auto;padding:5rem 1.5rem;}
+.section-tag{
+  display:inline-block;font-size:.7rem;font-weight:700;
+  letter-spacing:.14em;text-transform:uppercase;
+  color:var(--blue);background:var(--blue-lt);
+  border:1px solid var(--blue-md);
+  padding:.25rem .75rem;border-radius:50px;margin-bottom:.8rem;
+}
+.section-title{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.7rem,4.5vw,2.6rem);font-weight:900;
+  line-height:1.18;margin-bottom:1rem;color:var(--text);
+}
+.section-sub{color:var(--muted);font-size:1rem;max-width:540px;line-height:1.8;}
+
+/* ── FEATURE SECTIONS ── */
+.feat-section{overflow:hidden;}
+.feat-section.bg-white{background:var(--white);}
+.feat-section.bg-light{background:var(--bg);}
+.feat-section.bg-blue{background:linear-gradient(135deg,#0a1f4e,#1a56db);}
+.feat-inner{
+  max-width:1200px;margin:0 auto;padding:4.5rem 1.5rem;
+  display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:center;
+}
+.feat-inner.rev{direction:rtl;}
+.feat-inner.rev>*{direction:ltr;}
+.feat-img{
+  border-radius:var(--radius);overflow:hidden;
+  box-shadow:var(--shadow-lg);
+  transition:transform .3s,box-shadow .3s;
+  border:1.5px solid var(--border);
+}
+.feat-img:hover{transform:translateY(-8px);box-shadow:0 24px 60px rgba(26,86,219,.2);}
+.feat-img img{width:100%;object-fit:cover;min-height:280px;max-height:400px;display:block;transition:transform .5s;}
+.feat-img:hover img{transform:scale(1.04);}
+.feat-section.bg-blue .feat-img{border-color:rgba(255,255,255,.15);}
+
+.feat-text h2{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:900;
+  line-height:1.2;margin-bottom:1rem;color:var(--text);
+}
+.feat-section.bg-blue .feat-text h2{color:white;}
+.feat-text p{color:var(--muted);font-size:.97rem;line-height:1.82;margin-bottom:1rem;}
+.feat-section.bg-blue .feat-text p{color:rgba(255,255,255,.75);}
+.feat-text p:last-of-type{margin-bottom:1.5rem;}
+
+.blue-tag{color:var(--blue);background:var(--blue-lt);border-color:var(--blue-md);}
+.gold-tag{color:var(--gold);background:rgba(245,166,35,.12);border-color:rgba(245,166,35,.3);}
+
+.pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem;}
+.pill{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--blue-lt);border:1.5px solid var(--blue-md);
+  border-radius:50px;padding:.35rem .9rem;
+  font-size:.8rem;font-weight:700;color:var(--blue);
+}
+.feat-section.bg-blue .pill{background:rgba(245,166,35,.12);border-color:rgba(245,166,35,.3);color:var(--gold);}
+
+/* ── CATEGORIES ── */
+.cat-section{background:var(--white);}
+.cat-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+  gap:1.1rem;margin-top:2.5rem;
+}
+.cat-card{
+  background:var(--bg);border-radius:var(--radius);
+  padding:1.75rem 1rem 1.5rem;text-align:center;
+  cursor:pointer;transition:all .25s;
+  border:1.5px solid var(--border);display:block;
+  box-shadow:var(--shadow);
+}
+.cat-card:hover{transform:translateY(-7px);border-color:var(--blue);box-shadow:0 16px 40px rgba(26,86,219,.15);background:var(--white);}
+.cat-icon{
+  width:52px;height:52px;margin:0 auto .85rem;
+  background:var(--blue-lt);border:1.5px solid var(--blue-md);
+  border-radius:14px;display:flex;align-items:center;justify-content:center;
+}
+.cat-icon i{color:var(--blue);font-size:1.2rem;}
+.cat-card:hover .cat-icon{background:var(--blue);}
+.cat-card:hover .cat-icon i{color:white;}
+.cat-card strong{display:block;font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:.2rem;}
+.cat-card span{font-size:.73rem;color:var(--muted);}
+
+/* ── WHY CARDS ── */
+.why-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:1.6rem;margin-top:2.5rem;
+}
+.why-card{
+  background:var(--white);border-radius:var(--radius);
+  padding:1.85rem 1.6rem;border:1.5px solid var(--border);
+  transition:all .25s;position:relative;overflow:hidden;
+  box-shadow:var(--shadow);
+}
+.why-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--blue),var(--gold));
+  transform:scaleX(0);transform-origin:left;transition:transform .3s;
+}
+.why-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:var(--blue-md);}
+.why-card:hover::before{transform:scaleX(1);}
+.why-num{
+  font-family:'Playfair Display',serif;font-size:3rem;font-weight:900;
+  color:var(--blue-md);line-height:1;margin-bottom:.5rem;transition:color .3s;
+}
+.why-card:hover .why-num{color:rgba(26,86,219,.1);}
+.why-card h3{font-size:1rem;font-weight:800;margin-bottom:.55rem;color:var(--text);}
+.why-card p{font-size:.875rem;color:var(--muted);line-height:1.78;}
+
+/* ── HOW IT WORKS ── */
+.how-section{background:linear-gradient(135deg,#0a1f4e,#1a56db);}
+.how-inner{
+  max-width:1200px;margin:0 auto;padding:5rem 1.5rem;
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;
+}
+.how-img{
+  border-radius:var(--radius);overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,.4);
+  border:1.5px solid rgba(255,255,255,.1);
+  transition:transform .3s;
+}
+.how-img:hover{transform:translateY(-7px);}
+.how-img img{width:100%;object-fit:cover;min-height:280px;max-height:400px;}
+.steps{display:flex;flex-direction:column;gap:1.2rem;margin-top:2rem;}
+.step-row{display:flex;gap:1rem;align-items:flex-start;}
+.step-num{
+  width:40px;height:40px;background:var(--gold);color:var(--text);
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-weight:900;font-size:.875rem;flex-shrink:0;
+  box-shadow:0 4px 12px rgba(245,166,35,.4);
+}
+.step-info strong{display:block;font-size:.92rem;font-weight:700;color:white;margin-bottom:.15rem;}
+.step-info span{font-size:.82rem;color:rgba(255,255,255,.62);}
+
+/* ── TESTIMONIALS ── */
+.testi-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:1.4rem;margin-top:2.5rem;
+}
+.testi-card{
+  background:var(--bg);border-radius:var(--radius);
+  padding:1.75rem;border:1.5px solid var(--border);
+  transition:all .25s;box-shadow:var(--shadow);
+}
+.testi-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);border-color:var(--blue-md);}
+.stars{color:var(--gold);font-size:.9rem;margin-bottom:1rem;letter-spacing:2px;}
+.testi-card>p{font-size:.9rem;color:#374151;line-height:1.8;margin-bottom:1.2rem;}
+.reviewer{display:flex;align-items:center;gap:.8rem;}
+.rev-av{
+  width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--blue-dk));
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-weight:800;font-size:1rem;flex-shrink:0;
+  box-shadow:0 3px 10px rgba(26,86,219,.3);
+}
+.reviewer strong{font-size:.875rem;font-weight:700;display:block;}
+.reviewer span{font-size:.75rem;color:var(--muted);}
+
+/* ── CTA BANNER ── */
+.cta-section{
+  background:linear-gradient(135deg,var(--blue),var(--blue-dk));
+  color:white;padding:5rem 1.5rem;text-align:center;
+}
+.cta-section h2{
+  font-family:'Playfair Display',serif;
+  font-size:clamp(1.8rem,4vw,2.5rem);font-weight:900;margin-bottom:.75rem;
+}
+.cta-section>p{color:rgba(255,255,255,.85);margin-bottom:2rem;font-size:1.05rem;}
+.cta-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+
+/* ── FOOTER ── */
+footer{background:#061629;color:white;}
+.footer-top{
+  max-width:1200px;margin:0 auto;
+  padding:4rem 1.5rem 3rem;
+  display:grid;grid-template-columns:2fr 1fr 1fr 1.5fr;gap:2.5rem;
+}
+.footer-logo{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;margin-bottom:1rem;}
+.footer-logo span{color:var(--gold);}
+.footer-brand>p{font-size:.85rem;color:rgba(255,255,255,.55);line-height:1.8;margin-bottom:1.4rem;}
+.social-links{display:flex;gap:.6rem;flex-wrap:wrap;}
+.social-link{
+  width:38px;height:38px;background:rgba(255,255,255,.08);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;
+  transition:all .2s;border:1px solid rgba(255,255,255,.08);cursor:pointer;
+}
+.social-link:hover{background:var(--blue);transform:translateY(-3px);border-color:transparent;}
+.social-link i{color:white;font-size:.9rem;}
+.footer-col h4{font-size:.76rem;font-weight:700;text-transform:uppercase;letter-spacing:.11em;color:var(--gold);margin-bottom:1.2rem;}
+.footer-col ul{list-style:none;}
+.footer-col li{margin-bottom:.6rem;}
+.footer-col a{font-size:.85rem;color:rgba(255,255,255,.55);transition:color .2s;}
+.footer-col a:hover{color:white;}
+.fci{display:flex;gap:.7rem;align-items:flex-start;margin-bottom:.9rem;font-size:.84rem;color:rgba(255,255,255,.58);}
+.fci i{color:var(--gold);flex-shrink:0;margin-top:3px;font-size:.85rem;}
+.footer-bottom{
+  border-top:1px solid rgba(255,255,255,.07);
+  padding:1.5rem;text-align:center;
+  font-size:.78rem;color:rgba(255,255,255,.35);
+  max-width:1200px;margin:0 auto;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* ── BACK TO TOP ── */
+#back-top{
+  position:fixed;bottom:1.5rem;right:1.5rem;
+  width:48px;height:48px;
+  background:linear-gradient(148deg,#3b82f6,var(--blue));
+  color:white;border:none;border-radius:50%;cursor:pointer;
+  z-index:900;opacity:0;pointer-events:none;
+  transform:translateY(14px);transition:all .3s;
+  box-shadow:0 4px 16px rgba(26,86,219,.4);
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+}
+#back-top.show{opacity:1;pointer-events:auto;transform:translateY(0);}
+#back-top:hover{transform:translateY(-3px);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:960px){
+  .footer-top{grid-template-columns:1fr 1fr;}
+  .how-inner{grid-template-columns:1fr;gap:2.5rem;}
+  .feat-inner{grid-template-columns:1fr;gap:2rem;}
+  .feat-inner.rev{direction:ltr;}
+}
+@media(max-width:680px){
+  .footer-top{grid-template-columns:1fr;}
+  .hero-stats{gap:1.75rem;}
+  .cat-grid{grid-template-columns:repeat(2,1fr);}
+  .feat-img img{min-height:200px;max-height:260px;}
+}
+@media(max-width:480px){
+  .trust-item{flex:1 1 calc(50% - 1px);border-right:none;border-bottom:1px solid var(--border);}
+  .btn-login,.btn-signup{font-size:.8rem;padding:.45rem .9rem;min-height:38px;}
+  .logo{font-size:1.3rem;}
+}
+</style>
+<!-- Structured Data — tells Google our logo, name, and contact -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "MC Store",
+  "url": "https://mcstore.com.ng",
+  "logo": {
+    "@type": "ImageObject",
+    "url": "https://mcstore.com.ng/favicon-512.png",
+    "width": 512,
+    "height": 512
+  },
+  "description": "MC Store is Nigeria's trusted online shop for electronics, mobile phones, accessories, fashion and more. Fast delivery across Nigeria.",
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+234-805-623-0366",
+    "contactType": "customer service",
+    "areaServed": "NG",
+    "availableLanguage": "English"
+  },
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Opposite Bovas Filling Station, Bodija",
+    "addressLocality": "Ibadan",
+    "addressRegion": "Oyo State",
+    "addressCountry": "NG"
+  },
+  "sameAs": [
+    "https://www.instagram.com/mcstore.ng",
+    "https://www.facebook.com/mcstore.ng",
+    "https://www.tiktok.com/@mcstore.ng"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "MC Store",
+  "url": "https://mcstore.com.ng",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": {
+      "@type": "EntryPoint",
+      "urlTemplate": "https://mcstore.com.ng/signup"
+    },
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">MC<span>Store</span></div>
+    <div class="header-actions">
+      <a href="login" class="btn-login">Login</a>
+      <a href="signup" class="btn-signup"><i class="fas fa-shopping-bag" style="font-size:.8rem"></i> Sign Up Free</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <img class="hero-bg" src="https://i.postimg.cc/cHY2rhLY/1771776277550.png" alt="MC Store fast delivery Nigeria" fetchpriority="high">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <span class="hero-badge"><i class="fas fa-shield-check" style="font-size:.65rem"></i>&nbsp; Trusted by thousands across Nigeria</span>
+    <h1>Everything You Need,<br><em>Delivered</em> to Your Door.</h1>
+    <p class="hero-desc">MC Store brings thousands of verified products directly to you — electronics, phones, fashion and more. Order today, delivered in 2–5 business days.</p>
+    <div class="hero-cta">
+      <a href="signup" class="btn-gold"><i class="fas fa-shopping-bag"></i> Shop Now</a>
+      <a href="#categories" class="btn-outline-white"><i class="fas fa-th-large"></i> Browse Categories</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><strong>10,000+</strong><span>Products Available</span></div>
+      <div class="hero-stat"><strong>2–5 Days</strong><span>Average Delivery</span></div>
+      <div class="hero-stat"><strong>100%</strong><span>Verified Products</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST STRIP -->
+<div class="trust-strip">
+  <div class="trust-inner">
+    <div class="trust-item">
+      <div class="trust-icon"><i class="fas fa-shield-halved"></i></div>
+      <div class="trust-text"><strong>Secure Checkout</strong><span>Encrypted payment processing</span></div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon"><i class="fas fa-circle-check"></i></div>
+      <div class="trust-text"><strong>Verified Products</strong><span>Quality-checked before dispatch</span></div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon"><i class="fas fa-truck-fast"></i></div>
+      <div class="trust-text"><strong>Fast Delivery</strong><span>2–5 business days, tracked</span></div>
+    </div>
+    <div class="trust-item">
+      <div class="trust-icon"><i class="fas fa-headset"></i></div>
+      <div class="trust-text"><strong>Customer Support</strong><span>7 days a week, always here</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURE 1 — DOOR TO DOOR -->
+<div class="feat-section bg-white">
+  <div class="feat-inner">
+    <div class="feat-img reveal">
+      <img src="https://i.postimg.cc/1zzB6tCF/door-to-door-pickup-and-delivery-services.jpg" alt="Door-to-door delivery Nigeria" loading="lazy">
+    </div>
+    <div class="feat-text reveal">
+      <span class="section-tag blue-tag">Door-to-Door Delivery</span>
+      <h2>We Come to You — Every Single Order.</h2>
+      <p>At MC Store, every order is handled from the moment it leaves our warehouse. We don't just ship packages — we ensure your items arrive safely, securely, and on time at your doorstep.</p>
+      <p>Our reliable delivery covers locations across Nigeria. Whether you're in Ibadan, Lagos, Abuja, or anywhere — MC Store reaches you.</p>
+      <div class="pills">
+        <span class="pill"><i class="fas fa-check" style="font-size:.6rem"></i> Careful Handling</span>
+        <span class="pill"><i class="fas fa-check" style="font-size:.6rem"></i> Reliable Pickup</span>
+        <span class="pill"><i class="fas fa-check" style="font-size:.6rem"></i> Nationwide Coverage</span>
+      </div>
+      <a href="signup" class="btn-signup" style="display:inline-flex;padding:.85rem 1.8rem;font-size:.95rem;border-radius:12px;min-height:unset">
+        <i class="fas fa-shopping-bag"></i> Shop Now
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURE 2 — SHOP ANYWHERE -->
+<div class="feat-section bg-light">
+  <div class="feat-inner rev">
+    <div class="feat-img reveal">
+      <img src="https://i.postimg.cc/3wSzPz4f/1771773174137.png" alt="Shop from anywhere on mobile" loading="lazy">
+    </div>
+    <div class="feat-text reveal">
+      <span class="section-tag blue-tag">Shop From Anywhere</span>
+      <h2>Your Favourite Store — In Your Pocket.</h2>
+      <p>MC Store is designed for the way Nigerians shop today — on the go, from your phone, at any time. Fully optimised for mobile browsing so your next order is always just a tap away.</p>
+      <p>No app download needed. Visit our site, create a free account, and start shopping instantly.</p>
+      <div class="pills">
+        <span class="pill"><i class="fas fa-check" style="font-size:.6rem"></i> Mobile Optimised</span>
+        <span class="pill"><i class="fas fa-check" style="font-size:.6rem"></i> 24/7 Availability</span>
+        <span class="pill"><i class="fas fa-check" style="font-size:.6rem"></i> Easy Navigation</span>
+      </div>
+      <a href="signup" class="btn-signup" style="display:inline-flex;padding:.85rem 1.8rem;font-size:.95rem;border-radius:12px;min-height:unset">
+        <i class="fas fa-user-plus"></i> Create Free Account
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURE 3 — TRACKED SHIPPING (blue bg) -->
+<div class="feat-section bg-blue">
+  <div class="feat-inner">
+    <div class="feat-img reveal">
+      <img src="https://i.postimg.cc/jd905DsN/1771775223361.png" alt="Fast tracked shipping Nigeria" loading="lazy">
+    </div>
+    <div class="feat-text reveal">
+      <span class="section-tag gold-tag">Fast &amp; Tracked Shipping</span>
+      <h2>Know Exactly Where Your Order Is — Always.</h2>
+      <p>Once dispatched, you receive a tracking reference to monitor progress at every stage. No guessing, no waiting in the dark — clear, reliable updates until your package arrives.</p>
+      <p>Orders are processed within 24 hours. Delivery is 2–5 business days depending on your location in Nigeria.</p>
+      <div class="pills">
+        <span class="pill"><i class="fas fa-check" style="font-size:.6rem"></i> Live Tracking</span>
+        <span class="pill"><i class="fas fa-check" style="font-size:.6rem"></i> 2–5 Business Days</span>
+        <span class="pill"><i class="fas fa-check" style="font-size:.6rem"></i> SMS &amp; Email Alerts</span>
+      </div>
+      <a href="signup" class="btn-gold" style="display:inline-flex;align-items:center;gap:8px;padding:.85rem 1.8rem;font-size:.95rem;border-radius:12px;min-height:unset">
+        <i class="fas fa-shopping-bag"></i> Start Shopping
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURE 4 — SATISFACTION -->
+<div class="feat-section bg-white">
+  <div class="feat-inner rev">
+    <div class="feat-img reveal">
+      <img src="https://i.postimg.cc/vHTxyVNr/1771773603213.png" alt="Satisfaction guaranteed easy returns" loading="lazy">
+    </div>
+    <div class="feat-text reveal">
+      <span class="section-tag blue-tag">Satisfaction Guaranteed</span>
+      <h2>If You're Not Happy, Neither Are We.</h2>
+      <p>We stand behind every product sold on MC Store. If something isn't right — wrong item, damaged package, or not what you expected — our returns process is straightforward and stress-free.</p>
+      <p>Our customer-first policy means we resolve issues quickly. No long wait times, no runaround.</p>
+      <div class="pills">
+        <span class="pill"><i class="fas fa-check" style="font-size:.6rem"></i> Easy Returns</span>
+        <span class="pill"><i class="fas fa-check" style="font-size:.6rem"></i> Customer-First Policy</span>
+        <span class="pill"><i class="fas fa-check" style="font-size:.6rem"></i> Quick Resolutions</span>
+      </div>
+      <a href="signup" class="btn-signup" style="display:inline-flex;padding:.85rem 1.8rem;font-size:.95rem;border-radius:12px;min-height:unset">
+        <i class="fas fa-shield-halved"></i> Shop With Confidence
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="cat-section" id="categories">
+  <div class="section">
+    <span class="section-tag reveal">What We Sell</span>
+    <h2 class="section-title reveal">Shop by Category</h2>
+    <p class="section-sub reveal">From the latest gadgets to home essentials — a wide selection curated for everyday Nigerian life.</p>
+    <div class="cat-grid">
+      <a href="signup" class="cat-card reveal"><div class="cat-icon"><i class="fas fa-tv"></i></div><strong>Electronics</strong><span>Phones, tablets &amp; more</span></a>
+      <a href="signup" class="cat-card reveal"><div class="cat-icon"><i class="fas fa-headphones"></i></div><strong>Accessories</strong><span>Cables, cases &amp; add-ons</span></a>
+      <a href="signup" class="cat-card reveal"><div class="cat-icon"><i class="fas fa-house"></i></div><strong>Home Essentials</strong><span>Kitchen, cleaning &amp; decor</span></a>
+      <a href="signup" class="cat-card reveal"><div class="cat-icon"><i class="fas fa-shirt"></i></div><strong>Fashion</strong><span>Clothing, shoes &amp; bags</span></a>
+      <a href="signup" class="cat-card reveal"><div class="cat-icon"><i class="fas fa-laptop"></i></div><strong>Gadgets</strong><span>Smart tech &amp; tools</span></a>
+      <a href="signup" class="cat-card reveal"><div class="cat-icon"><i class="fas fa-bag-shopping"></i></div><strong>Daily Needs</strong><span>Personal care &amp; more</span></a>
+    </div>
+  </div>
+</div>
+
+<!-- WHY MC STORE -->
+<div style="background:var(--bg)">
+  <div class="section">
+    <span class="section-tag reveal">Why Choose Us</span>
+    <h2 class="section-title reveal">Shopping Made Simple,<br>Reliable &amp; Enjoyable.</h2>
+    <p class="section-sub reveal">MC Store was built with one goal — making your shopping as smooth and dependable as possible, right here in Nigeria.</p>
+    <div class="why-grid">
+      <div class="why-card reveal"><div class="why-num">01</div><h3>Unmatched Convenience</h3><p>Browse thousands of products from home. No crowds, no queues — available 24/7 from any device.</p></div>
+      <div class="why-card reveal"><div class="why-num">02</div><h3>Wide Range of Products</h3><p>From the latest smartphone to kitchen appliances — MC Store covers all major categories.</p></div>
+      <div class="why-card reveal"><div class="why-num">03</div><h3>Reliable Delivery</h3><p>We work with trusted logistics partners — 2–5 business days delivery nationwide.</p></div>
+      <div class="why-card reveal"><div class="why-num">04</div><h3>Quality Assurance</h3><p>Every product passes our verification process. Only reputable suppliers — you get exactly what you ordered.</p></div>
+      <div class="why-card reveal"><div class="why-num">05</div><h3>Customer-First Support</h3><p>Our team is available 7 days a week. Any question or issue — we're here for you.</p></div>
+      <div class="why-card reveal"><div class="why-num">06</div><h3>Secure &amp; Transparent</h3><p>Your data is protected. No hidden fees — what you see at checkout is exactly what you pay.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-section">
+  <div class="how-inner">
+    <div class="reveal">
+      <span class="section-tag gold-tag">How It Works</span>
+      <h2 class="section-title" style="color:white;margin-top:.5rem">From Your Screen<br>to Your Front Door.</h2>
+      <p class="section-sub" style="color:rgba(255,255,255,.7)">Orders placed on MC Store are processed and dispatched through our verified delivery network. Expect delivery within 2–5 business days.</p>
+      <div class="steps">
+        <div class="step-row"><div class="step-num">1</div><div class="step-info"><strong>Create Your Account</strong><span>Sign up free, browse and checkout securely in minutes</span></div></div>
+        <div class="step-row"><div class="step-num">2</div><div class="step-info"><strong>Order Processed</strong><span>We verify and carefully pack your items within 24 hours</span></div></div>
+        <div class="step-row"><div class="step-num">3</div><div class="step-info"><strong>Shipped &amp; Tracked</strong><span>A tracking reference is sent to you via email or SMS</span></div></div>
+        <div class="step-row"><div class="step-num">4</div><div class="step-info"><strong>Delivered to You</strong><span>Receive your order at your doorstep within 2–5 business days</span></div></div>
+      </div>
+    </div>
+    <div class="how-img reveal">
+      <img src="https://i.postimg.cc/1zzB6tCF/door-to-door-pickup-and-delivery-services.jpg" alt="MC Store delivery process" loading="lazy">
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div style="background:var(--white)">
+  <div class="section">
+    <span class="section-tag reveal">Customer Feedback</span>
+    <h2 class="section-title reveal">What Our Customers Say</h2>
+    <p class="section-sub reveal">Real feedback from real shoppers who trust MC Store for their everyday purchases across Nigeria.</p>
+    <div class="testi-grid">
+      <div class="testi-card reveal"><div class="stars">★★★★★</div><p>"I ordered wireless earphones and they arrived in just 3 days. Packaging was excellent, product exactly as described. MC Store is now my go-to for electronics."</p><div class="reviewer"><div class="rev-av">A</div><div><strong>Amara O.</strong><span>Electronics Customer, Lagos</span></div></div></div>
+      <div class="testi-card reveal"><div class="stars">★★★★★</div><p>"Bought kitchen items and home accessories. Everything arrived well-packaged and on time. The support team followed up to make sure I was satisfied. Very impressive."</p><div class="reviewer"><div class="rev-av">F</div><div><strong>Fatima B.</strong><span>Home Essentials, Abuja</span></div></div></div>
+      <div class="testi-card reveal"><div class="stars">★★★★★</div><p>"I was skeptical at first but after my first order I became a repeat customer. Fast delivery, genuine products and hassle-free returns. What more could you ask for?"</p><div class="reviewer"><div class="rev-av">K</div><div><strong>Kwame T.</strong><span>Repeat Customer, Ibadan</span></div></div></div>
+      <div class="testi-card reveal"><div class="stars">★★★★★</div><p>"The tracking feature is excellent — I knew exactly where my order was at every stage. MC Store's communication is top-notch. I recommend them to everyone."</p><div class="reviewer"><div class="rev-av">D</div><div><strong>David M.</strong><span>Gadgets Enthusiast, Kano</span></div></div></div>
+      <div class="testi-card reveal"><div class="stars">★★★★★</div><p>"Ordered fashion items for my kids — delivered in 4 days, well within the promised window. Items fit perfectly and quality was better than expected."</p><div class="reviewer"><div class="rev-av">N</div><div><strong>Nkechi A.</strong><span>Fashion Buyer, Port Harcourt</span></div></div></div>
+      <div class="testi-card reveal"><div class="stars">★★★★★</div><p>"Placed an order Friday evening and it arrived by Wednesday. The product was sealed and genuine. MC Store gives me more confidence than any other online store."</p><div class="reviewer"><div class="rev-av">J</div><div><strong>Joy E.</strong><span>Daily Needs Customer, Ibadan</span></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA BANNER -->
+<div class="cta-section">
+  <h2 class="reveal">Ready to Start Shopping?</h2>
+  <p class="reveal">Join thousands of Nigerians already shopping on MC Store. Create your free account today.</p>
+  <div class="cta-btns reveal">
+    <a href="signup" class="btn-gold" style="display:inline-flex;align-items:center;gap:8px;padding:1rem 2.2rem;font-size:1rem;border-radius:12px;min-height:unset">
+      <i class="fas fa-user-plus"></i> Create Free Account
+    </a>
+    <a href="login" class="btn-outline-white" style="padding:1rem 2rem;font-size:1rem;border-radius:12px">
+      <i class="fas fa-sign-in-alt"></i> Login
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="footer-logo">MC<span>Store</span></div>
+      <p>MC Store is a Nigerian online marketplace committed to connecting customers with quality products and fast, reliable delivery. Shopping should be simple, safe and satisfying — for everyone.</p>
+      <div class="social-links">
+        <a href="https://facebook.com" target="_blank" rel="noopener" class="social-link" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://instagram.com" target="_blank" rel="noopener" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="https://tiktok.com" target="_blank" rel="noopener" class="social-link" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+        <a href="https://wa.me/2348056230366" target="_blank" rel="noopener" class="social-link" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="signup">Shop All Products</a></li>
+        <li><a href="login">Login to Account</a></li>
+        <li><a href="signup">Create Account</a></li>
+        <li><a href="signup">New Arrivals</a></li>
+        <li><a href="referral">Refer &amp; Earn</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Help &amp; Support</h4>
+      <ul>
+        <li><a href="faq">FAQs</a></li>
+        <li><a href="refund-policy">Returns &amp; Refunds</a></li>
+        <li><a href="privacy-policy">Privacy Policy</a></li>
+        <li><a href="terms-of-service">Terms of Service</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact Us</h4>
+      <div class="fci"><i class="fas fa-location-dot"></i><span>Opposite Bovas Filling Station, Bodija, Ibadan, Oyo State, Nigeria</span></div>
+      <div class="fci"><i class="fas fa-phone"></i><span>+234 805 623 0366</span></div>
+      <div class="fci"><i class="fas fa-envelope"></i><span>mcstore.care@gmail.com</span></div>
+      <div class="fci"><i class="fas fa-clock"></i><span>Mon – Sat: 8:00am – 8:00pm</span></div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 MC Store. All rights reserved. &nbsp;|&nbsp; Serving customers across Nigeria.</p>
+  </div>
+</footer>
+
+<button id="back-top" aria-label="Back to top"><i class="fas fa-chevron-up"></i></button>
+
+<script>
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((e,i) => {
+    if (e.isIntersecting) {
+      setTimeout(() => e.target.classList.add('visible'), i * 50);
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold:0.1, rootMargin:'0px 0px -40px 0px' });
+reveals.forEach(el => io.observe(el));
+
+// Back to top
+const bt = document.getElementById('back-top');
+window.addEventListener('scroll', () => bt.classList.toggle('show', scrollY > 400), {passive:true});
+bt.addEventListener('click', () => window.scrollTo({top:0,behavior:'smooth'}));
+</script>
+</body>
+</html>
