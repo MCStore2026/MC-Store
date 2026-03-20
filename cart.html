@@ -920,6 +920,30 @@ window.calculateDelivery = async function() {
 
   document.getElementById('rateLoading').classList.remove('show');
   document.getElementById('calcRateBtn').disabled = false;
+  // ✅ ADD THIS NEW SECTION
+window.selectRate = function(index) {
+  // 1. Save the full shipping data so we don't lose the token
+  const chosen = lastFetchedRates[index]; 
+  window.selectedShippingOption = chosen; 
+
+  // 2. This part makes the blue border show which one you clicked
+  document.querySelectorAll('[id^="rateOpt-"]').forEach(el => {
+    el.style.borderColor = 'var(--border)';
+    const check = el.querySelector('[id^="rateCheck-"]');
+    if(check) check.style.display = 'none';
+  });
+  
+  const selectedEl = document.getElementById(`rateOpt-${index}`);
+  if(selectedEl) {
+    selectedEl.style.borderColor = 'var(--blue)';
+    const check = selectedEl.querySelector('[id^="rateCheck-"]');
+    if(check) check.style.display = 'block';
+  }
+
+  // 3. Update the total price at the bottom of the cart
+  if (typeof updateOrderSummary === 'function') updateOrderSummary();
+};
+  
 };
 
 // ── SELECT RATE ──
