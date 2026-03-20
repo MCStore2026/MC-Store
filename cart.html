@@ -1151,7 +1151,7 @@ async function saveOrder(deliveryAddress, payMethod, payRef, payStatus, total, c
   try {
     const addrPhone = document.getElementById('addrPhone')?.value || '';
     const addrEmail = document.getElementById('addrEmail')?.value || '';
-    const order = await db_placeOrder({
+        const order = await db_placeOrder({
       uid:                      currentUser.uid || currentUser.id,
       customerName:             currentUser.fullName,
       customerEmail:            currentUser.email || addrEmail,
@@ -1161,16 +1161,18 @@ async function saveOrder(deliveryAddress, payMethod, payRef, payStatus, total, c
       deliveryCity:             deliveryAddress.city,
       deliveryState:            deliveryAddress.state,
       deliveryLandmark:         deliveryAddress.landmark,
-      shipbubble_courier_id:    selectedRate?.courier_id   || '',
-      shipbubble_courier_name:  selectedRate?.courier_name || '',
-      shipbubble_service_code:  selectedRate?.service_code || '',
-      shipbubble_request_token: selectedRequestToken || '', // ✅ NEW: Save request_token!
+      // ✅ SHIPBUBBLE DATA
+      shipbubble_courier_id:    window.selectedShippingOption?.courier_id    || '',
+      shipbubble_courier_name:  window.selectedShippingOption?.courier_name  || '',
+      shipbubble_service_code:  window.selectedShippingOption?.service_code  || '',
+      shipbubble_request_token: window.selectedShippingOption?.request_token || '', 
       paymentMethod:            payMethod,
       paymentRef:               payRef,
       subtotal,
       deliveryFee,
       total
     });
+    
 
     // Update badges
     window.parent.postMessage({ type: 'cartUpdate', count: 0 }, '*');
