@@ -946,17 +946,33 @@ window.selectRate = function(index) {
   
 };
 
-// ── SELECT RATE ──
 window.selectRate = function(idx) {
   const rates = window._allRates || [];
   if (!rates[idx]) return;
 
+  // 1. Save selection for the database
   selectedRate = rates[idx];
   deliveryFee  = Number(rates[idx].delivery_fee) || 0;
-  // ✅ NEW: Also save request_token from selected rate
+  window.selectedShippingOption = rates[idx];
+  
+  // 2. Capture the Shipbubble Token
   if (rates[idx].request_token) {
     selectedRequestToken = rates[idx].request_token;
   }
+
+  // 3. UI: Update the blue selection borders
+  rates.forEach((_, i) => {
+    const el    = document.getElementById('rateOpt-' + i);
+    const check = document.getElementById('rateCheck-' + i);
+    if (!el) return;
+    el.style.borderColor = i === idx ? 'var(--blue)' : 'var(--border)';
+    el.style.background  = i === idx ? 'var(--blue-lt)' : 'var(--gray-lt)';
+    if (check) check.style.display = i === idx ? 'block' : 'none';
+  });
+
+  updateSummary();
+};
+  
 
   // Highlight selected
   rates.forEach((_, i) => {
