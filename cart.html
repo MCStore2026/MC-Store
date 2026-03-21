@@ -942,10 +942,8 @@ window.selectRate = function(index) {
 
   // 3. Update the total price at the bottom of the cart
   if (typeof updateOrderSummary === 'function') updateOrderSummary();
-};
   
-};
-
+// ── SELECT RATE ──
 window.selectRate = function(idx) {
   const rates = window._allRates || [];
   if (!rates[idx]) return;
