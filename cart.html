@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Store — Cart</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:    #1a56db;
+  --blue-dk: #1347c8;
+  --blue-lt: #eff6ff;
+  --blue-md: #dbeafe;
+  --gold:    #f5a623;
+  --red:     #ef4444;
+  --red-lt:  #fef2f2;
+  --green:   #16a34a;
+  --green-lt:#f0fdf4;
+  --white:   #ffffff;
+  --gray:    #6b7280;
+  --gray-lt: #f9fafb;
+  --text:    #0f172a;
+  --border:  #e5e7eb;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: #f8fafc; color: var(--text); -webkit-font-smoothing: antialiased; }
+
+.page { height: 100vh; overflow-y: auto; overflow-x: hidden; }
+
+/* ── HEADER ── */
+.top-header {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--white); border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(26,86,219,0.06); padding: 0 1rem;
+}
+.header-inner {
+  max-width: 1200px; margin: 0 auto;
+  height: 56px; display: flex; align-items: center; gap: 0.75rem;
+}
+.header-logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 900; color: var(--text); }
+.header-logo span { color: var(--gold); }
+.header-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; flex: 1; text-align: center; }
+
+/* ── MAIN ── */
+.main { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+
+/* ── STEP INDICATOR ── */
+.steps { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 1.25rem; }
+.step { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; flex: 1; position: relative; }
+.step:not(:last-child)::after { content: ''; position: absolute; top: 14px; left: 60%; width: 80%; height: 2px; background: var(--border); z-index: 0; }
+.step.done:not(:last-child)::after, .step.active:not(:last-child)::after { background: var(--blue); }
+.step-circle { width: 28px; height: 28px; border-radius: 50%; background: var(--gray-lt); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--gray); z-index: 1; }
+.step.active .step-circle { background: var(--blue); border-color: var(--blue); color: white; }
+.step.done .step-circle { background: var(--green); border-color: var(--green); color: white; }
+.step-label { font-size: 0.65rem; font-weight: 600; color: var(--gray); text-align: center; }
+
+/* ── SECTION CARD ── */
+.section-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 18px; padding: 1rem; margin-bottom: 1rem; }
+.section-card-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 800; color: var(--text); margin-bottom: 0.85rem; display: flex; align-items: center; gap: 0.5rem; }
+.section-card-title i { color: var(--blue); font-size: 15px; }
+
+/* ── CART ITEM ── */
+.cart-item { display: flex; gap: 0.75rem; padding: 0.75rem 0; border-bottom: 1px solid var(--border); position: relative; }
+.item-img { width: 70px; height: 70px; border-radius: 12px; background: var(--gray-lt); flex-shrink: 0; overflow: hidden; border: 1px solid var(--border); }
+.item-img img { width: 100%; height: 100%; object-fit: cover; }
+.item-info { flex: 1; min-width: 0; }
+.item-name { font-size: 0.82rem; font-weight: 600; color: var(--text); margin-bottom: 0.2rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.item-price { font-size: 0.92rem; font-weight: 800; color: var(--blue); margin-bottom: 0.4rem; }
+
+/* ── DELIVERY METHOD ── */
+.method-option { display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; border-radius: 14px; border: 2px solid var(--border); cursor: pointer; transition: all 0.25s; margin-bottom: 0.6rem; position: relative; }
+.method-option.selected { border-color: var(--blue); background: var(--blue-lt); }
+.method-icon { width: 42px; height: 42px; border-radius: 12px; background: var(--blue-lt); color: var(--blue); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.method-option.selected .method-icon { background: var(--blue); color: white; }
+
+/* ── ADDRESS FORM ── */
+.address-form { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-top: 0.85rem; }
+.form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+.form-group.full { grid-column: 1/-1; }
+.form-label { font-size: 0.72rem; font-weight: 700; color: var(--gray); text-transform: uppercase; }
+.form-input, .form-select { border: 1.5px solid var(--border); border-radius: 10px; padding: 0.6rem 0.75rem; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--text); outline: none; width: 100%; }
+
+/* ── RATE OPTIONS ── */
+.rate-option { display: flex; align-items: center; gap: 0.75rem; background: var(--gray-lt); border: 1.5px solid var(--border); border-radius: 12px; padding: 0.75rem 1rem; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s; }
+.rate-option.selected { border-color: var(--blue); background: var(--blue-lt); }
+.rate-check { color: var(--green); display: none; }
+.rate-option.selected .rate-check { display: block; }
+
+/* ── BUTTONS ── */
+.btn-primary { background: var(--blue); color: white; border: none; border-radius: 14px; padding: 0.85rem; font-weight: 800; cursor: pointer; width: 100%; transition: all 0.2s; }
+.btn-primary:disabled { background: var(--gray); opacity: 0.6; cursor: not-allowed; }
+.btn-calc { background: var(--gold); color: white; border: none; border-radius: 10px; padding: 0.65rem; font-weight: 700; cursor: pointer; margin-top: 0.5rem; }
+
+/* ── SUMMARY ── */
+.summary-row { display: flex; justify-content: space-between; padding: 0.4rem 0; font-size: 0.85rem; }
+.summary-total { border-top: 1.5px dashed var(--border); margin-top: 0.75rem; padding-top: 0.75rem; font-weight: 800; font-size: 1.1rem; }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; padding: 0.8rem 1.5rem; font-size: 0.9rem; font-weight: 700; box-shadow: 0 12px 40px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; z-index: 999; transition: transform 0.4s; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.error { border-color: var(--red); color: var(--red); }
+
+@media (max-width: 480px) { .address-form { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="page" id="cartPage">
+  <header class="top-header">
+    <div class="header-inner">
+      <div class="header-logo">MC <span>Store</span></div>
+      <div class="header-title">Checkout</div>
+      <div style="width:38px"></div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- STEPS -->
+    <div class="steps" id="stepsBar">
+      <div class="step active"><div class="step-circle">1</div><div class="step-label">Cart</div></div>
+      <div class="step"><div class="step-circle">2</div><div class="step-label">Delivery</div></div>
+      <div class="step"><div class="step-circle">3</div><div class="step-label">Payment</div></div>
+    </div>
+
+    <!-- STEP 1: CART ITEMS -->
+    <div id="stepCartItems">
+      <div class="section-card">
+        <div class="section-card-title"><i class="fas fa-shopping-cart"></i> Your Items</div>
+        <div id="cartItemsList"></div>
+      </div>
+      <button class="btn-primary" onclick="goToStep(2)">Continue to Delivery <i class="fas fa-arrow-right"></i></button>
+    </div>
+
+    <!-- STEP 2: DELIVERY -->
+    <div id="stepDelivery" style="display:none">
+      <div class="section-card">
+        <div class="section-card-title"><i class="fas fa-truck"></i> Delivery Method</div>
+        <div class="method-option" id="pickupOption" onclick="selectDelivery('pickup')">
+          <div class="method-icon"><i class="fas fa-store"></i></div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:0.875rem">Store Pickup</div>
+            <div style="font-size:0.75rem;color:var(--gray)">Pick up from our Bodija office</div>
+          </div>
+          <div style="font-weight:800;color:var(--green)">FREE</div>
+        </div>
+        <div class="method-option" id="deliveryOption" onclick="selectDelivery('delivery')">
+          <div class="method-icon"><i class="fas fa-house"></i></div>
+          <div style="flex:1">
+            <div style="font-weight:700;font-size:0.875rem">Home Delivery</div>
+            <div style="font-size:0.75rem;color:var(--gray)">Direct to your doorstep</div>
+          </div>
+          <div style="font-weight:800;color:var(--blue)">Calculated</div>
+        </div>
+
+        <div id="addressFormWrap" style="display:none; margin-top:1.5rem;">
+          <div class="address-form">
+            <div class="form-group full"><label class="form-label">Full Name</label><input class="form-input" id="addrName" placeholder="Receiver's name"></div>
+            <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="addrPhone" placeholder="080..."></div>
+            <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="addrEmail" placeholder="your@email.com"></div>
+            <div class="form-group full"><label class="form-label">Street Address</label><input class="form-input" id="addrStreet" placeholder="House no, street name"></div>
+            <div class="form-group"><label class="form-label">State</label><select class="form-select" id="addrState"></select></div>
+            <div class="form-group"><label class="form-label">City</label><input class="form-input" id="addrCity" placeholder="City / Area"></div>
+          </div>
+          <button class="btn-calc" id="calcRateBtn" onclick="calculateDelivery()"><i class="fas fa-sync-alt"></i> Fetch Live Rates</button>
+          
+          <div id="rateLoading" style="display:none; margin-top:1rem; font-size:0.8rem; color:var(--gray)"><i class="fas fa-spinner fa-spin"></i> Contacting Shipbubble...</div>
+          <div id="rateResult" style="display:none; margin-top:1rem;">
+            <div style="font-size:0.75rem; font-weight:700; color:var(--gray); margin-bottom:0.5rem; text-transform:uppercase">Available Couriers:</div>
+            <div id="rateOptionsList"></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; gap:0.6rem">
+        <button onclick="goToStep(1)" style="flex:1; background:var(--gray-lt); border:1.5px solid var(--border); border-radius:14px; font-weight:700; cursor:pointer">Back</button>
+        <button class="btn-primary" id="continueToPaymentBtn" onclick="goToStep(3)" style="flex:2">Continue to Payment</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: PAYMENT -->
+    <div id="stepPayment" style="display:none">
+      <div class="section-card">
+        <div class="section-card-title"><i class="fas fa-credit-card"></i> Payment Method</div>
+        <div class="method-option" id="payOnlineOption" onclick="selectPayment('online')">
+          <div class="method-icon"><i class="fas fa-shield-halved"></i></div>
+          <div style="flex:1"><div style="font-weight:700">Pay Online</div><div style="font-size:0.72rem;color:var(--gray)">Card, Transfer, USSD via Paystack</div></div>
+        </div>
+        <div class="method-option" id="payCODOption" onclick="selectPayment('cod')">
+          <div class="method-icon"><i class="fas fa-money-bill-wave"></i></div>
+          <div style="flex:1"><div style="font-weight:700">Cash on Delivery</div><div style="font-size:0.72rem;color:var(--gray)">Pay when your order arrives</div></div>
+        </div>
+      </div>
+
+      <div class="section-card">
+        <div class="section-card-title"><i class="fas fa-file-invoice"></i> Order Summary</div>
+        <div class="summary-row"><span>Subtotal</span><span id="summarySubtotal">₦0</span></div>
+        <div class="summary-row"><span>Delivery (<span id="summaryCourier">Pickup</span>)</span><span id="summaryDelivery">₦0</span></div>
+        <div class="summary-row summary-total"><span>Total Amount</span><span id="summaryTotal" style="color:var(--blue)">₦0</span></div>
+      </div>
+
+      <div style="display:flex; gap:0.6rem">
+        <button onclick="goToStep(2)" style="flex:1; background:var(--gray-lt); border:1.5px solid var(--border); border-radius:14px; font-weight:700; cursor:pointer">Back</button>
+        <button class="btn-primary" id="placeOrderBtn" onclick="placeOrderNow()" style="flex:2"><i class="fas fa-lock"></i> Place Order</button>
+      </div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div id="successScreen" style="display:none; text-align:center; padding:3rem 1rem;">
+      <div style="width:70px; height:70px; background:var(--green); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:2rem; margin:0 auto 1.5rem;"><i class="fas fa-check"></i></div>
+      <h2 style="font-family:'Playfair Display',serif; margin-bottom:0.5rem">Order Placed! 🎉</h2>
+      <p style="color:var(--gray); margin-bottom:2rem">Your order has been saved successfully.</p>
+      <div id="successOrderRef" style="font-weight:800; font-size:1.2rem; color:var(--blue); margin-bottom:2rem"></div>
+      <button class="btn-primary" onclick="location.reload()">Continue Shopping</button>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast">
+  <i class="fas fa-info-circle"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script type="module">
+import { getSession } from './session.js';
+import { db_getCart, db_placeOrder, db_clearCart, db_updateCartQty, db_removeFromCart } from './db.js';
+import { initiatePayment, processCOD, validateCOD } from './payment.js';
+
+const NIGERIAN_STATES = ['Abia','Adamawa','Akwa Ibom','Anambra','Bauchi','Bayelsa','Benue','Borno','Cross River','Delta','Ebonyi','Edo','Ekiti','Enugu','FCT','Gombe','Imo','Jigawa','Kaduna','Kano','Katsina','Kebbi','Kogi','Kwara','Lagos','Nasarawa','Niger','Ogun','Ondo','Osun','Oyo','Plateau','Rivers','Sokoto','Taraba','Yobe','Zamfara'];
+
+let currentUser = null;
+let cartItems = [];
+let deliveryMethod = 'pickup';
+let selectedRate = null;
+let deliveryFee = 0;
+let paymentMethod = null;
+let subtotal = 0;
+
+async function init() {
+  const session = await getSession();
+  if (!session) { window.location.href = 'login.html'; return; }
+  currentUser = session;
+
+  document.getElementById('addrName').value = session.fullName || '';
+  document.getElementById('addrPhone').value = session.phone || '';
+  document.getElementById('addrEmail').value = session.email || '';
+
+  const stateSelect = document.getElementById('addrState');
+  NIGERIAN_STATES.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s; opt.textContent = s;
+    stateSelect.appendChild(opt);
+  });
+  stateSelect.value = 'Lagos';
+
+  await loadCart();
+}
+
+async function loadCart() {
+  try {
+    cartItems = await db_getCart(currentUser.uid || currentUser.id) || [];
+    if (cartItems.length === 0) {
+      document.getElementById('stepCartItems').innerHTML = `<div style="text-align:center;padding:4rem 1rem"><i class="fas fa-cart-shopping" style="font-size:3rem;color:var(--border);margin-bottom:1rem"></i><h2>Cart is empty</h2></div>`;
+      return;
+    }
+    renderCart();
+  } catch(e) { showToast('Error loading cart', 'error'); }
+}
+
+function renderCart() {
+  subtotal = cartItems.reduce((s, i) => s + (i.price * i.quantity), 0);
+  document.getElementById('cartItemsList').innerHTML = cartItems.map(item => `
+    <div class="cart-item">
+      <div class="item-img"><img src="${item.image_url || 'https://via.placeholder.com/70'}" onerror="this.src='https://via.placeholder.com/70'"></div>
+      <div class="item-info">
+        <div class="item-name">${item.name}</div>
+        <div class="item-price">₦${item.price.toLocaleString()}</div>
+        <div style="font-size:0.75rem;color:var(--gray)">Quantity: ${item.quantity}</div>
+      </div>
+    </div>`).join('');
+}
+
+window.goToStep = function(step) {
+  if (step === 2 && cartItems.length === 0) return;
+  if (step === 3) {
+    if (deliveryMethod === 'delivery' && !selectedRate) {
+      showToast('Please select a shipping rate first', 'error');
+      return;
+    }
+    updateSummary();
+  }
+
+  document.getElementById('stepCartItems').style.display = step === 1 ? 'block' : 'none';
+  document.getElementById('stepDelivery').style.display = step === 2 ? 'block' : 'none';
+  document.getElementById('stepPayment').style.display = step === 3 ? 'block' : 'none';
+
+  document.querySelectorAll('.step').forEach((el, i) => {
+    el.classList.toggle('active', i + 1 === step);
+    el.classList.toggle('done', i + 1 < step);
+  });
+};
+
+window.selectDelivery = function(method) {
+  deliveryMethod = method;
+  document.getElementById('pickupOption').classList.toggle('selected', method === 'pickup');
+  document.getElementById('deliveryOption').classList.toggle('selected', method === 'delivery');
+  document.getElementById('addressFormWrap').style.display = method === 'delivery' ? 'block' : 'none';
+  
+  if (method === 'pickup') {
+    selectedRate = { courier_name: 'Store Pickup', delivery_fee: 0, courier_id: 'pickup' };
+    deliveryFee = 0;
+  } else {
+    selectedRate = null;
+    deliveryFee = 0;
+  }
+};
+
+window.calculateDelivery = async function() {
+  const name = document.getElementById('addrName').value.trim();
+  const phone = document.getElementById('addrPhone').value.trim();
+  const state = document.getElementById('addrState').value;
+  const city = document.getElementById('addrCity').value.trim();
+  const street = document.getElementById('addrStreet').value.trim();
+
+  if (!name || !phone || !state || !city || !street) {
+    showToast('Please fill all address fields', 'error');
+    return;
+  }
+
+  document.getElementById('rateLoading').style.display = 'block';
+  document.getElementById('rateResult').style.display = 'none';
+  document.getElementById('calcRateBtn').disabled = true;
+
+  try {
+    const res = await fetch('/api/shipping', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        action: 'getRates', 
+        payload: { 
+          recipientAddress: { fullName: name, phone, street, city, state, email: document.getElementById('addrEmail').value },
+          items: cartItems.map(i => ({ name: i.name, quantity: i.quantity, weight: i.weight || 0.5 }))
+        } 
+      })
+    });
+    const data = await res.json();
+    if (!data.ok || !data.rates || data.rates.length === 0) {
+      throw new Error('⚠️ Shipping Service Unavailable. Please check your address or try again.');
+    }
+
+    const list = document.getElementById('rateOptionsList');
+    list.innerHTML = data.rates.map((r, i) => `
+      <div class="rate-option" onclick="selectRate(${i})" id="rateOpt-${i}">
+        <div class="method-icon"><i class="fas fa-truck"></i></div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:0.85rem">${r.courier_name}</div>
+          <div style="font-size:0.7rem;color:var(--gray)">${r.eta || 'Estimated Delivery'}</div>
+        </div>
+        <div style="font-weight:800;color:var(--blue)">₦${r.delivery_fee.toLocaleString()}</div>
+        <div class="rate-check" id="rateCheck-${i}"><i class="fas fa-check-circle"></i></div>
+      </div>`).join('');
+
+    window._rates = data.rates;
+    document.getElementById('rateResult').style.display = 'block';
+    showToast('Rates loaded! Select one.');
+  } catch(e) {
+    showToast(e.message, 'error');
+  } finally {
+    document.getElementById('rateLoading').style.display = 'none';
+    document.getElementById('calcRateBtn').disabled = false;
+  }
+};
+
+window.selectRate = function(idx) {
+  const r = window._rates[idx];
+  selectedRate = r;
+  deliveryFee = r.delivery_fee;
+
+  document.querySelectorAll('.rate-option').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
+  });
+};
+
+window.selectPayment = function(method) {
+  paymentMethod = method;
+  document.getElementById('payOnlineOption').classList.toggle('selected', method === 'online');
+  document.getElementById('payCODOption').classList.toggle('selected', method === 'cod');
+};
+
+function updateSummary() {
+  document.getElementById('summarySubtotal').textContent = `₦${subtotal.toLocaleString()}`;
+  document.getElementById('summaryCourier').textContent = selectedRate ? selectedRate.courier_name : 'None';
+  document.getElementById('summaryDelivery').textContent = `₦${deliveryFee.toLocaleString()}`;
+  document.getElementById('summaryTotal').textContent = `₦${(subtotal + deliveryFee).toLocaleString()}`;
+}
+
+window.placeOrderNow = async function() {
+  if (!paymentMethod) { showToast('Select a payment method', 'error'); return; }
+  const btn = document.getElementById('placeOrderBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+  try {
+    const total = subtotal + deliveryFee;
+    const ref = `ORD-${Date.now()}`;
+    
+    if (paymentMethod === 'online') {
+      await initiatePayment({
+        email: currentUser.email,
+        amount: total,
+        orderId: ref,
+        onSuccess: async (res) => await saveToDB(res.reference, 'paid'),
+        onCancel: () => { btn.disabled = false; btn.innerHTML = 'Place Order'; }
+      });
+    } else {
+      await saveToDB(ref, 'pending');
+    }
+  } catch(e) {
+    showToast('Order failed: ' + e.message, 'error');
+    btn.disabled = false;
+    btn.innerHTML = 'Place Order';
+  }
+};
+
+async function saveToDB(ref, payStatus) {
+  try {
+    const orderData = {
+      uid: currentUser.uid || currentUser.id,
+      customerName: document.getElementById('addrName').value,
+      customerEmail: document.getElementById('addrEmail').value,
+      customerPhone: document.getElementById('addrPhone').value,
+      items: cartItems,
+      deliveryStreet: document.getElementById('addrStreet').value,
+      deliveryCity: document.getElementById('addrCity').value,
+      deliveryState: document.getElementById('addrState').value,
+      paymentMethod,
+      paymentRef: ref,
+      paymentStatus: payStatus,
+      subtotal,
+      deliveryFee,
+      total: subtotal + deliveryFee,
+      shipbubble_rate_id: selectedRate.rate_id || '',
+      shipbubble_courier_id: selectedRate.courier_id || '',
+      shipbubble_courier_name: selectedRate.courier_name || '',
+      shipbubble_service_code: selectedRate.service_code || '',
+      shipbubble_request_token: selectedRate.request_token || ''
+    };
+
+    const order = await db_placeOrder(orderData);
+    await db_clearCart(currentUser.uid || currentUser.id);
+    
+    document.getElementById('stepsBar').style.display = 'none';
+    document.getElementById('stepPayment').style.display = 'none';
+    document.getElementById('successOrderRef').textContent = `Order #${order.order_number || ref}`;
+    document.getElementById('successScreen').style.display = 'block';
+  } catch(e) {
+    showToast('Database error: ' + e.message, 'error');
+  }
+}
+
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.className = `toast ${type} show`;
+  document.getElementById('toastMsg').textContent = msg;
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+init();
+</script>
+</body>
+</html>
